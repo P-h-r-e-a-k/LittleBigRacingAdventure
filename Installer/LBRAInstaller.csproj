@@ -1,0 +1,93 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The installer of Little Big (Halloween) Racing Adventure: asks for the LBA1 and LBA2 game folders and an install folder, copies both
+    games' data into the install folder, builds the race tracks into its copy of LBA2 (LBA Assembler's race track build, compiled here from
+    its sources, linked, not copied, from the LBA Assembler repo beside this one), and puts the game there: LBA Assembler's engine with its
+    race game's menu (RACEGAME.TXT).
+  -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>LBRAInstaller</RootNamespace>
+    <AssemblyName>LBHRA-Setup</AssemblyName>
+    <ApplicationIcon>pumpkin.ico</ApplicationIcon>
+    <Version>2026.10.16</Version>
+    <Product>Little Big Halloween Racing Adventure</Product>
+    <NoWarn>$(NoWarn);CS8632;CA1416</NoWarn>
+    <!-- the LBA Assembler repo, whose race track build this installer runs -->
+    <Lba>..\..\LBAAssembler</Lba>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(Lba)\LbaScript\**\*.cs" Link="Lba\LbaScript\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="$(Lba)\HqrArchive.cs" Link="Lba\HqrArchive.cs" />
+    <Compile Include="$(Lba)\HqrWriter.cs" Link="Lba\HqrWriter.cs" />
+    <Compile Include="$(Lba)\Lba2TextBank.cs" Link="Lba\Lba2TextBank.cs" />
+    <Compile Include="$(Lba)\ScriptSession.cs" Link="Lba\ScriptSession.cs" />
+    <Compile Include="$(Lba)\DebugLog.cs" Link="Lba\DebugLog.cs" />
+    <Compile Include="$(Lba)\RendererLibraryApi.cs" Link="Lba\RendererLibraryApi.cs" />
+    <Compile Include="$(Lba)\HqrFile.cs" Link="Lba\HqrFile.cs" />
+    <Compile Include="$(Lba)\HqrLz.cs" Link="Lba\HqrLz.cs" />
+    <Compile Include="$(Lba)\FileTransaction.cs" Link="Lba\FileTransaction.cs" />
+    <Compile Include="$(Lba)\Scenes\**\*.cs" Link="Lba\Scenes\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="$(Lba)\Lba1\Lba1Scene.cs" Link="Lba\Lba1\Lba1Scene.cs" />
+    <Compile Include="$(Lba)\Lba1\Lba1SceneEdit.cs" Link="Lba\Lba1\Lba1SceneEdit.cs" />
+    <Compile Include="$(Lba)\Lba1\Lba1GridEdit.cs" Link="Lba\Lba1\Lba1GridEdit.cs" />
+    <Compile Include="$(Lba)\Lba1\Lba1GridCodec.cs" Link="Lba\Lba1\Lba1GridCodec.cs" />
+    <Compile Include="$(Lba)\Lba1\Lba1GridValidator.cs" Link="Lba\Lba1\Lba1GridValidator.cs" />
+    <Compile Include="$(Lba)\Lba1\Lba1Animation.cs" Link="Lba\Lba1\Lba1Animation.cs" />
+    <Compile Include="$(Lba)\Lba1\Runtime\*.cs" Link="Lba\Lba1\Runtime\%(Filename)%(Extension)" />
+    <Compile Include="$(Lba)\Lba1\Lba1ActorRecord.cs" Link="Lba\Lba1\Lba1ActorRecord.cs" />
+    <Compile Include="$(Lba)\Lba1\Lba1RoomDoorMod.cs" Link="Lba\Lba1\Lba1RoomDoorMod.cs" />
+    <Compile Include="$(Lba)\Lba1\Lba1LampPost.cs" Link="Lba\Lba1\Lba1LampPost.cs" />
+    <Compile Include="$(Lba)\Lba1\Lba1DoorLock.cs" Link="Lba\Lba1\Lba1DoorLock.cs" />
+    <Compile Include="$(Lba)\Lba1\Lba1PinkElf.cs" Link="Lba\Lba1\Lba1PinkElf.cs" />
+    <Compile Include="$(Lba)\Lba1\Lba1DialogueText.cs" Link="Lba\Lba1\Lba1DialogueText.cs" />
+    <Compile Include="$(Lba)\BodyStudio\Body.cs" Link="Lba\BodyStudio\Body.cs" />
+    <Compile Include="$(Lba)\BodyStudio\Anim.cs" Link="Lba\BodyStudio\Anim.cs" />
+    <Compile Include="$(Lba)\Lba1\Lba1Pose.cs" Link="Lba\Lba1\Lba1Pose.cs" />
+    <Compile Include="$(Lba)\Demo96\**\*.cs" Link="Lba\Demo96\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="$(Lba)\Lba1\Lba1SecretRoomExtras.cs" Link="Lba\Lba1\Lba1SecretRoomExtras.cs" />
+    <Compile Include="$(Lba)\Lba1\Lba1SurpriseChanges.cs" Link="Lba\Lba1\Lba1SurpriseChanges.cs" />
+    <Compile Include="$(Lba)\Lba1\Lba1Fishermen.cs" Link="Lba\Lba1\Lba1Fishermen.cs" />
+    <Compile Include="$(Lba)\Lba1\Lba1Areas.cs" Link="Lba\Lba1\Lba1Areas.cs" />
+    <Compile Include="$(Lba)\Lba1\Lba1Game.cs" Link="Lba\Lba1\Lba1Game.cs" />
+    <Compile Include="$(Lba)\HqdDescriptions.cs" Link="Lba\HqdDescriptions.cs" />
+    <Compile Include="$(Lba)\HqdWriter.cs" Link="Lba\HqdWriter.cs" />
+    <Compile Include="$(Lba)\Lba2BodyNames.cs" Link="Lba\Lba2BodyNames.cs" />
+    <Compile Include="$(Lba)\SceneMenuNames.cs" Link="Lba\SceneMenuNames.cs" />
+    <Compile Include="$(Lba)\Lba1\Lba1BlankScene.cs" Link="Lba\Lba1\Lba1BlankScene.cs" />
+    <Compile Include="$(Lba)\Lba2Engine.cs" Link="Lba\Lba2Engine.cs" />
+    <Compile Include="$(Lba)\Terrain\**\*.cs" Link="Lba\Terrain\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="$(Lba)\LiveDataRoot.cs" Link="Lba\LiveDataRoot.cs" />
+    <Compile Include="$(Lba)\AudioLevels.cs" Link="Lba\AudioLevels.cs" />
+    <Compile Include="$(Lba)\RaceCarSetup.cs" Link="Lba\RaceCarSetup.cs" />
+    <Compile Include="$(Lba)\EditorSettings.cs" Link="Lba\EditorSettings.cs" />
+    <Compile Include="$(Lba)\Assets\**\*.cs" Link="Lba\Assets\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="$(Lba)\Grids\**\*.cs" Link="Lba\Grids\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="$(Lba)\Maps\**\*.cs" Link="Lba\Maps\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="$(Lba)\Lba1\Lba1GridRenderer.cs" Link="Lba\Lba1\Lba1GridRenderer.cs" />
+    <Compile Include="$(Lba)\Lba2Areas.cs" Link="Lba\Lba2Areas.cs" />
+    <Compile Include="$(Lba)\Lba2Interiors.cs" Link="Lba\Lba2Interiors.cs" />
+    <Compile Include="$(Lba)\Lba2ActorPersistence.cs" Link="Lba\Lba2ActorPersistence.cs" />
+    <Compile Include="$(Lba)\Lba2EntityTable.cs" Link="Lba\Lba2EntityTable.cs" />
+    <Compile Include="$(Lba)\Lba2ScriptFixes.cs" Link="Lba\Lba2ScriptFixes.cs" />
+    <!-- the tracks' routes, as LBA Assembler builds them in -->
+    <EmbeddedResource Include="$(Lba)\docs\racetrack\temple_track_plan.json" LogicalName="RaceTrackPlan.Temple.json" />
+    <EmbeddedResource Include="$(Lba)\docs\racetrack\palace_track_plan.json" LogicalName="RaceTrackPlan.Palace.json" />
+    <EmbeddedResource Include="$(Lba)\docs\racetrack\cxtower_track_plan.json" LogicalName="RaceTrackPlan.CxTower.json" />
+    <EmbeddedResource Include="$(Lba)\docs\racetrack\polar_track_plan.json" LogicalName="RaceTrackPlan.Polar.json" />
+    <EmbeddedResource Include="$(Lba)\docs\racetrack\track_plan.json" LogicalName="RaceTrackPlan.Desert.json" />
+    <!-- the game: LBA Assembler's engine (statically linked), built by build.ps1 -->
+    <EmbeddedResource Include="$(Lba)\native\lba2-classic-community\out\build\windows_ucrt64_static\SOURCES\lba2cc.exe" LogicalName="engine.exe" />
+    <!-- the menu's picture (made by tools\make_art.ps1), and the icon put beside the game for its shortcut -->
+    <EmbeddedResource Include="..\Game\menu.png" LogicalName="art/menu.png" />
+    <EmbeddedResource Include="pumpkin.ico" LogicalName="game/pumpkin.ico" />
+    <Resource Include="pumpkin.ico" />
+  </ItemGroup>
+
+</Project>
