@@ -5,7 +5,7 @@ namespace LBRAInstaller;
 
 public partial class App : Application
 {
-    // LBHRA-Setup.exe --install <LBA1 folder> <LBA2 folder> <install folder>: the install without the window (tests, scripts), its log in
+    // LBRA-Setup.exe --install <LBA1 folder> <LBA2 folder> <install folder>: the install without the window (tests, scripts), its log in
     // <install folder>\setup.log; exit code 0 when installed
     protected override void OnStartup(StartupEventArgs e)
     {

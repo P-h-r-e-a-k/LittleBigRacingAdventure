@@ -13,7 +13,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>LBRAInstaller</RootNamespace>
-    <AssemblyName>LBHRA-Setup</AssemblyName>
+    <AssemblyName>LBRA-Setup</AssemblyName>
     <ApplicationIcon>pumpkin.ico</ApplicationIcon>
     <Version>2026.10.16</Version>
     <Product>Little Big Halloween Racing Adventure</Product>
