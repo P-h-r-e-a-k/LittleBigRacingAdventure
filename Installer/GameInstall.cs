@@ -104,6 +104,8 @@ internal static class GameInstall
         progress(0.5, "Building the race tracks");
         Environment.SetEnvironmentVariable("LBA1_DIR", lba1Target);
         var builds = Specials.Select(s => new RaceTrackService.TrackBuild(RaceTrackPlan.Built(s.Island), RaceTrackOptions.For(s.Island))).ToList();
+        // (none of the editor's private special cars in the game: LBA Assembler's RaceTrackService.PrivateCars)
+        RaceTrackService.PrivateCars = false;
         var result = RaceTrackService.Build(target, builds, new Direct<RaceTrackService.BuildProgress>(p => progress(0.5 + 0.4 * p.Done, p.Doing)));
         foreach (var line in result.Log) log("  " + line);
         if (!result.Ok) throw new InvalidDataException(result.Summary);
