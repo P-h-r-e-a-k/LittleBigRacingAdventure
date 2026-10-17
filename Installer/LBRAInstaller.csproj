@@ -66,6 +66,7 @@
     <Compile Include="$(Lba)\LiveDataRoot.cs" Link="Lba\LiveDataRoot.cs" />
     <Compile Include="$(Lba)\AudioLevels.cs" Link="Lba\AudioLevels.cs" />
     <Compile Include="$(Lba)\RaceCarSetup.cs" Link="Lba\RaceCarSetup.cs" />
+    <Compile Include="$(Lba)\RaceCarSetup.TrackSetups.cs" Link="Lba\RaceCarSetup.TrackSetups.cs" />
     <Compile Include="$(Lba)\EditorSettings.cs" Link="Lba\EditorSettings.cs" />
     <Compile Include="$(Lba)\Assets\**\*.cs" Link="Lba\Assets\%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="$(Lba)\Grids\**\*.cs" Link="Lba\Grids\%(RecursiveDir)%(Filename)%(Extension)" />

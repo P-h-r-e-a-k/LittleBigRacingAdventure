@@ -28,8 +28,8 @@ The main menu: **Story Mode** and **Track select** (greyed until the full game),
 **Options**, **Quit**; **Resume Game** while a race is on.
 
 - **Specials**: the Halloween track, then a **Race** (three laps against the Dark Monk, Ker'aooc and Tabata, with the power-ups: the
-  pumpkins on the road) or a **Time trial** (Twinsen alone, no pickups, a can of Gazogem at the start of every lap), then the car: ten
-  Halloween cars, each turning on the page (left and right to choose, Enter to race).
+  pumpkins on the road) or a **Time trial** (Twinsen alone, no pickups, a can of Gazogem at the start of every lap), then the car:
+  Twinsen's pumpkin F1 (the page opens on it) and ten Halloween cars, each turning on the page (left and right to choose, Enter to race).
 - **Best times**: the ten fastest time trials of each track, with the car.
 - After a race the game goes back to the menu by itself.
 

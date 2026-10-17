@@ -33,9 +33,11 @@ internal static class GameInstall
         (RaceTrackIsland.Temple, "Halloween Temple of Bu", "temple"),
     };
 
-    // The cars to choose from (RACECARS.JSON's numbers): the Halloween ones
+    // The cars to choose from (RACECARS.JSON's numbers): Twinsen's pumpkin F1 first -- the Temple's own car, the one the car page opens on --
+    // then the Halloween ones
     public static readonly (int Number, string Name)[] Cars =
     {
+        (RaceTrackCharacterCars.PumpkinNumber, "Twinsen's pumpkin F1"),
         (65, "Skeleton's ghost car"),
         (114, "Ghost's ghost car"),
         (107, "Giant spider's truck"),
