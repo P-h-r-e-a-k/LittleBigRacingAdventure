@@ -25,15 +25,26 @@ A desktop shortcut is optional. `LBRA-Setup.exe --install <LBA1> <LBA2> <folder>
 ## The game
 
 The main menu: **Story Mode** and **Track select** (greyed until the full game), **Specials**, **Best times**, the game's own
-**Options**, **Quit**; **Resume Game** while a race is on.
+**Options** (with **Power-ups** and **Race controls** at the end), **Quit**; **Resume Game** while a race is on.
 
 - **Specials**: the Halloween track, then a **Race** (three laps against the Dark Monk, Ker'aooc and Tabata, with the power-ups: the
   pumpkins on the road) or a **Time trial** (Twinsen alone, no pickups, a can of Gazogem at the start of every lap), then the car:
   Twinsen's pumpkin F1 (the page opens on it) and ten Halloween cars, each turning on the page (left and right to choose, Enter to race).
+- **Qualifying**: the first race always starts with a qualifying lap (no power-ups on it; its time places Twinsen on the grid). After
+  that, a race asks after the car page: **Qualifying lap**, or **Skip** and start at the back of the grid. The last answer is
+  remembered.
 - **Best times**: the ten fastest time trials of each track, with the car.
 - After a race the game goes back to the menu by itself.
 
-Driving: the arrow keys, **Ctrl** uses the power-up in the item box (the behaviour menu has no use in the car), Esc for the menu.
+The first time: before the first race or time trial a **Controls** page, and before the first race a **Power-ups** page (every power-up
+of the track in its item box, with what it does). Enter turns the pages, Esc skips them; they don't come back by themselves, but
+Options shows them again.
+
+Driving: the arrow keys, **Ctrl** uses the power-up in the item box (the behaviour menu has no use in the car), P to pause, Esc for
+the menu.
+
+The game's own settings (`RACEGAME_SETTINGS.TXT`, beside `BESTTIMES.TXT` in `User\LBA2\`) remember the pages seen, whether a qualifying
+lap has been driven and the last qualifying answer: deleting it, or a new install, shows the first-time pages again.
 
 ## Building
 
@@ -52,4 +63,5 @@ It needs MSYS2's UCRT64 toolchain (`C:\msys64`) for the engine and the .NET 10 S
 - `Installer\` - the installer (WPF): `GameInstall.cs` is the install, `MainWindow.xaml` its window.
 - `Game\menu.png` - the menu's backdrop, drawn by `tools\make_art.ps1` (no retail art in it).
 - The engine side lives in LBA Assembler: `native\lba2-classic-community\SOURCES\RACEGAME.CPP` (the menu, the car page, best times,
-  the race file it composes) and `RACEMOD.CPP` (the race-track mode: `start_scene=`, `start_in_car=`, `trial=`, `end_to_menu=`).
+  the qualifying choice, the power-up and controls pages, the race file it composes) and `RACEMOD.CPP` (the race-track mode:
+  `start_scene=`, `start_in_car=`, `trial=`, `end_to_menu=`, `grid_back=`; the power-ups' names and descriptions).

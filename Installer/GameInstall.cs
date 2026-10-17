@@ -227,7 +227,8 @@ internal static class GameInstall
     }
 
     // The race car as the game drives it: the LBA Assembler user's own setup (2026-10-16) -- five gears to 110 km/h, quick off the line,
-    // sharp brakes and steering -- against the line-up, with the power-ups, straight onto the grid (no qualifying lap).
+    // sharp brakes and steering -- against the line-up, with the power-ups, straight onto the grid (no qualifying lap in the file: the
+    // engine's race game adds one to the first race, and after that one or Twinsen at the back of the grid, as the player chooses).
     private static RaceCarSetup Setup() => new()
     {
         Gears = 5, GearTopKmh = new() { 45, 57, 63, 97, 110, 40 }, AccelerationPercent = 300, BrakingPercent = 300, CoastingPercent = 300,
