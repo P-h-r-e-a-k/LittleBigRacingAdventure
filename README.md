@@ -33,8 +33,7 @@ The main menu: **Story Mode** and **Track select** (greyed until the full game),
 - **Best times**: the ten fastest time trials of each track, with the car.
 - After a race the game goes back to the menu by itself.
 
-Driving: the arrow keys, **Ctrl** uses the power-up in the selected slot (the behaviour menu has no use in the car), **Q** switches
-slots, Esc for the menu.
+Driving: the arrow keys, **Ctrl** uses the power-up in the item box (the behaviour menu has no use in the car), Esc for the menu.
 
 ## Building
 
