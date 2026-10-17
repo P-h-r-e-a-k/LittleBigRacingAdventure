@@ -34,20 +34,22 @@ internal static class GameInstall
     };
 
     // The cars to choose from (RACECARS.JSON's numbers): Twinsen's pumpkin F1 first -- the Temple's own car, the one the car page opens on --
-    // then the Halloween ones
+    // then the Halloween ones: the three monsters the Temple's race is against first (LBA Assembler's RaceDriver.Temple: the skeleton, the
+    // one to beat, the ghost and the two-headed monster, since 2026-10-17), the other monsters, then the Dark Monk's, Ker'aooc's, Tabata's
+    // and the Tralu's
     public static readonly (int Number, string Name)[] Cars =
     {
         (RaceTrackCharacterCars.PumpkinNumber, "Twinsen's pumpkin F1"),
         (65, "Skeleton's ghost car"),
         (114, "Ghost's ghost car"),
+        (149, "Two-headed monster truck"),
         (107, "Giant spider's truck"),
+        (188, "Gas monster's ghost car"),
+        (130, "The Eye's ghost car"),
         (10, "Dark Monk's car"),
         (53, "Ker'aooc's cauldron"),
         (54, "Tabata's spell book"),
         (49, "Tralu's cave"),
-        (188, "Gas monster's ghost car"),
-        (130, "The Eye's ghost car"),
-        (149, "Two-headed monster truck"),
     };
 
     public static bool IsLba2Folder(string dir) => File.Exists(Path.Combine(dir, "RESS.HQR")) && File.Exists(Path.Combine(dir, "SCENE.HQR")) && File.Exists(Path.Combine(dir, "BODY.HQR"));
@@ -128,7 +130,8 @@ internal static class GameInstall
             TrialSetup().WriteEngineFile(trial, track, prefix: file + "_trial_");
             foreach (var written in new[] { race, trial }) Relative(written, target);
             menu.Append($"special={name}|{SpecialsFolder}/{Path.GetFileName(race)}|{SpecialsFolder}/{Path.GetFileName(trial)}|{track.StartScene}\n");
-            log($"{name}: starts in scene {track.StartScene}");
+            log($"{name}: starts in scene {track.StartScene}; against {string.Join(", ", (track.Drivers ?? new()).Where(d => !d.Ghost).Select(d => d.Name))}" +
+                (island.Levels is not null ? "; easy, medium and hard (the menu's difficulty page)" : ""));
         }
         var cars = 0;
         foreach (var (number, name) in Cars)
@@ -161,6 +164,8 @@ internal static class GameInstall
         progress(1, "Installed");
     }
 
+    // (a race's laps: the menu's, for a special whose race file names none -- the Temple of Bú's names its own five, RaceTrackIsland.RaceLaps,
+    // and the engine races those: RACEGAME.CPP SpecialLaps)
     public const int Laps = 3;
     public const int EndToMenuMs = 8000;
     public const string IconFile = "pumpkin.ico";
@@ -228,12 +233,14 @@ internal static class GameInstall
 
     // The race car as the game drives it: the LBA Assembler user's own setup (2026-10-16) -- five gears to 110 km/h, quick off the line,
     // sharp brakes and steering -- against the line-up, with the power-ups, straight onto the grid (no qualifying lap in the file: the
-    // engine's race game adds one to the first race, and after that one or Twinsen at the back of the grid, as the player chooses).
+    // engine's race game adds one to the first race, and after that one or Twinsen at the back of the grid, as the player chooses). A track
+    // with levels (the Temple's: easy, medium, hard) has them all in its race file, medium its own; the menu's difficulty page adds the
+    // player's pick after them (RACEGAME.CPP).
     private static RaceCarSetup Setup() => new()
     {
         Gears = 5, GearTopKmh = new() { 45, 57, 63, 97, 110, 40 }, AccelerationPercent = 300, BrakingPercent = 300, CoastingPercent = 300,
         ReverseKmh = 24, SteeringPercent = 200, Automatic = true, ShowDisplay = true, Opponent = true, MainSkill = 86, RacerSkill = 70,
-        PowerUps = true, Qualifying = false, FineWeather = true, OpponentsFightBack = true, StartAtLine = true,
+        PowerUps = true, Qualifying = false, FineWeather = true, OpponentsFightBack = true, StartAtLine = true, Difficulty = RaceDifficulty.Medium,
     };
 
     // ... and for a time trial: the same car, alone on the track, no mushrooms (the engine hands out a can of Gazogem every lap)

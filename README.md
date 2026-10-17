@@ -27,13 +27,23 @@ A desktop shortcut is optional. `LBRA-Setup.exe --install <LBA1> <LBA2> <folder>
 The main menu: **Story Mode** and **Track select** (greyed until the full game), **Specials**, **Best times**, the game's own
 **Options** (with **Power-ups** and **Race controls** at the end), **Quit**; **Resume Game** while a race is on.
 
-- **Specials**: the Halloween track, then a **Race** (three laps against the Dark Monk, Ker'aooc and Tabata, with the power-ups: the
-  pumpkins on the road) or a **Time trial** (Twinsen alone, no pickups, a can of Gazogem at the start of every lap), then the car:
-  Twinsen's pumpkin F1 (the page opens on it) and ten Halloween cars, each turning on the page (left and right to choose, Enter to race).
-- **Qualifying**: the first race always starts with a qualifying lap (no power-ups on it; its time places Twinsen on the grid). After
-  that, a race asks after the car page: **Qualifying lap**, or **Skip** and start at the back of the grid. The last answer is
-  remembered.
-- **Best times**: the ten fastest time trials of each track, with the car.
+- **Specials**: the Halloween track, then a **Race** (five laps against Halloween's monsters -- the skeleton in his ghost car, the one
+  to beat, the ghost in hers and the two-headed monster in his monster truck -- with the power-ups: the pumpkins on the road; the School
+  of Magic's assistant drops the flag at the start and waves the chequered flag at the finish) or a **Time trial** (Twinsen alone, five
+  laps, no pickups, a can of Gazogem at the start of every lap). A race then asks its **difficulty**:
+  - **Easy**: the monsters slower, easing off when they are ahead of you and never pushing harder behind you, taking items from fewer of
+    the pumpkin rows; the witches throw half as often.
+  - **Medium**: the race as it always was.
+  - **Hard**: the monsters quicker and pushing harder when behind you, holding their penguins, oil and magic balls until they would hit
+    you; the witches throw more often.
+
+  The last one chosen comes up first next time. Then the car: Twinsen's pumpkin F1 (the page opens on it) and ten Halloween cars, the
+  monsters' first, each turning on the page (left and right to choose, Enter to race, Esc back).
+- **Qualifying**: the first race always starts with a qualifying lap (no power-ups on it; its time places Twinsen on the grid; the
+  monsters wait in the slip lane beside the start line meanwhile). After that, a race asks after the car page: **Qualifying lap**, or
+  **Skip** and start at the back of the grid. The last answer is remembered.
+- **Best times**: the ten fastest time trials of each track, with the car (a time trial is the same at every difficulty; times over
+  another number of laps -- the Temple's three-lap trials before it became a five-lap race -- are kept in the file but not shown).
 - After a race the game goes back to the menu by itself.
 
 The first time: before the first race or time trial a **Controls** page, and before the first race a **Power-ups** page (every power-up
@@ -44,7 +54,7 @@ Driving: the arrow keys, **Ctrl** uses the power-up in the item box (the behavio
 the menu.
 
 The game's own settings (`RACEGAME_SETTINGS.TXT`, beside `BESTTIMES.TXT` in `User\LBA2\`) remember the pages seen, whether a qualifying
-lap has been driven and the last qualifying answer: deleting it, or a new install, shows the first-time pages again.
+lap has been driven, the last qualifying answer and the last difficulty: deleting it, or a new install, shows the first-time pages again.
 
 ## Building
 
@@ -62,6 +72,7 @@ It needs MSYS2's UCRT64 toolchain (`C:\msys64`) for the engine and the .NET 10 S
 
 - `Installer\` - the installer (WPF): `GameInstall.cs` is the install, `MainWindow.xaml` its window.
 - `Game\menu.png` - the menu's backdrop, drawn by `tools\make_art.ps1` (no retail art in it).
-- The engine side lives in LBA Assembler: `native\lba2-classic-community\SOURCES\RACEGAME.CPP` (the menu, the car page, best times,
-  the qualifying choice, the power-up and controls pages, the race file it composes) and `RACEMOD.CPP` (the race-track mode:
-  `start_scene=`, `start_in_car=`, `trial=`, `end_to_menu=`, `grid_back=`; the power-ups' names and descriptions).
+- The engine side lives in LBA Assembler: `native\lba2-classic-community\SOURCES\RACEGAME.CPP` (the menu, the difficulty page, the
+  car page, best times, the qualifying choice, the power-up and controls pages, the race file it composes) and `RACEMOD.CPP` (the
+  race-track mode: `start_scene=`, `start_in_car=`, `trial=`, `end_to_menu=`, `grid_back=`, `difficulty=`, `marshal=`; the power-ups'
+  names and descriptions). The levels' numbers are LBA Assembler's (`Terrain\RaceDifficulty.cs`), in the race file the installer writes.
