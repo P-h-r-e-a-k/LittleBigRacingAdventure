@@ -34,12 +34,15 @@ internal static class GameInstall
     };
 
     // The cars to choose from (RACECARS.JSON's numbers): Twinsen's pumpkin F1 first -- the Temple's own car, the one the car page opens on --
-    // then the Halloween ones: the three monsters the Temple's race is against first (LBA Assembler's RaceDriver.Temple: the skeleton, the
-    // one to beat, the ghost and the two-headed monster, since 2026-10-17), the other monsters, then the Dark Monk's, Ker'aooc's, Tabata's
-    // and the Tralu's
+    // then the Halloween ones: the three monsters the Temple's race is against first (LBA Assembler's RaceDriver.Temple, since 2026-10-18:
+    // the vampire in his coffin, the one to beat, the witch on her broomstick and the zombie in his hearse), the monsters who raced it before
+    // them (the skeleton, the ghost, the two-headed monster), the other monsters, then the Dark Monk's, Ker'aooc's, Tabata's and the Tralu's
     public static readonly (int Number, string Name)[] Cars =
     {
         (RaceTrackCharacterCars.PumpkinNumber, "Twinsen's pumpkin F1"),
+        (RaceTrackCharacterCars.VampireNumber, "Vampire's coffin"),
+        (RaceTrackCharacterCars.WitchNumber, "Witch's broomstick"),
+        (RaceTrackCharacterCars.ZombieNumber, "Zombie's hearse"),
         (65, "Skeleton's ghost car"),
         (114, "Ghost's ghost car"),
         (149, "Two-headed monster truck"),

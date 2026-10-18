@@ -28,8 +28,8 @@ windowed program, so no console window opens beside the game.
 The main menu: **Story Mode** and **Track select** (greyed until the full game), **Specials**, **Best times**, the game's own
 **Options** (with **Power-ups** and **Race controls** at the end), **Quit**; **Resume Game** while a race is on.
 
-- **Specials**: the Halloween track, then a **Race** (five laps against Halloween's monsters -- the skeleton in his ghost car, the one
-  to beat, the ghost in hers and the two-headed monster in his monster truck -- with the power-ups: the pumpkins on the road; the School
+- **Specials**: the Halloween track, then a **Race** (five laps against Halloween's monsters -- the vampire in his coffin, the one
+  to beat, the witch on her broomstick and the zombie in his hearse -- with the power-ups: the pumpkins on the road; the School
   of Magic's assistant drops the flag at the start, standing on the road between the grid's two columns with the cars setting off
   either side of her, then hops off to her plinth beside the road at the line to wave the chequered flag at the finish; the red magic
   ball follows the track to the car in front) or a **Time trial** (Twinsen alone, five
@@ -40,7 +40,7 @@ The main menu: **Story Mode** and **Track select** (greyed until the full game),
   - **Hard**: the monsters quicker and pushing harder when behind you, holding their penguins, oil and magic balls until they would hit
     you; the witches throw more often.
 
-  The last one chosen comes up first next time. Then the car: Twinsen's pumpkin F1 (the page opens on it) and ten Halloween cars, the
+  The last one chosen comes up first next time. Then the car: Twinsen's pumpkin F1 (the page opens on it) and thirteen Halloween cars, the
   monsters' first, each turning on the page (left and right to choose, Enter to race, Esc back).
 - **Qualifying**: the first race always starts with a qualifying lap (no power-ups on it; its time places Twinsen on the grid; the
   monsters wait in the slip lane beside the start line meanwhile). After that, a race asks after the car page: **Qualifying lap**, or
