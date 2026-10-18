@@ -25,7 +25,7 @@ windowed program, so no console window opens beside the game.
 
 ## The game
 
-The main menu: **Story Mode** and **Track select** (greyed until the full game), **Specials**, **Best times**, the game's own
+The main menu: **Story Mode** and **Track select** (greyed until the full game), **Specials**, **Best laps**, the game's own
 **Options** (with **Power-ups** and **Race controls** at the end), **Quit**; **Resume Game** while a race is on.
 
 - **Specials**: the Halloween track, then a **Race** (five laps against Halloween's monsters -- the vampire in his coffin, the one
@@ -33,7 +33,7 @@ The main menu: **Story Mode** and **Track select** (greyed until the full game),
   of Magic's assistant drops the flag at the start, standing on the road between the grid's two columns with the cars setting off
   either side of her, then hops off to her plinth beside the road at the line to wave the chequered flag at the finish; the red magic
   ball follows the track to the car in front) or a **Time trial** (Twinsen alone, five
-  laps, no pickups, a can of Gazogem at the start of every lap). A race then asks its **difficulty**:
+  laps, no pickups, a can of Gazogem at the start of every lap; its fastest lap goes to Best laps). A race then asks its **difficulty**:
   - **Easy**: the monsters slower, easing off when they are ahead of you and never pushing harder behind you, taking items from fewer of
     the pumpkin rows; the witches throw half as often.
   - **Medium**: the race as it always was.
@@ -45,8 +45,9 @@ The main menu: **Story Mode** and **Track select** (greyed until the full game),
 - **Qualifying**: the first race always starts with a qualifying lap (no power-ups on it; its time places Twinsen on the grid; the
   monsters wait in the slip lane beside the start line meanwhile). After that, a race asks after the car page: **Qualifying lap**, or
   **Skip** and start at the back of the grid. The last answer is remembered.
-- **Best times**: the ten fastest time trials of each track, with the car (a time trial is the same at every difficulty; times over
-  another number of laps -- the Temple's three-lap trials before it became a five-lap race -- are kept in the file but not shown).
+- **Best laps**: the ten fastest laps of each track, each the fastest single lap of a time trial, with the car (a time trial is the same
+  at every difficulty; races and qualifying laps never count). At the end of a time trial the screen shows its best lap and the rank it
+  took, and the whole time under it. The whole five-lap times kept by earlier versions stay in `BESTTIMES.TXT` but aren't shown as laps.
 - After a race the game goes back to the menu by itself.
 
 The first time: before the first race or time trial a **Controls** page, and before the first race a **Power-ups** page (every power-up
