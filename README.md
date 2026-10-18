@@ -29,7 +29,9 @@ The main menu: **Story Mode** and **Track select** (greyed until the full game),
 
 - **Specials**: the Halloween track, then a **Race** (five laps against Halloween's monsters -- the skeleton in his ghost car, the one
   to beat, the ghost in hers and the two-headed monster in his monster truck -- with the power-ups: the pumpkins on the road; the School
-  of Magic's assistant drops the flag at the start and waves the chequered flag at the finish) or a **Time trial** (Twinsen alone, five
+  of Magic's assistant drops the flag at the start, standing on the road between the grid's two columns with the cars setting off
+  either side of her, then hops off to her plinth beside the road at the line to wave the chequered flag at the finish; the red magic
+  ball follows the track to the car in front) or a **Time trial** (Twinsen alone, five
   laps, no pickups, a can of Gazogem at the start of every lap). A race then asks its **difficulty**:
   - **Easy**: the monsters slower, easing off when they are ahead of you and never pushing harder behind you, taking items from fewer of
     the pumpkin rows; the witches throw half as often.
