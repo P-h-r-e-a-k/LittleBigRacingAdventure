@@ -107,7 +107,7 @@ internal static class GameInstall
         progress(0.5, "Building the race tracks");
         Environment.SetEnvironmentVariable("LBA1_DIR", lba1Target);
         // (LBA1's own temple music, CD track 6, from the player's LBA1 folder -- its CD image beside the HQRs copied above: TempleMusic)
-        Environment.SetEnvironmentVariable("LBA1_MUSIC_DIR", lba1);
+        Environment.SetEnvironmentVariable("LBA1_MUSIC_DIR", MusicFolder(lba1, log));
         var builds = Specials.Select(s => new RaceTrackService.TrackBuild(RaceTrackPlan.Built(s.Island), RaceTrackOptions.For(s.Island))).ToList();
         // (none of the editor's private special cars in the game: LBA Assembler's RaceTrackService.PrivateCars)
         RaceTrackService.PrivateCars = false;
@@ -193,6 +193,41 @@ internal static class GameInstall
             return value.StartsWith(root, StringComparison.OrdinalIgnoreCase) ? l[..(eq + 1)] + value[root.Length..].Replace('\\', '/') : l;
         });
         File.WriteAllLines(raceFile, lines);
+    }
+
+    // Where LBA1's own temple music (its CD track 6) is: the chosen LBA1 folder when its CD image (GOG's LBA.GOG + LBA.DAT) or the track
+    // as a file is there or beside it -- else, since a copy of LBA1's data files alone has no music (the CD's music is audio tracks, not
+    // files), the LBA1 of GOG or Steam on this machine, for the music only. Null: none anywhere (the race then plays LBA2's music).
+    private static string? MusicFolder(string lba1, Action<string> log)
+    {
+        Environment.SetEnvironmentVariable(LBAAssembler.Terrain.Temple.TempleMusic.EnvDirectory, null);
+        var track = LBAAssembler.Terrain.Temple.TempleMusic.MusicNumber(lba1) + 1;
+        bool Has(string dir)
+        {
+            try { return Directory.Exists(dir) && LBAAssembler.Terrain.Temple.TempleMusic.Find(LBAAssembler.Terrain.Temple.TempleMusic.Places(dir), track) is not null; }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidDataException) { return false; }
+        }
+        if (Has(lba1)) return lba1;
+        foreach (var dir in InstalledLba1Folders().Where(d => !string.Equals(Path.GetFullPath(d).TrimEnd('\\'), Path.GetFullPath(lba1).TrimEnd('\\'), StringComparison.OrdinalIgnoreCase)))
+            if (Has(dir))
+            {
+                log($"LBA1's music: {lba1} has no CD music (LBA1's data files alone); taking it from {dir}");
+                return dir;
+            }
+        log($"LBA1's music: no CD music in {lba1} nor in a GOG or Steam LBA1 on this machine: the race plays LBA2's music");
+        return null;
+    }
+
+    // The LBA1 folders GOG and Steam install to, on every fixed drive (the installer window's own guesses look in the same places)
+    private static IEnumerable<string> InstalledLba1Folders()
+    {
+        foreach (var root in DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.Fixed && d.IsReady).Select(d => d.RootDirectory.FullName))
+            foreach (var where in new[] { "GOG Games", Path.Combine("Program Files (x86)", "GOG Galaxy", "Games"), Path.Combine("Program Files (x86)", "Steam", "steamapps", "common"),
+                         Path.Combine("SteamLibrary", "steamapps", "common") })
+            {
+                var dir = Path.Combine(root, where, "Little Big Adventure");
+                if (Directory.Exists(dir)) yield return dir;
+            }
     }
 
     // A program's PE header marked a windowed (GUI) program rather than a console one: the optional header's Subsystem field (offset 68 in
