@@ -106,6 +106,8 @@ internal static class GameInstall
         // ---- 3. the race tracks
         progress(0.5, "Building the race tracks");
         Environment.SetEnvironmentVariable("LBA1_DIR", lba1Target);
+        // (LBA1's own temple music, CD track 6, from the player's LBA1 folder -- its CD image beside the HQRs copied above: TempleMusic)
+        Environment.SetEnvironmentVariable("LBA1_MUSIC_DIR", lba1);
         var builds = Specials.Select(s => new RaceTrackService.TrackBuild(RaceTrackPlan.Built(s.Island), RaceTrackOptions.For(s.Island))).ToList();
         // (none of the editor's private special cars in the game: LBA Assembler's RaceTrackService.PrivateCars)
         RaceTrackService.PrivateCars = false;
