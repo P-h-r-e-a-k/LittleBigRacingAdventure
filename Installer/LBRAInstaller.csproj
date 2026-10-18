@@ -91,4 +91,9 @@
     <Resource Include="pumpkin.ico" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- LBA Assembler's TempleMusic decodes Steam's LBA1 Classic's MP3 tracks (Common\Music\Track_06.mp3) with it: MIT -->
+    <PackageReference Include="NLayer" Version="3.0.0" />
+  </ItemGroup>
+
 </Project>

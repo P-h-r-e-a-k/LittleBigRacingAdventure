@@ -13,7 +13,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         // (the usual places: GOG's, Steam's)
-        Lba1Box.Text = Guess("Little Big Adventure", GameInstall.IsLba1Folder);
+        Lba1Box.Text = LBAAssembler.Terrain.Temple.TempleMusic.InstalledLba1Folders().FirstOrDefault(GameInstall.IsLba1Folder) ?? Guess("Little Big Adventure", GameInstall.IsLba1Folder);
         Lba2Box.Text = Guess("Little Big Adventure 2", GameInstall.IsLba2Folder);
         TargetBox.Text = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", GameInstall.Title);
     }

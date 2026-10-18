@@ -208,7 +208,9 @@ internal static class GameInstall
             catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidDataException) { return false; }
         }
         if (Has(lba1)) return lba1;
-        foreach (var dir in InstalledLba1Folders().Where(d => !string.Equals(Path.GetFullPath(d).TrimEnd('\\'), Path.GetFullPath(lba1).TrimEnd('\\'), StringComparison.OrdinalIgnoreCase)))
+        // (GOG's and Steam's LBA1 installs on this PC -- registry, Steam libraries, the usual folders; Steam's Classic keeps its CD tracks as
+        // Common\Music\Track_06.mp3: TempleMusic.InstalledLba1Folders)
+        foreach (var dir in LBAAssembler.Terrain.Temple.TempleMusic.InstalledLba1Folders().Where(d => !string.Equals(Path.GetFullPath(d).TrimEnd('\\'), Path.GetFullPath(lba1).TrimEnd('\\'), StringComparison.OrdinalIgnoreCase)))
             if (Has(dir))
             {
                 log($"LBA1's music: {lba1} has no CD music (LBA1's data files alone); taking it from {dir}");
@@ -216,18 +218,6 @@ internal static class GameInstall
             }
         log($"LBA1's music: no CD music in {lba1} nor in a GOG or Steam LBA1 on this machine: the race plays LBA2's music");
         return null;
-    }
-
-    // The LBA1 folders GOG and Steam install to, on every fixed drive (the installer window's own guesses look in the same places)
-    private static IEnumerable<string> InstalledLba1Folders()
-    {
-        foreach (var root in DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.Fixed && d.IsReady).Select(d => d.RootDirectory.FullName))
-            foreach (var where in new[] { "GOG Games", Path.Combine("Program Files (x86)", "GOG Galaxy", "Games"), Path.Combine("Program Files (x86)", "Steam", "steamapps", "common"),
-                         Path.Combine("SteamLibrary", "steamapps", "common") })
-            {
-                var dir = Path.Combine(root, where, "Little Big Adventure");
-                if (Directory.Exists(dir)) yield return dir;
-            }
     }
 
     // A program's PE header marked a windowed (GUI) program rather than a console one: the optional header's Subsystem field (offset 68 in
