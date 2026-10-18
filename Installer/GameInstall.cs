@@ -150,6 +150,9 @@ internal static class GameInstall
         log("the menu's picture: SCREEN.HQR entry 4");
         using (var engine = typeof(GameInstall).Assembly.GetManifestResourceStream("engine.exe") ?? throw new InvalidDataException("The installer has no engine in it."))
         using (var exe = File.Create(Path.Combine(target, GameExe))) engine.CopyTo(exe);
+        // (LBA Assembler's engine is a console program -- its headless runs log to the console -- so Windows would open a console window
+        // beside the game: the game's copy is marked a windowed program instead; output redirected by a caller still works)
+        if (WindowedProgram(Path.Combine(target, GameExe))) log($"{GameExe}: a windowed program (no console window)");
         foreach (var res in typeof(GameInstall).Assembly.GetManifestResourceNames().Where(r => r.StartsWith("game/")))
         {
             var to = Path.Combine(target, res["game/".Length..].Replace('/', Path.DirectorySeparatorChar));
@@ -185,6 +188,27 @@ internal static class GameInstall
             return value.StartsWith(root, StringComparison.OrdinalIgnoreCase) ? l[..(eq + 1)] + value[root.Length..].Replace('\\', '/') : l;
         });
         File.WriteAllLines(raceFile, lines);
+    }
+
+    // A program's PE header marked a windowed (GUI) program rather than a console one: the optional header's Subsystem field (offset 68 in
+    // both PE32 and PE32+), 3 = console, 2 = windows. False when it isn't a console program already (left as it is).
+    private static bool WindowedProgram(string path)
+    {
+        using var file = new FileStream(path, FileMode.Open, FileAccess.ReadWrite);
+        var buffer = new byte[4];
+        file.Position = 0x3C;
+        file.ReadExactly(buffer);
+        var pe = BitConverter.ToInt32(buffer);
+        file.Position = pe;
+        file.ReadExactly(buffer);
+        if (buffer[0] != 'P' || buffer[1] != 'E' || buffer[2] != 0 || buffer[3] != 0) throw new InvalidDataException($"{Path.GetFileName(path)} isn't a Windows program.");
+        var subsystem = pe + 4 + 20 + 68;
+        file.Position = subsystem;
+        var value = file.ReadByte() | file.ReadByte() << 8;
+        if (value != 3) return false;
+        file.Position = subsystem;
+        file.Write(new byte[] { 2, 0 });
+        return true;
     }
 
     // The menu's picture (SCREEN.HQR entry 4, a 640x480 picture in RESS.HQR's palette 0, the menus' own): the installer's Halloween

@@ -19,8 +19,9 @@ installer.
    (`RACEGAME.TXT`), the menu's picture (the Halloween backdrop, written into the copy's `SCREEN.HQR` in LBA2's own palette) and
    `portable.txt`, so saves, settings and best times stay in the install folder (`User\LBA2\`).
 
-A desktop shortcut is optional. `LBRA-Setup.exe --install <LBA1> <LBA2> <folder>` installs without the window (log in
-`<folder>\setup.log`).
+A desktop shortcut is optional. The window shows only the install's progress; what it did goes to `<folder>\setup.log`.
+`LBRA-Setup.exe --install <LBA1> <LBA2> <folder>` installs without the window (the same log). The game's copy of the engine is marked a
+windowed program, so no console window opens beside the game.
 
 ## The game
 

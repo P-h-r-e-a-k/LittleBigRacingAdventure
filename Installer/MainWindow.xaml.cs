@@ -50,20 +50,23 @@ public partial class MainWindow : Window
         if (string.IsNullOrWhiteSpace(target)) { MessageBox.Show(this, "Choose a folder to install into.", Title); return; }
         if (Directory.Exists(target) && Directory.EnumerateFileSystemEntries(target).Any() && !File.Exists(Path.Combine(target, GameInstall.MenuFile))
             && MessageBox.Show(this, $"{target} isn't empty. Install into it anyway?", Title, MessageBoxButton.YesNo) != MessageBoxResult.Yes) return;
-        busy = true; InstallButton.IsEnabled = false; PlayButton.IsEnabled = false; LogBox.Clear();
-        void Log(string line) => Dispatcher.Invoke(() => { LogBox.AppendText(line + "\n"); LogBox.ScrollToEnd(); });
+        busy = true; InstallButton.IsEnabled = false; PlayButton.IsEnabled = false;
+        // (what the install did goes to <install folder>\setup.log, as a headless install's does -- the window shows only its progress)
+        var lines = new List<string>();
+        void Log(string line) { lock (lines) lines.Add(line); }
         void Report(double f, string what) => Dispatcher.Invoke(() => { Progress.Value = f; Status.Text = what; });
         var shortcut = ShortcutBox.IsChecked == true;
         try
         {
-            await Task.Run(() => GameInstall.Run(lba1, lba2, target, Report, Log));
+            try { await Task.Run(() => GameInstall.Run(lba1, lba2, target, Report, Log)); }
+            finally { try { Directory.CreateDirectory(target); File.WriteAllLines(Path.Combine(target, "setup.log"), lines); } catch (Exception error) when (error is IOException or UnauthorizedAccessException) { } }
             if (shortcut) { try { Shortcut.Desktop(Path.Combine(target, GameInstall.GameExe), GameInstall.Title, Path.Combine(target, GameInstall.IconFile)); Log("a shortcut on the desktop"); } catch (Exception error) { Log("no shortcut: " + error.Message); } }
             Status.Text = "Installed. Happy Halloween!";
             PlayButton.IsEnabled = true;
         }
         catch (Exception error) when (error is IOException or InvalidDataException or UnauthorizedAccessException or InvalidOperationException or ArgumentException)
         {
-            Log("FAILED: " + error);
+            try { File.AppendAllText(Path.Combine(target, "setup.log"), "FAILED: " + error + "\n"); } catch (Exception again) when (again is IOException or UnauthorizedAccessException) { }
             Status.Text = "Not installed: " + error.Message;
             MessageBox.Show(this, "Not installed: " + error.Message, Title, MessageBoxButton.OK, MessageBoxImage.Warning);
         }
