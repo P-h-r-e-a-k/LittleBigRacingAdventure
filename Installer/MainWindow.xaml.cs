@@ -8,14 +8,20 @@ namespace LBRAInstaller;
 public partial class MainWindow : Window
 {
     private bool busy;
+    // (opened by an update that couldn't install by itself -- the game's folders gone: the site's file it is, for install.json)
+    private readonly Updater.Source? source;
 
-    public MainWindow()
+    public MainWindow() : this(null, null, null, null) { }
+
+    // The window filled in: the folders given (an update's), else guessed
+    internal MainWindow(string? lba1, string? lba2, string? target, Updater.Source? source)
     {
         InitializeComponent();
+        this.source = source;
         // (the usual places: GOG's, Steam's)
-        Lba1Box.Text = LBAAssembler.Terrain.Temple.TempleMusic.InstalledLba1Folders().FirstOrDefault(GameInstall.IsLba1Folder) ?? Guess("Little Big Adventure", GameInstall.IsLba1Folder);
-        Lba2Box.Text = Guess("Little Big Adventure 2", GameInstall.IsLba2Folder);
-        TargetBox.Text = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", GameInstall.Title);
+        Lba1Box.Text = lba1 ?? LBAAssembler.Terrain.Temple.TempleMusic.InstalledLba1Folders().FirstOrDefault(GameInstall.IsLba1Folder) ?? Guess("Little Big Adventure", GameInstall.IsLba1Folder);
+        Lba2Box.Text = lba2 ?? Guess("Little Big Adventure 2", GameInstall.IsLba2Folder);
+        TargetBox.Text = target ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", GameInstall.Title);
     }
 
     private static string Guess(string name, Func<string, bool> ok)
@@ -58,7 +64,7 @@ public partial class MainWindow : Window
         var shortcut = ShortcutBox.IsChecked == true;
         try
         {
-            try { await Task.Run(() => GameInstall.Run(lba1, lba2, target, Report, Log)); }
+            try { await Task.Run(() => GameInstall.Run(lba1, lba2, target, Report, Log, source)); }
             finally { try { Directory.CreateDirectory(target); File.WriteAllLines(Path.Combine(target, "setup.log"), lines); } catch (Exception error) when (error is IOException or UnauthorizedAccessException) { } }
             if (shortcut) { try { Shortcut.Desktop(Path.Combine(target, GameInstall.GameExe), GameInstall.Title, Path.Combine(target, GameInstall.IconFile)); Log("a shortcut on the desktop"); } catch (Exception error) { Log("no shortcut: " + error.Message); } }
             Status.Text = "Installed. Happy Halloween!";

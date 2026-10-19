@@ -11,10 +11,15 @@ namespace LBRAInstaller;
 //   2. LBA1's data copied in, to lba1\ (the Temple of Bú is made from its scenes);
 //   3. the race tracks built into the copy (LBA Assembler's race track build: RaceTrackService.Build) -- the Temple of Bú's Halloween race;
 //   4. the game: LBA Assembler's engine as the game's exe, its race file for each special track (specials\), the cars to choose from and the
-//      menu (RACEGAME.TXT), and portable.txt (its saves and settings beside it).
+//      menu (RACEGAME.TXT), and portable.txt (its saves and settings beside it);
+//   5. the updater: this setup copied to Update\, what it installed from in Update\install.json (Updater.Record).
+// The player's User\ folder (saves, settings, best laps) is never touched: an install over an install -- an update -- keeps it.
 internal static class GameInstall
 {
-    public const string GameExe = "Little Big Halloween Racing Adventure.exe";
+    // (LBRA.exe since 2026-10-19 -- the user: "this needs to be 'Little Big Racing Adventure.exe' or 'LBRA.exe'"; an install over one
+    // made before takes the old exe away and moves the desktop shortcut to the new one)
+    public const string GameExe = "LBRA.exe";
+    public const string OldGameExe = "Little Big Halloween Racing Adventure.exe";
     public const string Title = "Little Big Halloween Racing Adventure";
     public const string MenuFile = "RACEGAME.TXT";
     public const string Lba1Folder = "lba1";
@@ -58,7 +63,8 @@ internal static class GameInstall
     public static bool IsLba2Folder(string dir) => File.Exists(Path.Combine(dir, "RESS.HQR")) && File.Exists(Path.Combine(dir, "SCENE.HQR")) && File.Exists(Path.Combine(dir, "BODY.HQR"));
     public static bool IsLba1Folder(string dir) => LBAAssembler.Lba1.Lba1Game.IsInstalled(dir);
 
-    public static void Run(string lba1, string lba2, string target, Action<double, string> progress, Action<string> log)
+    // `source`: the site's file this setup is (an update's download), for install.json
+    public static void Run(string lba1, string lba2, string target, Action<double, string> progress, Action<string> log, Updater.Source? source = null)
     {
         if (!IsLba1Folder(lba1)) throw new InvalidDataException($"{lba1} isn't an LBA1 game folder (it needs SCENE.HQR, LBA_GRI.HQR, LBA_BLL.HQR, LBA_BRK.HQR and RESS.HQR).");
         if (!IsLba2Folder(lba2)) throw new InvalidDataException($"{lba2} isn't an LBA2 game folder (it needs RESS.HQR, SCENE.HQR and BODY.HQR).");
@@ -158,6 +164,12 @@ internal static class GameInstall
         // (LBA Assembler's engine is a console program -- its headless runs log to the console -- so Windows would open a console window
         // beside the game: the game's copy is marked a windowed program instead; output redirected by a caller still works)
         if (WindowedProgram(Path.Combine(target, GameExe))) log($"{GameExe}: a windowed program (no console window)");
+        var old = Path.Combine(target, OldGameExe);
+        if (File.Exists(old))
+        {
+            try { File.Delete(old); log($"{OldGameExe} removed (the game is {GameExe} now)"); }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException) { log($"{OldGameExe} not removed: {e.Message}"); }
+        }
         foreach (var res in typeof(GameInstall).Assembly.GetManifestResourceNames().Where(r => r.StartsWith("game/")))
         {
             var to = Path.Combine(target, res["game/".Length..].Replace('/', Path.DirectorySeparatorChar));
@@ -171,6 +183,10 @@ internal static class GameInstall
         // copies LBA2's files in afresh)
         foreach (var kept in Directory.GetFiles(target, "*" + Kept).Concat(Directory.GetFiles(target, "*.bak"))) File.Delete(kept);
         log($"the game: {GameExe}, {MenuFile}, {Specials.Length} special track(s), {cars} cars");
+
+        // ---- 5. the updater
+        progress(0.99, "Setting up the updates");
+        Updater.Record(target, lba1, lba2, source, log);
         progress(1, "Installed");
     }
 
