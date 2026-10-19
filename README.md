@@ -23,7 +23,7 @@ installer.
 
 A desktop shortcut (named after the game, starting `LBRA.exe`) is optional. The window shows only the install's progress; what it did
 goes to `<folder>\setup.log`. `LBRA-Setup.exe --install <LBA1> <LBA2> <folder>` installs without the window (the same log). The game's
-copy of the engine is marked a windowed program, so no console window opens beside the game. Installing over an older install (the
+copy of the engine is marked a windowed program, so no console window opens beside the game; its window is titled "Little Big Racing Adventure". Installing over an older install (the
 game was `Little Big Halloween Racing Adventure.exe` until 2026-10-19) removes the old exe and moves the desktop shortcut to `LBRA.exe`;
 the player's `User\` folder is never touched.
 
@@ -85,6 +85,12 @@ Options shows them again.
 Driving: the arrow keys, **Ctrl** uses the power-up in the item box (the behaviour menu has no use in the car), P to pause, Esc for
 the menu. **F11** or **Alt+Enter** switches between full screen and a window at any time (also Options > **Window mode, updates**;
 kept in `lba2.cfg`).
+
+**Out of the car** (the Halloween track): stop and press **Space** (a pad's **X** button) to get out and explore the temple on foot --
+Twinsen runs, and Space jumps. The race goes on without you: the monsters keep racing and the clock keeps running. **Space** beside
+your car gets you back in it; **Ctrl** (a pad's left shoulder) anywhere puts you straight back in it, as does a fall into the dark,
+or five minutes on foot. Somewhere in the temple a secret is waiting for those who go looking -- a jack-o'-lantern off the long
+corridor shows the way.
 
 The game's own settings (`RACEGAME_SETTINGS.TXT`, beside `BESTTIMES.TXT` in `User\LBA2\`) remember the pages seen, whether a qualifying
 lap has been driven, the last qualifying answer, the last difficulty, the updates' mode and the last update check: deleting it, or a

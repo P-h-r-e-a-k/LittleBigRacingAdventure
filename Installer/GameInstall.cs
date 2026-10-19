@@ -21,6 +21,7 @@ internal static class GameInstall
     public const string GameExe = "LBRA.exe";
     public const string OldGameExe = "Little Big Halloween Racing Adventure.exe";
     public const string Title = "Little Big Halloween Racing Adventure";
+    public const string WindowTitle = "Little Big Racing Adventure";
     public const string MenuFile = "RACEGAME.TXT";
     public const string Lba1Folder = "lba1";
     public const string SpecialsFolder = "specials";
@@ -130,6 +131,8 @@ internal static class GameInstall
         var menu = new StringBuilder();
         menu.Append($"# {Title}: the race game's menu (LBA Assembler's engine reads it: RACEGAME.CPP). Made by the installer.\n");
         menu.Append($"title={Title}\n");
+        // (the window's title bar: the series' name, not the engine's -- RACEGAME.CPP RaceGame_WindowTitle, read before the window is made)
+        menu.Append($"window_title={WindowTitle}\n");
         // (Story Mode and Track select greyed: the full game's, still to come)
         menu.Append($"story=0\ntracks=0\nlaps={Laps}\nend_to_menu={EndToMenuMs}\n");
         foreach (var (island, name, file) in Specials)
