@@ -12,7 +12,9 @@ installer.
 `LBRA-Setup.exe` asks for three folders: LBA1's, LBA2's (GOG and Steam installs are found on their own) and one to install into. Then:
 
 1. LBA2's data is copied in (its HQRs, its islands, its disc image and music; one disc image when GOG's folder has the same one twice).
-   The games' own folders are only read, never changed.
+   The games' own folders are only read, never changed. The HQRs and islands are then taken from the disc image (GOG's `LBA2.GOG`),
+   as they came on the CD: a game folder an editor has saved into still installs the retail game (setup.log names any file that
+   differed). Copies an editor kept beside its edits (`Orig*.HQR`, `_*.HQR`) are left out.
 2. LBA1's HQRs are copied to `lba1\` (the temple is built from its scenes).
 3. LBA Assembler's race track build makes the Temple of Bù island and its Halloween race in the copy.
 4. The game goes in: LBA Assembler's engine as `LBRA.exe`, the race files (`specials\`), the menu
@@ -77,6 +79,9 @@ The main menu: **Story Mode** and **Track select** (greyed until the full game),
   driven with no power-ups (a time trial is the same at every difficulty; a race's laps never count). At the end of a time trial the screen shows its best lap and the rank it
   took, and the whole time under it. The whole five-lap times kept by earlier versions stay in `BESTTIMES.TXT` but aren't shown as laps.
 - After a race the game goes back to the menu by itself.
+- **Time trial display**: over the lap the display shows **Best time** -- the track's best lap from Best laps (`--:--.--` before there
+  is one), or the trial's own fastest lap as soon as one beats it. At the end of every lap, in races and time trials, the lap's time
+  stays on the lap line for two seconds before the next lap's clock runs, in gold when it is a new best time.
 
 The first time: before the first race or time trial a **Controls** page, and before the first race a **Power-ups** page (every power-up
 of the track in its item box, with what it does). Enter turns the pages, Esc skips them; they don't come back by themselves, but
@@ -84,7 +89,9 @@ Options shows them again.
 
 Driving: the arrow keys, **Ctrl** uses the power-up in the item box (the behaviour menu has no use in the car), P to pause, Esc for
 the menu. **F11** or **Alt+Enter** switches between full screen and a window at any time (also Options > **Window mode, updates**;
-kept in `lba2.cfg`).
+kept in `lba2.cfg`). In a window the game fills the window whatever its shape: resize or maximise it and the menus, the race and
+its display are laid out to fit, with no black bars. The window's size, and whether it was maximised, is remembered for the next start
+(`WindowWidth`, `WindowHeight`, `WindowMaximized` in `User\LBA2\lba2.cfg`). Full screen is unchanged.
 
 **Out of the car** (the Halloween track): stop and press **Space** (a pad's **X** button) to get out and explore the temple on foot --
 Twinsen runs, and Space jumps. The race goes on without you: the monsters keep racing and the clock keeps running. **Space** beside

@@ -80,7 +80,9 @@ internal static class GameInstall
             var name = Path.GetFileName(path);
             var ext = Path.GetExtension(name).ToUpperInvariant();
             var stem = Path.GetFileNameWithoutExtension(name).ToUpperInvariant();
-            var wanted = ext == ".HQR" || (ext is ".ILE" or ".OBL") && Islands.Contains(stem) || DiscExtensions.Contains(ext) && stem.StartsWith("LBA2");
+            // (not the copies an editor kept beside its edits: OrigSCENE.HQR, _SCENE.HQR)
+            var wanted = ext == ".HQR" && !stem.StartsWith("ORIG") && !stem.StartsWith('_') || (ext is ".ILE" or ".OBL") && Islands.Contains(stem)
+                         || DiscExtensions.Contains(ext) && stem.StartsWith("LBA2");
             if (!wanted) continue;
             var original = path + Kept;
             files.Add((File.Exists(original) ? original : path, Path.Combine(target, name)));
@@ -101,6 +103,7 @@ internal static class GameInstall
             progress(0.01 + 0.44 * done / total, $"Copying LBA2's data: {Path.GetFileName(to)}");
         }
         log($"LBA2: {files.Count} files copied ({total / (1024 * 1024)} MB)");
+        RetailFromDisc(images.Select(f => f.From).FirstOrDefault(), files.Select(f => f.To).ToList(), log);
 
         // ---- 2. LBA1
         progress(0.45, "Copying LBA1's data");
@@ -334,6 +337,41 @@ internal static class GameInstall
         File.Copy(from, to, true);
         var info = new FileInfo(to);
         if (info.IsReadOnly) info.IsReadOnly = false;
+    }
+
+    // The game's data as it came on its CD: a game folder's own files may have been changed (an editor's work saved into it -- the
+    // user's GOG folder had an old race track build's SCENE.HQR and BODY.HQR, the build found no racer to copy, and the Temple's race
+    // came with no opponents and no grid, 2026-10-19), but its disc image (GOG's LBA2.GOG, a raw MODE1 CD) never is. Every copied data
+    // file the disc has (its LBA2 folder's HQRs and islands) is written again from it; one that differed is said. No image, or one
+    // that can't be read: the folder's files stay.
+    private static void RetailFromDisc(string? image, List<string> copied, Action<string> log)
+    {
+        if (image is null) { log("LBA2's data: the folder's own (no CD image beside it)"); return; }
+        try
+        {
+            using var disc = new LBAAssembler.Lba1.Runtime.Lba1Iso(image);
+            var onDisc = disc.Files.Where(f => f.Path.StartsWith("/LBA2/", StringComparison.OrdinalIgnoreCase) && f.Path.Count(c => c == '/') == 2)
+                .GroupBy(f => Path.GetFileName(f.Path).ToUpperInvariant()).ToDictionary(g => g.Key, g => g.First());
+            var taken = 0; var changed = new List<string>();
+            foreach (var to in copied)
+            {
+                var name = Path.GetFileName(to).ToUpperInvariant();
+                if (Path.GetExtension(name) is not (".HQR" or ".ILE" or ".OBL") || !onDisc.TryGetValue(name, out var entry)) continue;
+                var bytes = disc.Read(entry);
+                if (new FileInfo(to).Length != bytes.Length || !File.ReadAllBytes(to).AsSpan().SequenceEqual(bytes))
+                {
+                    changed.Add(name);
+                    File.WriteAllBytes(to, bytes);
+                }
+                taken++;
+            }
+            log($"LBA2's data: {taken} files as they are on the CD image ({Path.GetFileName(image)})" +
+                (changed.Count > 0 ? $"; the folder's own {string.Join(", ", changed)} had been changed: the CD's used" : ", the folder's the same"));
+        }
+        catch (Exception e) when (e is IOException or InvalidDataException or UnauthorizedAccessException or ArgumentException or EndOfStreamException)
+        {
+            log($"LBA2's data: the folder's own (its CD image {Path.GetFileName(image)} could not be read: {e.Message})");
+        }
     }
 
     // Progress said as it is made (Progress<T> posts it to the window's thread, later: after a windowless install's log is closed)
