@@ -83,6 +83,8 @@
     <EmbeddedResource Include="$(Lba)\docs\racetrack\cxtower_track_plan.json" LogicalName="RaceTrackPlan.CxTower.json" />
     <EmbeddedResource Include="$(Lba)\docs\racetrack\polar_track_plan.json" LogicalName="RaceTrackPlan.Polar.json" />
     <EmbeddedResource Include="$(Lba)\docs\racetrack\track_plan.json" LogicalName="RaceTrackPlan.Desert.json" />
+    <!-- the race items' sounds, as LBA Assembler carries them: the race track build writes them into the game folder (RaceSounds) -->
+    <EmbeddedResource Include="$(Lba)\sounds\**\*.mp3;$(Lba)\sounds\**\*.wav" LogicalName="RaceSounds/%(RecursiveDir)%(Filename)%(Extension)" />
     <!-- the game: LBA Assembler's engine (statically linked), built by build.ps1 -->
     <EmbeddedResource Include="$(Lba)\native\lba2-classic-community\out\build\windows_ucrt64_static\SOURCES\lba2cc.exe" LogicalName="engine.exe" />
     <!-- the menu's picture (made by tools\make_art.ps1), and the icon put beside the game for its shortcut -->
