@@ -75,8 +75,28 @@ The main menu: **Story Mode** and **Track select** (greyed until the full game),
   - **Hard**: the monsters quicker and pushing harder when behind you, holding their penguins, oil and magic balls until they would hit
     you; the witches throw more often.
 
-  The last one chosen comes up first next time. Then the car: Twinsen's pumpkin F1 (the page opens on it) and thirteen Halloween cars, the
-  monsters' first, each turning on the page (left and right to choose, Enter to race, Esc back).
+  The last one chosen comes up first next time. Then the car, each turning on the page (left and right to choose, Enter to race, Esc
+  back): Twinsen's pumpkin F1 (the page opens on it), Zoe's car, the Emperor's car, the Dark Monk's car, the priest's car, the
+  guitarist's guitar, the trooper's tank, Dino-Fly, the Tralu's cave, the skeleton's ghost car, the little Tralu's monster truck and
+  the third quetch child's kart. Under each car's name its stats, 0 to 5 stars in half stars: **Acceleration**, **Top speed** and
+  **Handling**. Every car's stars add up to the same 7.5, so what a car has more of it pays for in the others, and the race drives it
+  by them: the pumpkin F1's 2.5 stars each are the track's own car; from there, up to 5 stars gives up to half as much pull again,
+  8 % more top speed and a fifth more steering, and fewer stars as much less. (A time trial uses the car too; Best laps shows it.)
+
+  | Car | Acceleration | Top speed | Handling |
+  | --- | :-: | :-: | :-: |
+  | Twinsen's pumpkin F1 | 2.5 | 2.5 | 2.5 |
+  | Zoe's car | 3 | 1.5 | 3 |
+  | The Emperor's car | 2 | 4.5 | 1 |
+  | The Dark Monk's car | 1.5 | 4 | 2 |
+  | The priest's car | 2 | 2.5 | 3 |
+  | The guitarist's guitar | 4 | 2 | 1.5 |
+  | The trooper's tank | 1.5 | 2.5 | 3.5 |
+  | Dino-Fly | 3.5 | 3.5 | 0.5 |
+  | The Tralu's cave | 1 | 4 | 2.5 |
+  | The skeleton's ghost car | 3 | 3 | 1.5 |
+  | The little Tralu's monster truck | 4 | 1.5 | 2 |
+  | The third quetch child's kart | 3 | 1 | 3.5 |
 - **Qualifying**: the first race always starts with a qualifying lap (no power-ups on it; its time places Twinsen on the grid; the
   monsters wait in the slip lane beside the start line meanwhile). After that, a race asks after the car page: **Qualifying lap**, or
   **Skip** and start at the back of the grid. The last answer is remembered.

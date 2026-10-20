@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO;
 using System.Text;
 using LBAAssembler;
@@ -40,25 +41,28 @@ internal static class GameInstall
     };
 
     // The cars to choose from (RACECARS.JSON's numbers): Twinsen's pumpkin F1 first -- the Temple's own car, the one the car page opens on --
-    // then the Halloween ones: the three monsters the Temple's race is against first (LBA Assembler's RaceDriver.Temple, since 2026-10-18:
-    // the vampire in his coffin, the one to beat, the witch on her broomstick and the zombie in his hearse), the monsters who raced it before
-    // them (the skeleton, the ghost, the two-headed monster), the other monsters, then the Dark Monk's, Ker'aooc's, Tabata's and the Tralu's
-    public static readonly (int Number, string Name)[] Cars =
+    // then the user's choice for the Temple (2026-10-20), in the user's order: the racer entity's cars 4, 3, 10, 16, 37, 25, 47, 49, then
+    // the cast's 65, 90, 104. (The Halloween monsters' cars aren't offered any more: they are the Temple race's line-up, not the player's.)
+    // Each car's stats, in stars from 0 to 5 in half stars -- acceleration, top speed, handling -- every car's adding up to the same
+    // StarTotal: the car page shows them, and the race drives the car by them (RACEGAME.CPP, RACEMOD.CPP car_accel= car_top=
+    // car_handling=: 2.5 stars the track's own setup; 5 stars +50 % pull, +8 % top speed, +20 % steering, and as much less at 0 -- on
+    // the Temple a star of top speed is worth the most and one of pull the least, so the ranges differ: the cars' perfect laps within
+    // 2.6 s of each other, the pull-heavy ones a little behind on a clean lap and back quicker after every hit that stops them).
+    public const double StarTotal = 7.5;
+    public static readonly (int Number, string Name, double Accel, double Top, double Handling)[] Cars =
     {
-        (RaceTrackCharacterCars.PumpkinNumber, "Twinsen's pumpkin F1"),
-        (RaceTrackCharacterCars.VampireNumber, "Vampire's coffin"),
-        (RaceTrackCharacterCars.WitchNumber, "Witch's broomstick"),
-        (RaceTrackCharacterCars.ZombieNumber, "Zombie's hearse"),
-        (65, "Skeleton's ghost car"),
-        (114, "Ghost's ghost car"),
-        (149, "Two-headed monster truck"),
-        (107, "Giant spider's truck"),
-        (188, "Gas monster's ghost car"),
-        (130, "The Eye's ghost car"),
-        (10, "Dark Monk's car"),
-        (53, "Ker'aooc's cauldron"),
-        (54, "Tabata's spell book"),
-        (49, "Tralu's cave"),
+        (RaceTrackCharacterCars.PumpkinNumber, "Twinsen's pumpkin F1", 2.5, 2.5, 2.5),   // the all-rounder: the Temple's setup as it is
+        (4, "Zoe's car", 3, 1.5, 3),                            // a nippy runabout: quick away and into the bends, not fast
+        (3, "The Emperor's car", 2, 4.5, 1),                    // the fastest at the top, heavy in the bends
+        (10, "The Dark Monk's car", 1.5, 4, 2),                 // fast once going, slow to get there
+        (16, "The priest's car", 2, 2.5, 3),                    // calm and sure-footed: a little better in the bends, a little slower away
+        (37, "The guitarist's guitar", 4, 2, 1.5),              // a rock-and-roll start, all over the road
+        (25, "The trooper's tank", 1.5, 2.5, 3.5),              // a slow start, then tracks that turn it on the spot
+        (47, "Dino-Fly", 3.5, 3.5, 0.5),                        // quick and fast, but a flyer: the hardest to steer
+        (49, "The Tralu's cave", 1, 4, 2.5),                    // a rolling rock: slow away, fast and steady once rolling
+        (65, "The skeleton's ghost car", 3, 3, 1.5),            // a lively ghost, floaty in the bends
+        (90, "The little Tralu's monster truck", 4, 1.5, 2),    // big wheels, big pull, low top speed
+        (104, "The third quetch child's kart", 3, 1, 3.5),      // quick and nimble, slow at the top
     };
 
     public static bool IsLba2Folder(string dir) => File.Exists(Path.Combine(dir, "RESS.HQR")) && File.Exists(Path.Combine(dir, "SCENE.HQR")) && File.Exists(Path.Combine(dir, "BODY.HQR"));
@@ -155,12 +159,16 @@ internal static class GameInstall
                 (island.Levels is not null ? "; easy, medium and hard (the menu's difficulty page)" : ""));
         }
         var cars = 0;
-        foreach (var (number, name) in Cars)
+        foreach (var (number, name, accel, top, handling) in Cars)
         {
             var line = RaceCarEngineFile.DriveAsLine(target, number);
             var drive = line?.Split('\n').FirstOrDefault(l => l.StartsWith("drive_as="))?["drive_as=".Length..].Trim();
             if (drive is null) { log($"no car {number} ({name}) in this build: left out"); continue; }
-            menu.Append($"car={name}|{drive}\n");
+            // (its stars: acceleration, top speed, handling -- RACEGAME.CPP reads a line without them as a car with none, driven as the
+            // track sets it)
+            string S(double v) => v.ToString("0.#", CultureInfo.InvariantCulture);
+            if (Math.Abs(accel + top + handling - StarTotal) > 0.01) log($"{name}: its stars add up to {S(accel + top + handling)}, not {S(StarTotal)}");
+            menu.Append($"car={name}|{drive}|{S(accel)} {S(top)} {S(handling)}\n");
             cars++;
         }
         File.WriteAllText(Path.Combine(target, MenuFile), menu.ToString(), new UTF8Encoding(false));
