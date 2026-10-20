@@ -21,7 +21,8 @@ public partial class MainWindow : Window
         // (the usual places: GOG's, Steam's)
         Lba1Box.Text = lba1 ?? LBAAssembler.Terrain.Temple.TempleMusic.InstalledLba1Folders().FirstOrDefault(GameInstall.IsLba1Folder) ?? Guess("Little Big Adventure", GameInstall.IsLba1Folder);
         Lba2Box.Text = lba2 ?? Guess("Little Big Adventure 2", GameInstall.IsLba2Folder);
-        TargetBox.Text = target ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", GameInstall.Title);
+        // (the series' name, not the Halloween edition's: the user, 2026-10-20)
+        TargetBox.Text = target ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", GameInstall.WindowTitle);
     }
 
     private static string Guess(string name, Func<string, bool> ok)
