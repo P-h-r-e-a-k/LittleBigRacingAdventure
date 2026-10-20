@@ -62,11 +62,14 @@ public partial class MainWindow : Window
         if (GameInstall.MusicFolderFor(lba1) is null)
             while (true)
             {
+                // (without the CD music, LBA1's own MIDI score of it when its MIDI_MI.HQR is there: TempleMusicMidi)
+                var midi = File.Exists(Path.Combine(lba1, LBAAssembler.Terrain.Temple.TempleMusic.MidiArchiveName));
                 var answer = MessageBox.Show(this,
-                    $"Little Big Adventure's music (the temple's track on its CD) wasn't found in {lba1}, nor in a GOG or Steam copy of the game on this PC. " +
-                    "Without it the Halloween race plays Little Big Adventure 2's music instead.\n\n" +
-                    "Yes: choose the folder it's in -- Little Big Adventure's GOG or Steam folder, or a folder with its CD image (LBA.GOG, LBA.iso, or a .cue and .bin) " +
-                    "or its music tracks (Track_06.mp3).\nNo: install without it.\nCancel: don't install yet.",
+                    $"Little Big Adventure's CD music (the temple's track on its CD) wasn't found in {lba1}, nor in a GOG or Steam copy of the game on this PC. " +
+                    (midi ? "Without it the Halloween race plays Little Big Adventure's own MIDI version of the temple's music instead -- the one the game itself plays without its CD -- through Windows' MIDI synth."
+                          : "Without it the Halloween race plays Little Big Adventure 2's music instead.") +
+                    "\n\nYes: choose the folder the CD music is in -- Little Big Adventure's GOG or Steam folder, or a folder with its CD image (LBA.GOG, LBA.iso, or a .cue and .bin) " +
+                    "or its music tracks (Track_06.mp3).\nNo: install " + (midi ? "with the MIDI version." : "without it.") + "\nCancel: don't install yet.",
                     Title, MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
                 if (answer == MessageBoxResult.Cancel) return;
                 if (answer == MessageBoxResult.No) break;
