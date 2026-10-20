@@ -76,16 +76,25 @@ The main menu: **Story Mode** and **Track select** (greyed until the full game),
     you; the witches throw more often.
 
   The last one chosen comes up first next time. Then the car, each turning on the page (left and right to choose, Enter to race, Esc
-  back): Twinsen's pumpkin F1 (the page opens on it), Zoe's car, the Emperor's car, the Dark Monk's car, the priest's car, the
-  guitarist's guitar, the trooper's tank, Dino-Fly, the Tralu's cave, the skeleton's ghost car, the little Tralu's monster truck and
-  the third quetch child's kart. Under each car's name its stats, 0 to 5 stars in half stars: **Acceleration**, **Top speed** and
+  back): Twinsen's Halloween buggy (his own buggy painted pumpkin orange, with bats on its sides and its back; the page opens on it),
+  Twinsen's pumpkin F1 (locked until you win), Zoe's car, the Emperor's car, the Dark Monk's car, the priest's car, the guitarist's
+  guitar, the trooper's tank, Dino-Fly, the Tralu's cave, the skeleton's ghost car, the little Tralu's monster truck and the third
+  quetch child's kart. Under each car's name its stats, 0 to 5 stars in half stars: **Acceleration**, **Top speed** and
   **Handling**. Every car's stars add up to the same 7.5, so what a car has more of it pays for in the others, and the race drives it
-  by them: the pumpkin F1's 2.5 stars each are the track's own car; from there, up to 5 stars gives up to half as much pull again,
+  by them: the Halloween buggy's 2.5 stars each are the track's own car; from there, up to 5 stars gives up to half as much pull again,
   8 % more top speed and a fifth more steering, and fewer stars as much less. (A time trial uses the car too; Best laps shows it.)
+
+  **Unlocking the pumpkin F1**: until then it is on the car page dark, under a padlock -- "Win the Halloween race to unlock" -- and
+  can't be taken. Win a race (first over the line, at any difficulty) and, a moment after the line, the congratulations: fireworks over
+  the menu's Halloween night, with their sound, the pumpkin F1 turning, "Twinsen's pumpkin F1 is unlocked for your time trials!"
+  (Enter, Esc or a click goes on; it ends by itself with the fireworks, after half a minute). It comes once; the unlock is kept
+  (`pumpkin_unlocked=1` in `RACEGAME_SETTINGS.TXT`). From then on the pumpkin F1 is yours for **time trials**; on the car page for a
+  race it shows "For time trials" and isn't taken. A race's end says **You win!** or the place you finished in (or who beat you).
 
   | Car | Acceleration | Top speed | Handling |
   | --- | :-: | :-: | :-: |
-  | Twinsen's pumpkin F1 | 2.5 | 2.5 | 2.5 |
+  | Twinsen's Halloween buggy | 2.5 | 2.5 | 2.5 |
+  | Twinsen's pumpkin F1 (won: time trials) | 2.5 | 2.5 | 2.5 |
   | Zoe's car | 3 | 1.5 | 3 |
   | The Emperor's car | 2 | 4.5 | 1 |
   | The Dark Monk's car | 1.5 | 4 | 2 |
@@ -149,7 +158,9 @@ It needs MSYS2's UCRT64 toolchain (`C:\msys64`) for the engine and the .NET 10 S
   `--update`, `UpdateWindows.cs` the "Install it now?" question and the update's progress window.
 - `Game\menu.png` - the menu's backdrop, drawn by `tools\make_art.ps1` (no retail art in it).
 - The engine side lives in LBA Assembler: `native\lba2-classic-community\SOURCES\RACEGAME.CPP` (the menu, the difficulty page, the
-  car page, best times, the qualifying choice, the power-up and controls pages, the Updates page and the weekly check, the race file it
-  composes), `RACEUPDATE.CPP` (the updater started, hidden) and `RACEMOD.CPP` (the
-  race-track mode: `start_scene=`, `start_in_car=`, `trial=`, `end_to_menu=`, `grid_back=`, `difficulty=`, `marshal=`; the power-ups'
-  names and descriptions). The levels' numbers are LBA Assembler's (`Terrain\RaceDifficulty.cs`), in the race file the installer writes.
+  car page and its locked car, the congratulations and their fireworks, best times, the qualifying choice, the power-up and controls
+  pages, the Updates page and the weekly check, the race file it composes), `RACEUPDATE.CPP` (the updater started, hidden) and
+  `RACEMOD.CPP` (the race-track mode: `start_scene=`, `start_in_car=`, `trial=`, `end_to_menu=`, `grid_back=`, `difficulty=`,
+  `marshal=`, `twinsen_body=` (the Halloween buggy); the power-ups' names and descriptions). The Halloween buggy's bodies are made by
+  the race track build (`Terrain\RaceTrackCharacterCars.HalloweenBuggy.cs`), the fireworks' sound from `sounds\firework.mp3`
+  (`Terrain\RaceSounds.cs`: `RACESOUNDS\FIREWORK.WAV`). The levels' numbers are LBA Assembler's (`Terrain\RaceDifficulty.cs`), in the race file the installer writes.

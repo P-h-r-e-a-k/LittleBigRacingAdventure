@@ -40,7 +40,9 @@ internal static class GameInstall
         (RaceTrackIsland.Temple, "Halloween Temple of Bu", "temple"),
     };
 
-    // The cars to choose from (RACECARS.JSON's numbers): Twinsen's pumpkin F1 first -- the Temple's own car, the one the car page opens on --
+    // The cars to choose from (RACECARS.JSON's numbers): Twinsen's Halloween buggy first -- his own buggy painted orange, with bats, the one
+    // the car page opens on (HalloweenBuggy: not a RACECARS.JSON car) -- then Twinsen's pumpkin F1, the Temple's own car, held back until
+    // the player wins a race (2026-10-20, the user: "Let's hold this car back until it's unlocked": PumpkinUnlock), then for time trials;
     // then the user's choice for the Temple (2026-10-20), in the user's order: the racer entity's cars 4, 3, 10, 16, 37, 25, 47, 49, then
     // the cast's 65, 90, 104. (The Halloween monsters' cars aren't offered any more: they are the Temple race's line-up, not the player's.)
     // Each car's stats, in stars from 0 to 5 in half stars -- acceleration, top speed, handling -- every car's adding up to the same
@@ -49,9 +51,17 @@ internal static class GameInstall
     // the Temple a star of top speed is worth the most and one of pull the least, so the ranges differ: the cars' perfect laps within
     // 2.6 s of each other, the pull-heavy ones a little behind on a clean lap and back quicker after every hit that stops them).
     public const double StarTotal = 7.5;
+    // Twinsen's Halloween buggy: his own buggy's bodies painted (RaceTrackCharacterCars.InstallHalloweenBuggy), raced as his buggy with them
+    // on him (RACEMOD.CPP twinsen_body=: RaceTrackCharacterCars.HalloweenBuggyCar), not a RACECARS.JSON car drawn in its place
+    public const int HalloweenBuggy = -100;
+    // The pumpkin F1 locked until a race is won, then for time trials only (RACEGAME.CPP: car= unlock=<id> trial; the player's
+    // RACEGAME_SETTINGS.TXT pumpkin_unlocked=1), and what the car page says of it until then
+    public const string PumpkinUnlock = "pumpkin";
+    public const string PumpkinHint = "Win the Halloween race to unlock";
     public static readonly (int Number, string Name, double Accel, double Top, double Handling)[] Cars =
     {
-        (RaceTrackCharacterCars.PumpkinNumber, "Twinsen's pumpkin F1", 2.5, 2.5, 2.5),   // the all-rounder: the Temple's setup as it is
+        (HalloweenBuggy, RaceTrackCharacterCars.HalloweenBuggyName, 2.5, 2.5, 2.5),   // the all-rounder: the Temple's setup as it is
+        (RaceTrackCharacterCars.PumpkinNumber, "Twinsen's pumpkin F1", 2.5, 2.5, 2.5),   // the same, won: for time trials
         (4, "Zoe's car", 3, 1.5, 3),                            // a nippy runabout: quick away and into the bends, not fast
         (3, "The Emperor's car", 2, 4.5, 1),                    // the fastest at the top, heavy in the bends
         (10, "The Dark Monk's car", 1.5, 4, 2),                 // fast once going, slow to get there
@@ -163,14 +173,28 @@ internal static class GameInstall
         var cars = 0;
         foreach (var (number, name, accel, top, handling) in Cars)
         {
-            var line = RaceCarEngineFile.DriveAsLine(target, number);
-            var drive = line?.Split('\n').FirstOrDefault(l => l.StartsWith("drive_as="))?["drive_as=".Length..].Trim();
+            // (the drive_as= value -- or, the Halloween buggy, its race file line, twinsen_body=..., and the body the car page shows: page=)
+            string? drive;
+            var options = "";
+            if (number == HalloweenBuggy)
+            {
+                var buggy = RaceTrackCharacterCars.HalloweenBuggyCar(target);
+                drive = buggy?.Line;
+                if (buggy is { } b) options = $"|page={b.Body} {b.Anim}";
+            }
+            else
+            {
+                var line = RaceCarEngineFile.DriveAsLine(target, number);
+                drive = line?.Split('\n').FirstOrDefault(l => l.StartsWith("drive_as="))?["drive_as=".Length..].Trim();
+            }
             if (drive is null) { log($"no car {number} ({name}) in this build: left out"); continue; }
+            // (the pumpkin F1: won by winning a race, then for time trials -- RACEGAME.CPP's padlock until then)
+            if (number == RaceTrackCharacterCars.PumpkinNumber) options += $"|unlock={PumpkinUnlock} trial|hint={PumpkinHint}";
             // (its stars: acceleration, top speed, handling -- RACEGAME.CPP reads a line without them as a car with none, driven as the
             // track sets it)
             string S(double v) => v.ToString("0.#", CultureInfo.InvariantCulture);
             if (Math.Abs(accel + top + handling - StarTotal) > 0.01) log($"{name}: its stars add up to {S(accel + top + handling)}, not {S(StarTotal)}");
-            menu.Append($"car={name}|{drive}|{S(accel)} {S(top)} {S(handling)}\n");
+            menu.Append($"car={name}|{drive}|{S(accel)} {S(top)} {S(handling)}{options}\n");
             cars++;
         }
         File.WriteAllText(Path.Combine(target, MenuFile), menu.ToString(), new UTF8Encoding(false));
