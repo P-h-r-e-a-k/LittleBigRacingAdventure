@@ -54,6 +54,7 @@ internal static class Updater
         public string? Lba1 { get; set; }
         public string? Lba2 { get; set; }
         public string? Music { get; set; }              // LBA1's music, where the player chose it when it wasn't found (GameInstall.MusicFolderFor)
+        public string? MenuMusic { get; set; }          // LBA2's menu music, the same (GameInstall.MenuMusicFolderFor)
         public DateTime InstalledUtc { get; set; }
         public string? Version { get; set; }
         public string Updates { get; set; } = "auto";   // the mode at the install (the game's own setting, RACEGAME_SETTINGS.TXT, wins)
@@ -116,7 +117,7 @@ internal static class Updater
     // An install done (the window's, --install's, --update's): this setup copied into Update\ (the game's updater from now on), what it
     // was installed from in install.json -- the folders, the time, the site's file it came from when known (an update's) -- the mode
     // kept from before. The desktop's shortcut moved from the old exe's name to LBRA.exe.
-    public static void Record(string installDir, string lba1, string lba2, Source? source, Action<string> log, string? music = null)
+    public static void Record(string installDir, string lba1, string lba2, Source? source, Action<string> log, string? music = null, string? menuMusic = null)
     {
         var dir = Path.Combine(installDir, Folder);
         Directory.CreateDirectory(dir);
@@ -139,6 +140,7 @@ internal static class Updater
         {
             Lba1 = Path.GetFullPath(lba1), Lba2 = Path.GetFullPath(lba2), InstalledUtc = DateTime.UtcNow, Version = OwnVersion.ToString(),
             Updates = before?.Updates ?? "auto", Source = source, Music = music is null ? null : Path.GetFullPath(music),
+            MenuMusic = menuMusic is null ? null : Path.GetFullPath(menuMusic),
         };
         Save(installDir, info);
         log($"updates: {Path.Combine(dir, InfoFile)} written (source: {source?.ToString() ?? "not known"})");
@@ -485,7 +487,7 @@ internal static class Updater
                 await Task.Delay(1000);
             }
             var lines = new List<string>();
-            await Task.Run(() => GameInstall.Run(lba1, lba2, installDir, (f, what) => window.Dispatcher.Invoke(() => window.Report(f, what)), lines.Add, pending, info?.Music));
+            await Task.Run(() => GameInstall.Run(lba1, lba2, installDir, (f, what) => window.Dispatcher.Invoke(() => window.Report(f, what)), lines.Add, pending, info?.Music, info?.MenuMusic));
             File.WriteAllLines(Path.Combine(installDir, "setup.log"), lines);
             foreach (var line in lines.Where(l => l.StartsWith("updates:") || l.StartsWith("the game:") || l.Contains("shortcut") || l.StartsWith(GameInstall.OldGameExe))) L(line);
             L($"INSTALLED version {OwnVersion}; User\\ kept");

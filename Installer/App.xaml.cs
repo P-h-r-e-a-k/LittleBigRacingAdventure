@@ -12,15 +12,16 @@ public partial class App : Application
     // a small progress window (Updater.cs).
     protected override async void OnStartup(StartupEventArgs e)
     {
-        // (--install <LBA1> <LBA2> <folder> [<LBA1 music folder>]: the last as the setup window's question chooses it)
-        if (e.Args is ["--install", var lba1, var lba2, var target, ..] && e.Args.Length <= 5)
+        // (--install <LBA1> <LBA2> <folder> [<LBA1 music folder> [<LBA2 menu music folder>]]: as the setup window's questions choose them;
+        // "" for none)
+        if (e.Args is ["--install", var lba1, var lba2, var target, ..] && e.Args.Length <= 6)
         {
             Directory.CreateDirectory(target);
             using var log = new StreamWriter(Path.Combine(target, "setup.log")) { AutoFlush = true };
             var code = 0;
             try
             {
-                GameInstall.Run(lba1, lba2, target, (f, what) => log.WriteLine($"[{f:P0}] {what}"), log.WriteLine, null, e.Args.Length == 5 ? e.Args[4] : null);
+                GameInstall.Run(lba1, lba2, target, (f, what) => log.WriteLine($"[{f:P0}] {what}"), log.WriteLine, null, e.Args.Length >= 5 && e.Args[4].Length > 0 ? e.Args[4] : null, e.Args.Length == 6 && e.Args[5].Length > 0 ? e.Args[5] : null);
                 log.WriteLine("INSTALLED");
             }
             catch (Exception error)

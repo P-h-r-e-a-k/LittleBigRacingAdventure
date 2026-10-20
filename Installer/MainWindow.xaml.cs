@@ -78,6 +78,25 @@ public partial class MainWindow : Window
                 if (GameInstall.HasMusic(dialog.FolderName, lba1)) { music = dialog.FolderName; break; }
                 MessageBox.Show(this, $"There's no Little Big Adventure CD music in {dialog.FolderName} (nor in the two folders above it).", Title, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
+        // LBA2's menu music (its title theme, an audio track on LBA2's CD): in the LBA2 folder or a GOG or Steam LBA2 on this PC -- else asked
+        // for (the user, 2026-10-20: a copy of the CD's files installed with silent menus and no warning)
+        string? music2 = null;
+        if (GameInstall.MenuMusicFolderFor(lba2) is null)
+            while (true)
+            {
+                var answer = MessageBox.Show(this,
+                    $"Little Big Adventure 2's menu music wasn't found in {lba2}, nor in a GOG or Steam copy of the game on this PC. It's an audio track on LBA2's CD, " +
+                    "so a copy of the CD's files hasn't got it, and without it the menus have no music.\n\n" +
+                    "Yes: choose the folder it's in -- Little Big Adventure 2's GOG or Steam folder (LBA2.OGG and LBA2.DAT), or a folder with an image of its CD (a .cue and .bin).\n" +
+                    "No: install without it.\nCancel: don't install yet.",
+                    Title, MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                if (answer == MessageBoxResult.Cancel) return;
+                if (answer == MessageBoxResult.No) break;
+                var dialog = new Microsoft.Win32.OpenFolderDialog { Title = "The folder with Little Big Adventure 2's music" };
+                if (dialog.ShowDialog(this) != true) continue;
+                if (GameInstall.HasMenuMusic(dialog.FolderName)) { music2 = dialog.FolderName; break; }
+                MessageBox.Show(this, $"There's no Little Big Adventure 2 menu music in {dialog.FolderName}.", Title, MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         busy = true; InstallButton.IsEnabled = false; PlayButton.IsEnabled = false;
         // (what the install did goes to <install folder>\setup.log, as a headless install's does -- the window shows only its progress)
         var lines = new List<string>();
@@ -86,7 +105,7 @@ public partial class MainWindow : Window
         var shortcut = ShortcutBox.IsChecked == true;
         try
         {
-            try { await Task.Run(() => GameInstall.Run(lba1, lba2, target, Report, Log, source, music)); }
+            try { await Task.Run(() => GameInstall.Run(lba1, lba2, target, Report, Log, source, music, music2)); }
             finally { try { Directory.CreateDirectory(target); File.WriteAllLines(Path.Combine(target, "setup.log"), lines); } catch (Exception error) when (error is IOException or UnauthorizedAccessException) { } }
             if (shortcut) { try { Shortcut.Desktop(Path.Combine(target, GameInstall.GameExe), GameInstall.Title, Path.Combine(target, GameInstall.IconFile)); Log("a shortcut on the desktop"); } catch (Exception error) { Log("no shortcut: " + error.Message); } }
             Status.Text = "Installed. Happy Halloween!";

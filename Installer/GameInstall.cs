@@ -69,9 +69,10 @@ internal static class GameInstall
     public static bool IsLba1Folder(string dir) => LBAAssembler.Lba1.Lba1Game.IsInstalled(dir);
 
     // `source`: the site's file this setup is (an update's download), for install.json
-    // `music`: a folder the player chose for LBA1's music when none was found (the setup window asks: MusicFolderFor), kept for updates
+    // `music`: a folder the player chose for LBA1's music when none was found (the setup window asks: MusicFolderFor), kept for updates;
+    // `music2` the same for LBA2's menu music (MenuMusicFolderFor)
     public static void Run(string lba1, string lba2, string target, Action<double, string> progress, Action<string> log, Updater.Source? source = null,
-                           string? music = null)
+                           string? music = null, string? music2 = null)
     {
         if (!IsLba1Folder(lba1)) throw new InvalidDataException($"{lba1} isn't an LBA1 game folder (it needs SCENE.HQR, LBA_GRI.HQR, LBA_BLL.HQR, LBA_BRK.HQR and RESS.HQR).");
         if (!IsLba2Folder(lba2)) throw new InvalidDataException($"{lba2} isn't an LBA2 game folder (it needs RESS.HQR, SCENE.HQR and BODY.HQR).");
@@ -109,6 +110,7 @@ internal static class GameInstall
             progress(0.01 + 0.44 * done / total, $"Copying LBA2's data: {Path.GetFileName(to)}");
         }
         log($"LBA2: {files.Count} files copied ({total / (1024 * 1024)} MB)");
+        MenuMusicInto(lba2, target, log, music2);
         RetailFromDisc(images.Select(f => f.From).FirstOrDefault(), files.Select(f => f.To).ToList(), log);
 
         // ---- 2. LBA1
@@ -202,7 +204,8 @@ internal static class GameInstall
 
         // ---- 5. the updater
         progress(0.99, "Setting up the updates");
-        Updater.Record(target, lba1, lba2, source, log, music is not null && HasMusic(music, lba1) ? music : null);
+        Updater.Record(target, lba1, lba2, source, log, music is not null && HasMusic(music, lba1) ? music : null,
+                       music2 is not null && HasMenuMusic(music2) ? music2 : null);
         progress(1, "Installed");
     }
 
@@ -252,6 +255,81 @@ internal static class GameInstall
         foreach (var dir in LBAAssembler.Terrain.Temple.TempleMusic.InstalledLba1Folders().Where(d => !string.Equals(Path.GetFullPath(d).TrimEnd('\\'), Path.GetFullPath(lba1).TrimEnd('\\'), StringComparison.OrdinalIgnoreCase)))
             if (HasMusic(dir, lba1)) return dir;
         return null;
+    }
+
+    // LBA2's menu music -- its CD's sixth music, the title theme the menus play (TADPCM6) -- is the one music the CD has as an audio track,
+    // not a file in its MUSIC folder (TADPCM1-5): a copy of the CD's files (the user's E:\dump\Test\LBA2\LBA2, 2026-10-20) has none, and the
+    // game's menus were silent. GOG's LBA2 has it as LBA2.OGG over its cue sheet LBA2.DAT; a raw image of the CD (.GOG / .bin with a .cue)
+    // has it as a track; a rip as MUSIC\TADPCM6.WAV or track6.ogg (the engine's fallbacks: LIB386/AIL/SDL/STREAM.CPP).
+    public static bool HasMenuMusic(string dir)
+    {
+        try
+        {
+            if (!Directory.Exists(dir)) return false;
+            bool In(string sub, string name) => Directory.Exists(Path.Combine(dir, sub)) && Directory.EnumerateFiles(Path.Combine(dir, sub)).Any(f => string.Equals(Path.GetFileName(f), name, StringComparison.OrdinalIgnoreCase));
+            if (In("MUSIC", "TADPCM6.WAV") || In("MUSIC", "track6.ogg")) return true;
+            var files = Directory.EnumerateFiles(dir).Select(f => (Path: f, Name: Path.GetFileName(f).ToUpperInvariant())).ToList();
+            var cue = files.Any(f => f.Name is "LBA2.DAT" || f.Name.StartsWith("LBA2") && f.Name.EndsWith(".CUE"));
+            if (cue && files.Any(f => f.Name == "LBA2.OGG")) return true;
+            return cue && files.Any(f => f.Name.StartsWith("LBA2") && Path.GetExtension(f.Name) is ".GOG" or ".BIN" or ".IMG" && new FileInfo(f.Path).Length > 100_000_000);
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException) { return false; }
+    }
+
+    // Where the menu music would be taken from for this LBA2 folder: the folder itself, else a GOG or Steam LBA2 on this PC; null: none
+    // (the setup window then asks where it is)
+    public static string? MenuMusicFolderFor(string lba2)
+    {
+        if (HasMenuMusic(lba2)) return lba2;
+        return InstalledLba2Folders().FirstOrDefault(d => !Same(d, lba2) && HasMenuMusic(d));
+    }
+
+    // GOG's and Steam's LBA2 folders on this PC, the usual places on every fixed drive
+    public static IEnumerable<string> InstalledLba2Folders()
+    {
+        foreach (var drive in DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.Fixed && d.IsReady))
+            foreach (var where in new[] { "GOG Games", Path.Combine("Program Files (x86)", "GOG Galaxy", "Games"), Path.Combine("Program Files (x86)", "Steam", "steamapps", "common"),
+                         Path.Combine("SteamLibrary", "steamapps", "common") })
+                foreach (var name in new[] { "Little Big Adventure 2", Path.Combine("Little Big Adventure 2", "LBA2"), Path.Combine("Little Big Adventure 2", "Common") })
+                {
+                    var dir = Path.Combine(drive.RootDirectory.FullName, where, name);
+                    if (Directory.Exists(dir)) yield return dir;
+                }
+    }
+
+    // The menu music into the install when the copy of the LBA2 folder hasn't got it: from the chosen folder, or a GOG or Steam LBA2 on this
+    // PC -- the cue sheet and its OGG or image, or the rip's file -- else said in the log (the menus will be silent).
+    private static void MenuMusicInto(string lba2, string target, Action<string> log, string? chosen)
+    {
+        if (HasMenuMusic(target)) { log("LBA2's menu music: in its folder"); return; }
+        var from = chosen is not null && HasMenuMusic(chosen) ? chosen : MenuMusicFolderFor(lba2);
+        if (from is null)
+        {
+            log($"LBA2's menu music: WARNING: not in {lba2} (its title theme is an audio track on LBA2's CD, which a copy of the CD's files hasn't got) nor in a GOG or Steam LBA2 on this PC: the menus have no music");
+            return;
+        }
+        var copied = new List<string>();
+        // (GOG's small OGG and its cue sheet when it has them -- not its 700 MB image as well)
+        var ogg = File.Exists(Path.Combine(from, "LBA2.OGG"));
+        foreach (var path in Directory.GetFiles(from))
+        {
+            var name = Path.GetFileName(path).ToUpperInvariant();
+            if (!(name is "LBA2.DAT" or "LBA2.OGG" || name.StartsWith("LBA2") && Path.GetExtension(name) is ".CUE"
+                  || !ogg && name.StartsWith("LBA2") && Path.GetExtension(name) is ".GOG" or ".BIN" or ".IMG")) continue;
+            var to = Path.Combine(target, Path.GetFileName(path));
+            if (File.Exists(to) && new FileInfo(to).Length == new FileInfo(path).Length) continue;
+            CopyPlain(path, to);
+            copied.Add(Path.GetFileName(path));
+        }
+        foreach (var name in new[] { "TADPCM6.WAV", "track6.ogg" })
+        {
+            var rip = Directory.Exists(Path.Combine(from, "MUSIC")) ? Directory.EnumerateFiles(Path.Combine(from, "MUSIC")).FirstOrDefault(f => string.Equals(Path.GetFileName(f), name, StringComparison.OrdinalIgnoreCase)) : null;
+            if (rip is null) continue;
+            Directory.CreateDirectory(Path.Combine(target, "music"));
+            CopyPlain(rip, Path.Combine(target, "music", Path.GetFileName(rip)));
+            copied.Add("MUSIC\\" + Path.GetFileName(rip));
+        }
+        log($"LBA2's menu music: not in {lba2} (an audio track on LBA2's CD); taken from {from}{(chosen is not null && Same(from, chosen) ? " (chosen)" : "")}: {string.Join(", ", copied)}");
     }
 
     // Whether LBA1's temple music (its CD track for `lba1`'s version) is in or beside `dir`: a CD image (LBA.GOG / LBA.iso with its cue
