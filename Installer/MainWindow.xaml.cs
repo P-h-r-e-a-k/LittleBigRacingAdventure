@@ -7,7 +7,7 @@ namespace LBRAInstaller;
 
 public partial class MainWindow : Window
 {
-    private bool busy;
+    private bool busy, installed;
     // (opened by an update that couldn't install by itself -- the game's folders gone: the site's file it is, for install.json)
     private readonly Updater.Source? source;
 
@@ -56,6 +56,25 @@ public partial class MainWindow : Window
         if (string.IsNullOrWhiteSpace(target)) { MessageBox.Show(this, "Choose a folder to install into.", Title); return; }
         if (Directory.Exists(target) && Directory.EnumerateFileSystemEntries(target).Any() && !File.Exists(Path.Combine(target, GameInstall.MenuFile))
             && MessageBox.Show(this, $"{target} isn't empty. Install into it anyway?", Title, MessageBoxButton.YesNo) != MessageBoxResult.Yes) return;
+        // LBA1's music: in the LBA1 folder or a GOG or Steam LBA1 on this PC -- else the player is asked where it is (the user, 2026-10-20:
+        // players reporting no music), or installs without it (the race then plays LBA2's music)
+        string? music = null;
+        if (GameInstall.MusicFolderFor(lba1) is null)
+            while (true)
+            {
+                var answer = MessageBox.Show(this,
+                    $"Little Big Adventure's music (the temple's track on its CD) wasn't found in {lba1}, nor in a GOG or Steam copy of the game on this PC. " +
+                    "Without it the Halloween race plays Little Big Adventure 2's music instead.\n\n" +
+                    "Yes: choose the folder it's in -- Little Big Adventure's GOG or Steam folder, or a folder with its CD image (LBA.GOG, LBA.iso, or a .cue and .bin) " +
+                    "or its music tracks (Track_06.mp3).\nNo: install without it.\nCancel: don't install yet.",
+                    Title, MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                if (answer == MessageBoxResult.Cancel) return;
+                if (answer == MessageBoxResult.No) break;
+                var dialog = new Microsoft.Win32.OpenFolderDialog { Title = "The folder with Little Big Adventure's music" };
+                if (dialog.ShowDialog(this) != true) continue;
+                if (GameInstall.HasMusic(dialog.FolderName, lba1)) { music = dialog.FolderName; break; }
+                MessageBox.Show(this, $"There's no Little Big Adventure CD music in {dialog.FolderName} (nor in the two folders above it).", Title, MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         busy = true; InstallButton.IsEnabled = false; PlayButton.IsEnabled = false;
         // (what the install did goes to <install folder>\setup.log, as a headless install's does -- the window shows only its progress)
         var lines = new List<string>();
@@ -64,11 +83,13 @@ public partial class MainWindow : Window
         var shortcut = ShortcutBox.IsChecked == true;
         try
         {
-            try { await Task.Run(() => GameInstall.Run(lba1, lba2, target, Report, Log, source)); }
+            try { await Task.Run(() => GameInstall.Run(lba1, lba2, target, Report, Log, source, music)); }
             finally { try { Directory.CreateDirectory(target); File.WriteAllLines(Path.Combine(target, "setup.log"), lines); } catch (Exception error) when (error is IOException or UnauthorizedAccessException) { } }
             if (shortcut) { try { Shortcut.Desktop(Path.Combine(target, GameInstall.GameExe), GameInstall.Title, Path.Combine(target, GameInstall.IconFile)); Log("a shortcut on the desktop"); } catch (Exception error) { Log("no shortcut: " + error.Message); } }
             Status.Text = "Installed. Happy Halloween!";
             PlayButton.IsEnabled = true;
+            // (installed: Install stays greyed -- a second press installed it all again; a failed install can be tried again)
+            installed = true;
         }
         catch (Exception error) when (error is IOException or InvalidDataException or UnauthorizedAccessException or InvalidOperationException or ArgumentException)
         {
@@ -76,7 +97,7 @@ public partial class MainWindow : Window
             Status.Text = "Not installed: " + error.Message;
             MessageBox.Show(this, "Not installed: " + error.Message, Title, MessageBoxButton.OK, MessageBoxImage.Warning);
         }
-        finally { busy = false; InstallButton.IsEnabled = true; }
+        finally { busy = false; InstallButton.IsEnabled = !installed; }
     }
 
     private void Play_Click(object sender, RoutedEventArgs e)

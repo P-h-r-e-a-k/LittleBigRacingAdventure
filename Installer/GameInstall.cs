@@ -65,7 +65,9 @@ internal static class GameInstall
     public static bool IsLba1Folder(string dir) => LBAAssembler.Lba1.Lba1Game.IsInstalled(dir);
 
     // `source`: the site's file this setup is (an update's download), for install.json
-    public static void Run(string lba1, string lba2, string target, Action<double, string> progress, Action<string> log, Updater.Source? source = null)
+    // `music`: a folder the player chose for LBA1's music when none was found (the setup window asks: MusicFolderFor), kept for updates
+    public static void Run(string lba1, string lba2, string target, Action<double, string> progress, Action<string> log, Updater.Source? source = null,
+                           string? music = null)
     {
         if (!IsLba1Folder(lba1)) throw new InvalidDataException($"{lba1} isn't an LBA1 game folder (it needs SCENE.HQR, LBA_GRI.HQR, LBA_BLL.HQR, LBA_BRK.HQR and RESS.HQR).");
         if (!IsLba2Folder(lba2)) throw new InvalidDataException($"{lba2} isn't an LBA2 game folder (it needs RESS.HQR, SCENE.HQR and BODY.HQR).");
@@ -117,7 +119,7 @@ internal static class GameInstall
         progress(0.5, "Building the race tracks");
         Environment.SetEnvironmentVariable("LBA1_DIR", lba1Target);
         // (LBA1's own temple music, CD track 6, from the player's LBA1 folder -- its CD image beside the HQRs copied above: TempleMusic)
-        Environment.SetEnvironmentVariable("LBA1_MUSIC_DIR", MusicFolder(lba1, log));
+        Environment.SetEnvironmentVariable("LBA1_MUSIC_DIR", MusicFolder(lba1, log, music));
         var builds = Specials.Select(s => new RaceTrackService.TrackBuild(RaceTrackPlan.Built(s.Island), RaceTrackOptions.For(s.Island))).ToList();
         // (none of the editor's private special cars in the game: LBA Assembler's RaceTrackService.PrivateCars)
         RaceTrackService.PrivateCars = false;
@@ -192,7 +194,7 @@ internal static class GameInstall
 
         // ---- 5. the updater
         progress(0.99, "Setting up the updates");
-        Updater.Record(target, lba1, lba2, source, log);
+        Updater.Record(target, lba1, lba2, source, log, music is not null && HasMusic(music, lba1) ? music : null);
         progress(1, "Installed");
     }
 
@@ -220,26 +222,44 @@ internal static class GameInstall
     // Where LBA1's own temple music (its CD track 6) is: the chosen LBA1 folder when its CD image (GOG's LBA.GOG + LBA.DAT) or the track
     // as a file is there or beside it -- else, since a copy of LBA1's data files alone has no music (the CD's music is audio tracks, not
     // files), the LBA1 of GOG or Steam on this machine, for the music only. Null: none anywhere (the race then plays LBA2's music).
-    private static string? MusicFolder(string lba1, Action<string> log)
+    // (`chosen`: the folder the player chose when none was found -- MusicFolderFor -- tried first)
+    private static string? MusicFolder(string lba1, Action<string> log, string? chosen = null)
     {
         Environment.SetEnvironmentVariable(LBAAssembler.Terrain.Temple.TempleMusic.EnvDirectory, null);
-        var track = LBAAssembler.Terrain.Temple.TempleMusic.MusicNumber(lba1) + 1;
-        bool Has(string dir)
-        {
-            try { return Directory.Exists(dir) && LBAAssembler.Terrain.Temple.TempleMusic.Find(LBAAssembler.Terrain.Temple.TempleMusic.Places(dir), track) is not null; }
-            catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidDataException) { return false; }
-        }
-        if (Has(lba1)) return lba1;
+        if (chosen is not null && HasMusic(chosen, lba1)) { log($"LBA1's music: from {chosen} (chosen)"); return chosen; }
+        if (chosen is not null) log($"LBA1's music: {chosen} (chosen) has no LBA1 CD music any more");
+        if (MusicFolderFor(lba1) is not { } dir) { log($"LBA1's music: no CD music in {lba1} nor in a GOG or Steam LBA1 on this machine: the race plays LBA2's music"); return null; }
+        if (!string.Equals(dir, lba1, StringComparison.OrdinalIgnoreCase)) log($"LBA1's music: {lba1} has no CD music (LBA1's data files alone); taking it from {dir}");
+        return dir;
+    }
+
+    // Where LBA1's temple music would be taken from for this LBA1 folder (MusicFolder), without a word: the folder itself, else a GOG or
+    // Steam LBA1 on this machine; null when none has it -- the setup window then asks the player where it is (the user, 2026-10-20: "if we
+    // can't find the LBA1 music, alert the user and allow them to select where we should copy it from", players reporting no music).
+    public static string? MusicFolderFor(string lba1)
+    {
+        if (HasMusic(lba1, lba1)) return lba1;
         // (GOG's and Steam's LBA1 installs on this PC -- registry, Steam libraries, the usual folders; Steam's Classic keeps its CD tracks as
         // Common\Music\Track_06.mp3: TempleMusic.InstalledLba1Folders)
         foreach (var dir in LBAAssembler.Terrain.Temple.TempleMusic.InstalledLba1Folders().Where(d => !string.Equals(Path.GetFullPath(d).TrimEnd('\\'), Path.GetFullPath(lba1).TrimEnd('\\'), StringComparison.OrdinalIgnoreCase)))
-            if (Has(dir))
-            {
-                log($"LBA1's music: {lba1} has no CD music (LBA1's data files alone); taking it from {dir}");
-                return dir;
-            }
-        log($"LBA1's music: no CD music in {lba1} nor in a GOG or Steam LBA1 on this machine: the race plays LBA2's music");
+            if (HasMusic(dir, lba1)) return dir;
         return null;
+    }
+
+    // Whether LBA1's temple music (its CD track for `lba1`'s version) is in or beside `dir`: a CD image (LBA.GOG / LBA.iso with its cue
+    // sheet, a .cue and .bin) or the track as a file (Steam's Music\Track_06.mp3) -- TempleMusic.Places/Find
+    public static bool HasMusic(string dir, string lba1)
+    {
+        // (Places looks in LBA1_MUSIC_DIR first, which an install sets: the folder alone here)
+        var env = Environment.GetEnvironmentVariable(LBAAssembler.Terrain.Temple.TempleMusic.EnvDirectory);
+        try
+        {
+            Environment.SetEnvironmentVariable(LBAAssembler.Terrain.Temple.TempleMusic.EnvDirectory, null);
+            var track = LBAAssembler.Terrain.Temple.TempleMusic.MusicNumber(lba1) + 1;
+            return Directory.Exists(dir) && LBAAssembler.Terrain.Temple.TempleMusic.Find(LBAAssembler.Terrain.Temple.TempleMusic.Places(dir), track) is not null;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidDataException or ArgumentException) { return false; }
+        finally { Environment.SetEnvironmentVariable(LBAAssembler.Terrain.Temple.TempleMusic.EnvDirectory, env); }
     }
 
     // A program's PE header marked a windowed (GUI) program rather than a console one: the optional header's Subsystem field (offset 68 in
