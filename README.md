@@ -40,7 +40,7 @@ The setup is published at <https://lbabirthdayevent.com/LBRA-Setup.exe>; uploadi
 
 - **When**: the game, at its start, once a week (`update_checked=` in `RACEGAME_SETTINGS.TXT`; never in LBA Assembler's Play or any
   run with the engine's command harness), starts `Update\LBRA-Setup.exe --check-update "<folder>" --wait-pid <the game>` hidden, and
-  plays on. Options > **Window, mini-map, updates**: **Updates: Automatic / Ask first / Off** (`updates=auto|ask|off`, Enter goes round them) and
+  plays on. Options > **Camera, window, updates**: **Updates: Automatic / Ask first / Off** (`updates=auto|ask|off`, Enter goes round them) and
   **Check for updates now** (also with updates off: asked first then); under them what the last check said (`Update\status.txt`).
 - **The check** (no window): a HEAD request over HTTPS; a new version is an ETag other than the one installed from -- or, for an install
   whose source isn't known (a setup run by hand), a file newer than the install or of another size. It is downloaded to
@@ -61,7 +61,7 @@ The setup is published at <https://lbabirthdayevent.com/LBRA-Setup.exe>; uploadi
 ## The game
 
 The main menu: **Story Mode** and **Track select** (greyed until the full game), **Specials**, **Best laps**, the game's own
-**Options** (with **Race controls, power-ups** and **Window, mini-map, updates** at the end), **Quit**; **Resume Game** while a race is on.
+**Options** (with **Race controls, power-ups** and **Camera, window, updates** at the end), **Quit**; **Resume Game** while a race is on.
 
 - **Specials**: the Halloween track, then a **Race** (five laps against Halloween's monsters -- the vampire in his coffin, the one
   to beat, the witch on her broomstick and the zombie in his hearse -- with the power-ups: the pumpkins on the road; the School
@@ -117,15 +117,21 @@ The main menu: **Story Mode** and **Track select** (greyed until the full game),
   is one), or the trial's own fastest lap as soon as one beats it. At the end of every lap, in races and time trials, the lap's time
   stays on the lap line for two seconds before the next lap's clock runs, in gold when it is a new best time.
 - **Mini-map**: a small map of the whole track in the bottom-right corner while you race, with a dot for every car -- yours the big
-  yellow one, each monster its own colour. Options > **Window, mini-map, updates** > **Mini-map: On / Off** turns it off or back on
+  yellow one, each monster its own colour. Options > **Camera, window, updates** > **Mini-map: On / Off** turns it off or back on
   (`minimap=` in `RACEGAME_SETTINGS.TXT`; on at first). It is hidden behind the menu and the pause, and once you finish.
+- **Camera**: three views -- **inside the car** (the driver's view: the car itself isn't drawn, and the view climbs and dips with
+  it on the temple's ramps and stairs), **just behind** (the camera as it was up to 2026-10-20) and **further back** (farther behind
+  and higher: the car smaller and lower in the picture, more of the road ahead in view; the first time). **V** (a pad's **Back**
+  button) goes round them during a race, the view's name shown a moment; Options > **Camera, window, updates** > **Camera** too
+  (Enter goes round them). The last one chosen is kept (`camera=0|1|2` in `RACEGAME_SETTINGS.TXT`).
 
 The first time: before the first race or time trial a **Controls** page, and before the first race a **Power-ups** page (every power-up
 of the track in its item box, with what it does). Enter turns the pages, Esc skips them; they don't come back by themselves, but
 Options shows them again.
 
-Driving: the arrow keys, **Ctrl** uses the power-up in the item box (the behaviour menu has no use in the car), P to pause, Esc for
-the menu. **F11** or **Alt+Enter** switches between full screen and a window at any time (also Options > **Window, mini-map, updates**;
+Driving: the arrow keys, **Ctrl** uses the power-up in the item box (the behaviour menu has no use in the car), **V** changes the
+camera's view, P to pause, Esc for the menu. **F11** or **Alt+Enter** switches between full screen and a window at any time (also
+Options > **Camera, window, updates**;
 kept in `lba2.cfg`). In a window the game fills the window whatever its shape: resize or maximise it and the menus, the race and
 its display are laid out to fit, with no black bars. The window's size, and whether it was maximised, is remembered for the next start
 (`WindowWidth`, `WindowHeight`, `WindowMaximized` in `User\LBA2\lba2.cfg`). Full screen is unchanged.
@@ -137,7 +143,7 @@ or five minutes on foot. Somewhere in the temple a secret is waiting for those w
 corridor shows the way.
 
 The game's own settings (`RACEGAME_SETTINGS.TXT`, beside `BESTTIMES.TXT` in `User\LBA2\`) remember the pages seen, whether a qualifying
-lap has been driven, the last qualifying answer, the last difficulty, the mini-map, the updates' mode and the last update check: deleting it, or a
+lap has been driven, the last qualifying answer, the last difficulty, the mini-map, the camera's view, the updates' mode and the last update check: deleting it, or a
 new install into another folder, shows the first-time pages again (an update, or an install over the game, keeps it).
 
 ## Building
