@@ -129,8 +129,10 @@ The first time: before the first race or time trial a **Controls** page, and bef
 of the track in its item box, with what it does). Enter turns the pages, Esc skips them; they don't come back by themselves, but
 Options shows them again.
 
-Driving: the arrow keys, **Ctrl** uses the power-up in the item box (the behaviour menu has no use in the car), **V** changes the
-camera's view, P to pause, Esc for the menu. **F11** or **Alt+Enter** switches between full screen and a window at any time (also
+Driving: the arrow keys, **Ctrl** uses the power-up in the item box (the behaviour menu has no use in the car), **Shift** is the
+handbrake (a pad's **Y** button): hold it into a tight corner and steer -- the back of the car steps out and it slides round, losing
+some speed -- then let go and the tyres grip again, the car pointing down the road. **V** changes the camera's view, P to pause, Esc
+for the menu. **F11** or **Alt+Enter** switches between full screen and a window at any time (also
 Options > **Camera, window, updates**;
 kept in `lba2.cfg`). In a window the game fills the window whatever its shape: resize or maximise it and the menus, the race and
 its display are laid out to fit, with no black bars. The window's size, and whether it was maximised, is remembered for the next start
