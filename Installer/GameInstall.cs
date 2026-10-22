@@ -336,6 +336,20 @@ internal static class GameInstall
     // (locked as on the specials' car page: won in the Halloween race, then for time trials), Halloween's monsters' cars, then every car
     // of the folder's RACECARS.JSON in its order -- the cars made by hand, then the cast's (the private ones aren't installed:
     // RaceTrackService.PrivateCars). Each car's stats: the specials' hand-set ones for the cars they list (Cars), else CarStats.
+    // Cars left out of the grid (the user, 2026-10-22: "Let's drop the following cars from LBRA" -- and to come out of LBA Assembler's
+    // cast later), by their names as RACECARS.JSON has them
+    private static readonly HashSet<string> DroppedCars = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "The snake's basket car", "The flying rat's glider", "The grey dog's basket car", "The brown dog's basket car", "The bird's glider",
+        "Citadel's robot's robot car", "The crab's swamp boat", "The giant spider's monster truck", "The nitro penguin's robot car",
+        "The desert robot's robot car", "The camel's monster truck",
+        "The duck's swamp boat", "The Eye's ghost car", "The translator's robot car", "The hidden Esmer's robot car", "The prison robot's robot car",
+        "The casino reptile's swamp boat", "The brown racing dog's basket car", "The orange racing dog's basket car", "The cyan racing dog's basket car",
+        "The yellow racing dog's basket car",
+        "The gas monster's ghost car", "The little gas monster's ghost car", "The firefly's glider", "The frog's swamp boat", "The yellow pig's basket car",
+        "The Franco dog's basket car", "The mechanic owl's glider", "The small spider's monster truck",
+    };
+
     private static List<string> GridCars(string target, Action<string> log)
     {
         string S(double v) => v.ToString("0.#", CultureInfo.InvariantCulture);
@@ -348,6 +362,7 @@ internal static class GameInstall
         {
             // (Twinsen's laser cars, as a folder built on 2026-10-08 lists them: his own buggy firing lasers, not cars of their own)
             if (e.Name is RaceTrackCharacterCars.LaserGreenName or RaceTrackCharacterCars.LaserRedName) continue;
+            if (DroppedCars.Contains(e.Name)) continue;
             order.Add((e.Number, e.Name));
         }
         var made = new Dictionary<string, int>();
@@ -373,7 +388,9 @@ internal static class GameInstall
             if (samples.Count < 12 && (number < 0 || number % 19 == 0 || given.Name is not null)) samples.Add($"{name} {S(accel)}/{S(top)}/{S(handling)} ({feel})");
             lines.Add($"gridcar={name}|{drive}|{S(accel)} {S(top)} {S(handling)}{options}");
         }
-        log($"the car grid: {lines.Count} cars ({(lines.Count + 48) / 49} pages of 7 x 7); their stats by kind: {string.Join(", ", made.OrderByDescending(m => m.Value).Select(m => $"{m.Key} {m.Value}"))}");
+        var dropped = catalogue.Count(e => DroppedCars.Contains(e.Name));
+        if (dropped != DroppedCars.Count) log($"the car grid: WARNING: {DroppedCars.Count - dropped} of the cars to leave out aren't in RACECARS.JSON by those names");
+        log($"the car grid: {lines.Count} cars, {dropped} left out ({(lines.Count + 48) / 49} pages of 7 x 7); their stats by kind: {string.Join(", ", made.OrderByDescending(m => m.Value).Select(m => $"{m.Key} {m.Value}"))}");
         log($"the car grid's stats (acceleration/top speed/handling), some of them: {string.Join("; ", samples)}");
         return lines;
     }
