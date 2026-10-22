@@ -83,6 +83,18 @@
     <EmbeddedResource Include="$(Lba)\docs\racetrack\cxtower_track_plan.json" LogicalName="RaceTrackPlan.CxTower.json" />
     <EmbeddedResource Include="$(Lba)\docs\racetrack\polar_track_plan.json" LogicalName="RaceTrackPlan.Polar.json" />
     <EmbeddedResource Include="$(Lba)\docs\racetrack\track_plan.json" LogicalName="RaceTrackPlan.Desert.json" />
+    <!-- (Track select's tracks, 2026-10-22: every island's, in the user's order, GameInstall.Tracks) -->
+    <EmbeddedResource Include="$(Lba)\docs\racetrack\citadel_track_plan.json" LogicalName="RaceTrackPlan.Citadel.json" />
+    <EmbeddedResource Include="$(Lba)\docs\racetrack\citadel_storm_track_plan.json" LogicalName="RaceTrackPlan.CitadelStorm.json" />
+    <EmbeddedResource Include="$(Lba)\docs\racetrack\emerald_track_plan.json" LogicalName="RaceTrackPlan.Emerald.json" />
+    <EmbeddedResource Include="$(Lba)\docs\racetrack\otringal_track_plan.json" LogicalName="RaceTrackPlan.Otringal.json" />
+    <EmbeddedResource Include="$(Lba)\docs\racetrack\celebrat_track_plan.json" LogicalName="RaceTrackPlan.CelebrationLava.json" />
+    <EmbeddedResource Include="$(Lba)\docs\racetrack\knartas_track_plan.json" LogicalName="RaceTrackPlan.Knartas.json" />
+    <EmbeddedResource Include="$(Lba)\docs\racetrack\elevator_track_plan.json" LogicalName="RaceTrackPlan.Elevator.json" />
+    <EmbeddedResource Include="$(Lba)\docs\racetrack\wannies_track_plan.json" LogicalName="RaceTrackPlan.Wannies.json" />
+    <EmbeddedResource Include="$(Lba)\docs\racetrack\mosquibe_track_plan.json" LogicalName="RaceTrackPlan.Mosquibe.json" />
+    <EmbeddedResource Include="$(Lba)\docs\racetrack\volcano_track_plan.json" LogicalName="RaceTrackPlan.Volcano.json" />
+    <EmbeddedResource Include="$(Lba)\docs\racetrack\celebration_track_plan.json" LogicalName="RaceTrackPlan.Celebration.json" />
     <!-- the race items' sounds, as LBA Assembler carries them: the race track build writes them into the game folder (RaceSounds) -->
     <EmbeddedResource Include="$(Lba)\sounds\**\*.mp3;$(Lba)\sounds\**\*.wav" LogicalName="RaceSounds/%(RecursiveDir)%(Filename)%(Extension)" />
     <!-- the game: LBA Assembler's engine (statically linked), built by build.ps1 -->

@@ -16,8 +16,9 @@ installer.
    as they came on the CD: a game folder an editor has saved into still installs the retail game (setup.log names any file that
    differed). Copies an editor kept beside its edits (`Orig*.HQR`, `_*.HQR`) are left out.
 2. LBA1's HQRs are copied to `lba1\` (the temple is built from its scenes).
-3. LBA Assembler's race track build makes the Temple of Bù island and its Halloween race in the copy.
-4. The game goes in: LBA Assembler's engine as `LBRA.exe`, the race files (`specials\`), the menu
+3. LBA Assembler's race track build makes every track in the copy: Track select's fifteen (Polar Island and the palace and Island CX
+   made as islands of their own) and the Temple of Bù island with its Halloween race.
+4. The game goes in: LBA Assembler's engine as `LBRA.exe`, the race files (`specials\`, `tracks\`), the menu
    (`RACEGAME.TXT`), the menu's picture (the Halloween backdrop, written into the copy's `SCREEN.HQR` in LBA2's own palette) and
    `portable.txt`, so saves, settings and best times stay in the install folder (`User\LBA2\`).
 5. The updater: the setup copies itself to `Update\LBRA-Setup.exe` and writes `Update\install.json` (the LBA1 and LBA2 folders it
@@ -60,8 +61,46 @@ The setup is published at <https://lbabirthdayevent.com/LBRA-Setup.exe>; uploadi
 
 ## The game
 
-The main menu: **Story Mode** and **Track select** (greyed until the full game), **Specials**, **Best laps**, the game's own
+The main menu: **Story Mode** (greyed until the full game), **Track select**, **Specials**, **Best laps**, the game's own
 **Options** (with **Race controls, power-ups** and **Camera, window, updates** at the end), **Quit**; **Resume Game** while a race is on.
+
+- **Track select** (for now behind a code): choosing it asks for the code -- type the digits (the keyboard's row or its keypad; each
+  shows as a star, Backspace takes one back), **Enter** to open, **Esc** back. A wrong code says "Wrong code" and empties; the right
+  one (**1234**) opens Track select for the rest of the run (it isn't kept: the next start asks again). The code is the installer's
+  `tracks_code=` line in `RACEGAME.TXT`, so it can change without a new engine; without the line there is no code.
+  Then the tracks, in this order, each with its best lap beside it (up and down, Enter, Esc back; the mouse too):
+  1. Polar Island (a sprint from the dock to the peak: start to finish once)
+  2. Citadel Island: the storm (in the rain, against Raph's time)
+  3. Citadel Island: the town (the town circuit, once the storm is over)
+  4. Desert Island
+  5. The Emerald Moon
+  6. Otringal
+  7. Celebration Island: the lava lake
+  8. Island of the Francos
+  9. The Elevator Platform (the rollercoaster)
+  10. Wannies Island
+  11. Mosquibees Island
+  12. Volcano Island
+  13. Island CX
+  14. The Emperor's palace (a sprint through its rooms, out of the round window)
+  15. Celebration Island: the statue
+
+  Each track: a **Race** (its own line-up and power-ups, three laps; a sprint once from start to finish -- won or lost, the menu
+  follows, no story's waking up) or a **Time trial** (Twinsen alone, no power-ups; its fastest lap, or a sprint's time, goes to Best
+  laps); then the **car grid**; then, for a race, the qualifying question as for the specials (not on a sprint). Best laps goes
+  through every track once Track select is open.
+- **The car grid** (Track select's car page): every car of the game, 7 x 7 on a page (222 cars: five pages) -- Twinsen's Halloween
+  buggy first, his pumpkin F1 (locked as on the Halloween car page until the Halloween race is won, then for time trials), Halloween's
+  monsters' cars (the vampire's coffin, the witch's broomstick, the zombie's hearse), then the cars made by hand for the islands' people
+  and the cast's cars. The arrows go through them (a row up and down, on to the next page past the ends), **Page up** / **Page down** a
+  page; the car chosen is framed in orange and shown large on the right, turning, with its name and stars; **Enter** (or a click on
+  it) races it, **Esc** goes back. The small cars are drawn once as their page opens. The last car taken is remembered
+  (`grid_car=` in `RACEGAME_SETTINGS.TXT`).
+  Every car has its own stats, adding up to the same 7.5 stars: the Halloween car page's cars keep their own (the table below); every
+  other car's come from what it is -- karts and bubble cars nimble and quick away but slow at the top, trucks and tanks slow but sure
+  in the bends, rockets and gliders fast and floaty, monster trucks all pull, ghost cars lively and floaty, boats fast on the
+  straights, mine carts as on rails -- with half a star (now and then a whole one) moved between two stats by the car's own number, so
+  two cars of a kind differ; the same on every install.
 
 - **Specials**: the Halloween track, then a **Race** (five laps against Halloween's monsters -- the vampire in his coffin, the one
   to beat, the witch on her broomstick and the zombie in his hearse -- with the power-ups: the pumpkins on the road; the School
@@ -145,7 +184,7 @@ or five minutes on foot. Somewhere in the temple a secret is waiting for those w
 corridor shows the way.
 
 The game's own settings (`RACEGAME_SETTINGS.TXT`, beside `BESTTIMES.TXT` in `User\LBA2\`) remember the pages seen, whether a qualifying
-lap has been driven, the last qualifying answer, the last difficulty, the mini-map, the camera's view, the updates' mode and the last update check: deleting it, or a
+lap has been driven, the last qualifying answer, the last difficulty, the car grid's last car, the mini-map, the camera's view, the updates' mode and the last update check: deleting it, or a
 new install into another folder, shows the first-time pages again (an update, or an install over the game, keeps it).
 
 ## Building
@@ -165,7 +204,7 @@ It needs MSYS2's UCRT64 toolchain (`C:\msys64`) for the engine and the .NET 10 S
 - `Installer\` - the installer (WPF): `GameInstall.cs` is the install, `MainWindow.xaml` its window, `Updater.cs` the update check and
   `--update`, `UpdateWindows.cs` the "Install it now?" question and the update's progress window.
 - `Game\menu.png` - the menu's backdrop, drawn by `tools\make_art.ps1` (no retail art in it).
-- The engine side lives in LBA Assembler: `native\lba2-classic-community\SOURCES\RACEGAME.CPP` (the menu, the difficulty page, the
+- The engine side lives in LBA Assembler: `native\lba2-classic-community\SOURCES\RACEGAME.CPP` (the menu, Track select's code, track list and car grid, the difficulty page, the
   car page and its locked car, the congratulations and their fireworks, best times, the qualifying choice, the power-up and controls
   pages, the Updates page and the weekly check, the race file it composes), `RACEUPDATE.CPP` (the updater started, hidden) and
   `RACEMOD.CPP` (the race-track mode: `start_scene=`, `start_in_car=`, `trial=`, `end_to_menu=`, `grid_back=`, `difficulty=`,

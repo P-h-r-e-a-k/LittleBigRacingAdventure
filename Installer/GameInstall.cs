@@ -10,8 +10,10 @@ namespace LBRAInstaller;
 //   1. LBA2's data copied in: its HQRs, its islands, its disc image and music, its voices and videos -- each file as the retail game has it
 //      (where the folder has a race track build's kept original, *.before-racetrack, that one);
 //   2. LBA1's data copied in, to lba1\ (the Temple of Bú is made from its scenes);
-//   3. the race tracks built into the copy (LBA Assembler's race track build: RaceTrackService.Build) -- the Temple of Bú's Halloween race;
-//   4. the game: LBA Assembler's engine as the game's exe, its race file for each special track (specials\), the cars to choose from and the
+//   3. the race tracks built into the copy (LBA Assembler's race track build: RaceTrackService.Build) -- Track select's fifteen tracks
+//      (Tracks, since 2026-10-22) and the Temple of Bú's Halloween race;
+//   4. the game: LBA Assembler's engine as the game's exe, its race files for each special track (specials\) and each of Track select's
+//      (tracks\), the cars to choose from -- the specials' car page's (car=) and Track select's car grid's, every car (gridcar=) -- and the
 //      menu (RACEGAME.TXT), and portable.txt (its saves and settings beside it);
 //   5. the updater: this setup copied to Update\, what it installed from in Update\install.json (Updater.Record).
 // The player's User\ folder (saves, settings, best laps) is never touched: an install over an install -- an update -- keeps it.
@@ -38,6 +40,32 @@ internal static class GameInstall
     public static readonly (RaceTrackIsland Island, string Name, string File)[] Specials =
     {
         (RaceTrackIsland.Temple, "Halloween Temple of Bu", "temple"),
+    };
+
+    // Track select's tracks (2026-10-22 -- the user: "Pull all tracks into LBRA under Track select, but temporarily password gate them with
+    // the password 1234", in this order): the island file each is raced on (RaceTrackService.RaceFor picks its track by it -- Citadel
+    // Island's two files each carry one, built together: the storm track in CITADEL, the town circuit in CITABAU), the island built for it,
+    // its name in the menu and its race files' names (tracks\<file>.txt, <file>_trial.txt). Not the old moon nor Sendell's Well; the Temple
+    // of Bú stays a special.
+    public const string TracksFolder = "tracks";
+    public const string TracksCode = "1234";
+    public static readonly (string IleFile, RaceTrackIsland Island, string Name, string File)[] Tracks =
+    {
+        ("POLAR.ILE", RaceTrackIsland.Polar, "Polar Island", "polar"),
+        ("CITADEL.ILE", RaceTrackIsland.Citadel, "Citadel Island: the storm", "citadel"),
+        ("CITABAU.ILE", RaceTrackIsland.Citadel, "Citadel Island: the town", "citabau"),
+        ("DESERT.ILE", RaceTrackIsland.Desert, "Desert Island", "desert"),
+        ("EMERAUDE.ILE", RaceTrackIsland.Emerald, "The Emerald Moon", "emeraude"),
+        ("OTRINGAL.ILE", RaceTrackIsland.Otringal, "Otringal", "otringal"),
+        ("CELEBRAT.ILE", RaceTrackIsland.CelebrationLava, "Celebration Island: the lava lake", "celebrat"),
+        ("KNARTAS.ILE", RaceTrackIsland.Knartas, "Island of the Francos", "knartas"),
+        ("ASCENCE.ILE", RaceTrackIsland.Elevator, "The Elevator Platform", "ascence"),
+        ("PLATFORM.ILE", RaceTrackIsland.Wannies, "Wannies Island", "platform"),
+        ("MOSQUIBE.ILE", RaceTrackIsland.Mosquibe, "Mosquibees Island", "mosquibe"),
+        ("SOUSCELB.ILE", RaceTrackIsland.Volcano, "Volcano Island", "souscelb"),
+        ("CXTOWER.ILE", RaceTrackIsland.CxTower, "Island CX", "cxtower"),
+        ("PALACE.ILE", RaceTrackIsland.Palace, "The Emperor's palace", "palace"),
+        ("CELEBRA2.ILE", RaceTrackIsland.Celebration, "Celebration Island: the statue", "celebra2"),
     };
 
     // The cars to choose from (RACECARS.JSON's numbers): Twinsen's Halloween buggy first -- his own buggy painted orange, with bats, the one
@@ -136,13 +164,17 @@ internal static class GameInstall
         Environment.SetEnvironmentVariable("LBA1_DIR", lba1Target);
         // (LBA1's own temple music, CD track 6, from the player's LBA1 folder -- its CD image beside the HQRs copied above: TempleMusic)
         Environment.SetEnvironmentVariable("LBA1_MUSIC_DIR", MusicFolder(lba1, log, music));
-        var builds = Specials.Select(s => new RaceTrackService.TrackBuild(RaceTrackPlan.Built(s.Island), RaceTrackOptions.For(s.Island))).ToList();
+        // (Track select's tracks, then the specials: each island once -- Citadel Island's build carries both its tracks)
+        var builds = Tracks.Select(t => t.Island).Concat(Specials.Select(s => s.Island)).Distinct()
+            .Select(island => new RaceTrackService.TrackBuild(RaceTrackPlan.Built(island), RaceTrackOptions.For(island))).ToList();
+        var buildWatch = System.Diagnostics.Stopwatch.StartNew();
         // (none of the editor's private special cars in the game: LBA Assembler's RaceTrackService.PrivateCars)
         RaceTrackService.PrivateCars = false;
         var result = RaceTrackService.Build(target, builds, new Direct<RaceTrackService.BuildProgress>(p => progress(0.5 + 0.4 * p.Done, p.Doing)));
         foreach (var line in result.Log) log("  " + line);
         if (!result.Ok) throw new InvalidDataException(result.Summary);
         log(result.Summary);
+        log($"the race tracks: {builds.Count} islands built in {buildWatch.Elapsed.TotalSeconds:0} s");
 
         // ---- 4. the game
         progress(0.9, "Writing the game");
@@ -154,8 +186,9 @@ internal static class GameInstall
         menu.Append($"title={Title}\n");
         // (the window's title bar: the series' name, not the engine's -- RACEGAME.CPP RaceGame_WindowTitle, read before the window is made)
         menu.Append($"window_title={WindowTitle}\n");
-        // (Story Mode and Track select greyed: the full game's, still to come)
-        menu.Append($"story=0\ntracks=0\nlaps={Laps}\nend_to_menu={EndToMenuMs}\n");
+        // (Story Mode greyed: the full game's, still to come; Track select open behind a code -- RACEGAME.CPP CodePage: "temporarily password
+        // gate them with the password 1234", the user, 2026-10-22: no tracks_code= line and it asks none)
+        menu.Append($"story=0\ntracks=1\ntracks_code={TracksCode}\nlaps={Laps}\nend_to_menu={EndToMenuMs}\n");
         foreach (var (island, name, file) in Specials)
         {
             var track = RaceTrackService.RaceFor(target, island.IleFile) ?? info;
@@ -169,6 +202,39 @@ internal static class GameInstall
             menu.Append($"special={name}|{SpecialsFolder}/{Path.GetFileName(race)}|{SpecialsFolder}/{Path.GetFileName(trial)}|{track.StartScene}\n");
             log($"{name}: starts in scene {track.StartScene}; against {string.Join(", ", (track.Drivers ?? new()).Where(d => !d.Ghost).Select(d => d.Name))}" +
                 (island.Levels is not null ? "; easy, medium and hard (the menu's difficulty page)" : ""));
+        }
+        // Track select's tracks, in the user's order: each its race and its time trial (tracks\), as the specials'
+        var tracksDir = Path.Combine(target, TracksFolder);
+        Directory.CreateDirectory(tracksDir);
+        var trackCount = 0;
+        foreach (var (ile, island, name, file) in Tracks)
+        {
+            var track = RaceTrackService.RaceFor(target, ile);
+            var built = track is null ? null : RaceTrackIsland.All.FirstOrDefault(i => string.Equals(i.Name, track.Island, StringComparison.OrdinalIgnoreCase));
+            if (track is null || built is null || !(string.Equals(built.IleFile, ile, StringComparison.OrdinalIgnoreCase) || string.Equals(built.TwinIleFile, ile, StringComparison.OrdinalIgnoreCase)))
+            {
+                log($"{name}: WARNING: no track on {ile} in this build: left out of Track select");
+                continue;
+            }
+            var raced = RaceTrackService.Raced(track);
+            var race = Path.Combine(tracksDir, file + ".txt");
+            var trial = Path.Combine(tracksDir, file + "_trial.txt");
+            Setup().WriteEngineFile(race, track, prefix: file + "_");
+            TrialSetup().WriteEngineFile(trial, track, prefix: file + "_trial_");
+            foreach (var written in new[] { race, trial })
+            {
+                // (a sprint the story dreams or ends with -- Polar Island's dream, the palace's teleporter --: the race alone, start to
+                // finish, then the menu; not its story's lines)
+                if (raced.Dream is not null) WithoutStory(written);
+                Relative(written, target);
+            }
+            menu.Append($"track={name}|{TracksFolder}/{Path.GetFileName(race)}|{TracksFolder}/{Path.GetFileName(trial)}|{raced.StartScene}\n");
+            trackCount++;
+            var opponents = (raced.Drivers ?? new()).Where(d => !d.Ghost).Select(d => d.Name).ToList();
+            var laps = raced.Dream is not null ? "a sprint, start to finish" : built.RaceLaps is int own ? $"{own} laps" : $"{Laps} laps";
+            log($"Track select {trackCount}: {name} ({ile}, {built.Name}): starts in scene {raced.StartScene}, {laps}; " +
+                (opponents.Count > 0 ? $"against {string.Join(", ", opponents)}" : "no opponents") +
+                ((raced.Drivers ?? new()).Any(d => d.Ghost) ? ", a time to beat" : "") + (raced.Mushrooms is { Count: > 0 } m ? $", {m.Count} power-up spots" : ""));
         }
         var cars = 0;
         foreach (var (number, name, accel, top, handling) in Cars)
@@ -197,6 +263,8 @@ internal static class GameInstall
             menu.Append($"car={name}|{drive}|{S(accel)} {S(top)} {S(handling)}{options}\n");
             cars++;
         }
+        var grid = GridCars(target, log);
+        foreach (var line in grid) menu.Append(line).Append('\n');
         File.WriteAllText(Path.Combine(target, MenuFile), menu.ToString(), new UTF8Encoding(false));
         // the menu's picture: the Halloween backdrop in LBA2's own palette, in the copy's SCREEN.HQR
         MenuPicture(target);
@@ -224,7 +292,7 @@ internal static class GameInstall
         // (the race track build's own keepsakes -- the files as they were before it, its .bak copies -- of no use to the game: a reinstall
         // copies LBA2's files in afresh)
         foreach (var kept in Directory.GetFiles(target, "*" + Kept).Concat(Directory.GetFiles(target, "*.bak"))) File.Delete(kept);
-        log($"the game: {GameExe}, {MenuFile}, {Specials.Length} special track(s), {cars} cars");
+        log($"the game: {GameExe}, {MenuFile}, {Specials.Length} special track(s) ({cars} cars), Track select's {trackCount} tracks ({grid.Count} cars in the car grid)");
 
         // ---- 5. the updater
         progress(0.99, "Setting up the updates");
@@ -252,6 +320,129 @@ internal static class GameInstall
             return value.StartsWith(root, StringComparison.OrdinalIgnoreCase) ? l[..(eq + 1)] + value[root.Length..].Replace('\\', '/') : l;
         });
         File.WriteAllLines(raceFile, lines);
+    }
+
+    // A Track select race file of a sprint the story dreams or ends with (Polar Island's dream, the Emperor's palace's teleporter to
+    // Celebration Island): its story's lines taken out -- the dream's intro and loss lines, the waking up a win leads to and the game
+    // variable it sets -- so the race is the race alone: start to finish, then the menu (RACEMOD.CPP: a lost sprint isn't run again
+    // when the race goes back to the menu, end_to_menu=).
+    private static readonly string[] StoryKeys = { "intro=", "lose=", "wake=", "win=", "wake_flight=", "after_gears=" };
+    private static void WithoutStory(string raceFile) =>
+        File.WriteAllLines(raceFile, File.ReadAllLines(raceFile).Where(l => !StoryKeys.Any(k => l.StartsWith(k, StringComparison.Ordinal))));
+
+    // ---- the car grid (Track select's): every car the build installed, each with its stats
+
+    // The car grid's gridcar= lines (RACEGAME.CPP GridPage, the same fields as car=): Twinsen's Halloween buggy first, his pumpkin F1
+    // (locked as on the specials' car page: won in the Halloween race, then for time trials), Halloween's monsters' cars, then every car
+    // of the folder's RACECARS.JSON in its order -- the cars made by hand, then the cast's (the private ones aren't installed:
+    // RaceTrackService.PrivateCars). Each car's stats: the specials' hand-set ones for the cars they list (Cars), else CarStats.
+    private static List<string> GridCars(string target, Action<string> log)
+    {
+        string S(double v) => v.ToString("0.#", CultureInfo.InvariantCulture);
+        var lines = new List<string>();
+        var catalogue = RaceTrackCharacterCars.Catalogue(target);
+        var halloween = new[] { RaceTrackCharacterCars.PumpkinNumber, RaceTrackCharacterCars.VampireNumber, RaceTrackCharacterCars.WitchNumber, RaceTrackCharacterCars.ZombieNumber };
+        var order = new List<(int Number, string Name)> { (HalloweenBuggy, RaceTrackCharacterCars.HalloweenBuggyName) };
+        foreach (var n in halloween) if (catalogue.FirstOrDefault(e => e.Number == n) is { } e) order.Add((n, e.Name));
+        foreach (var e in catalogue.Where(e => !halloween.Contains(e.Number)).OrderBy(e => e.Number))
+        {
+            // (Twinsen's laser cars, as a folder built on 2026-10-08 lists them: his own buggy firing lasers, not cars of their own)
+            if (e.Name is RaceTrackCharacterCars.LaserGreenName or RaceTrackCharacterCars.LaserRedName) continue;
+            order.Add((e.Number, e.Name));
+        }
+        var made = new Dictionary<string, int>();
+        var samples = new List<string>();
+        foreach (var (number, listedName) in order)
+        {
+            var given = Cars.FirstOrDefault(c => c.Number == number);
+            var name = given.Name ?? listedName;
+            string? drive;
+            var options = "";
+            if (number == HalloweenBuggy)
+            {
+                var buggy = RaceTrackCharacterCars.HalloweenBuggyCar(target);
+                drive = buggy?.Line;
+                if (buggy is { } b) options = $"|page={b.Body} {b.Anim}";
+            }
+            else drive = RaceCarEngineFile.DriveAsLine(target, number)?.Split('\n').FirstOrDefault(l => l.StartsWith("drive_as="))?["drive_as=".Length..].Trim();
+            if (drive is null) { log($"the car grid: no car {number} ({name}) in this build: left out"); continue; }
+            if (number == RaceTrackCharacterCars.PumpkinNumber) options += $"|unlock={PumpkinUnlock} trial|hint={PumpkinHint}";
+            var (accel, top, handling, feel) = given.Name is not null ? (given.Accel, given.Top, given.Handling, "hand-set") : CarStats(number);
+            if (Math.Abs(accel + top + handling - StarTotal) > 0.01) log($"the car grid: {name}'s stars add up to {S(accel + top + handling)}, not {S(StarTotal)}");
+            made[feel] = made.GetValueOrDefault(feel) + 1;
+            if (samples.Count < 12 && (number < 0 || number % 19 == 0 || given.Name is not null)) samples.Add($"{name} {S(accel)}/{S(top)}/{S(handling)} ({feel})");
+            lines.Add($"gridcar={name}|{drive}|{S(accel)} {S(top)} {S(handling)}{options}");
+        }
+        log($"the car grid: {lines.Count} cars ({(lines.Count + 48) / 49} pages of 7 x 7); their stats by kind: {string.Join(", ", made.OrderByDescending(m => m.Value).Select(m => $"{m.Key} {m.Value}"))}");
+        log($"the car grid's stats (acceleration/top speed/handling), some of them: {string.Join("; ", samples)}");
+        return lines;
+    }
+
+    // How a kind of car drives, in stars (acceleration, top speed, handling: each kind's add up to StarTotal) -- karts nimble and slow at
+    // the top, trucks and tanks slow away but sure in the bends, rockets and gliders fast and floaty, monster trucks all pull, ghosts
+    // lively and floaty, ...
+    private enum Feel { Roadster, Jeep, Truck, Kart, Bubble, Ball, Cart, Glider, Boat, Monster, Robot, Basket, Ghost, Rocket, Tank, Saucer, Racer, Flyer }
+    private static (double Accel, double Top, double Handling) Profile(Feel feel) => feel switch
+    {
+        Feel.Roadster => (2.5, 3.5, 1.5),     // long and low: fast, wide in the bends
+        Feel.Jeep => (2.5, 2, 3),             // sure-footed
+        Feel.Truck => (1.5, 2, 4),            // slow away, slow at the top, steady
+        Feel.Kart => (3.5, 1, 3),             // nimble: quick away, slow at the top
+        Feel.Bubble => (3, 1.5, 3),           // a zippy little egg
+        Feel.Ball => (3.5, 2, 2),             // bouncy: all pull
+        Feel.Cart => (2, 2, 3.5),             // as on rails
+        Feel.Glider => (1.5, 4.5, 1.5),       // fast once going, floaty
+        Feel.Boat => (2, 3.5, 2),             // a fan behind it: fast on the straights
+        Feel.Monster => (4, 1.5, 2),          // huge wheels, huge pull, low top speed
+        Feel.Robot => (2, 2.5, 3),            // steady, precise
+        Feel.Basket => (3, 1.5, 3),           // light and handy
+        Feel.Ghost => (3, 3, 1.5),            // lively, floaty in the bends
+        Feel.Rocket => (1.5, 5, 1),           // the fastest at the top, a handful
+        Feel.Tank => (1, 2, 4.5),             // tracks: slow, turns on the spot
+        Feel.Saucer => (3, 3.5, 1),           // hovering: quick, sliding
+        Feel.Racer => (3, 3, 1.5),            // a race car
+        _ => (2, 4, 1.5),                     // Flyer: fast, light in the bends
+    };
+
+    // The cars made by hand (the racer entity's, RACECARS.JSON 0-63) by what they are; Halloween's monsters' cars too
+    private static readonly Dictionary<int, Feel> HandMade = new()
+    {
+        [0] = Feel.Racer, [2] = Feel.Glider, [5] = Feel.Ghost, [6] = Feel.Roadster, [7] = Feel.Robot, [8] = Feel.Truck, [9] = Feel.Rocket,
+        [11] = Feel.Cart, [12] = Feel.Boat, [13] = Feel.Boat, [14] = Feel.Rocket, [15] = Feel.Saucer, [17] = Feel.Roadster, [18] = Feel.Kart,
+        [19] = Feel.Tank, [20] = Feel.Basket, [21] = Feel.Boat, [22] = Feel.Truck, [23] = Feel.Truck, [24] = Feel.Kart, [26] = Feel.Tank,
+        [27] = Feel.Basket, [28] = Feel.Cart, [29] = Feel.Jeep, [30] = Feel.Boat, [31] = Feel.Jeep, [32] = Feel.Truck, [33] = Feel.Flyer,
+        [34] = Feel.Truck, [35] = Feel.Basket, [36] = Feel.Ball, [38] = Feel.Ball, [39] = Feel.Kart, [40] = Feel.Boat, [41] = Feel.Basket,
+        [42] = Feel.Basket, [43] = Feel.Basket, [44] = Feel.Boat, [45] = Feel.Boat, [46] = Feel.Truck, [48] = Feel.Cart, [50] = Feel.Monster,
+        [51] = Feel.Roadster, [52] = Feel.Ball, [53] = Feel.Ghost, [54] = Feel.Flyer, [55] = Feel.Roadster, [56] = Feel.Truck,
+        [57] = Feel.Flyer, [58] = Feel.Roadster, [59] = Feel.Racer, [60] = Feel.Jeep, [61] = Feel.Cart, [62] = Feel.Jeep, [63] = Feel.Robot,
+        [RaceTrackCharacterCars.VampireNumber] = Feel.Ghost, [RaceTrackCharacterCars.WitchNumber] = Feel.Flyer,
+        [RaceTrackCharacterCars.ZombieNumber] = Feel.Truck,
+    };
+
+    // A car's stats: its kind's (a cast's car by the style its kind drives, RaceTrackCharacterCars.StyleOf; a car made by hand by HandMade),
+    // then -- so that two cars of a kind differ -- half a star (now and then a whole one) moved from one stat to another, picked by the car's
+    // number: the same every install, the total always StarTotal, each stat kept to half a star .. 5.
+    private static (double Accel, double Top, double Handling, string Feel) CarStats(int number)
+    {
+        var cast = RaceTrackCharacterCars.Cast;
+        var feel = number >= RaceTrackCharacterCars.CastFirst && number - RaceTrackCharacterCars.CastFirst < cast.Length
+            ? Enum.Parse<Feel>(RaceTrackCharacterCars.StyleOf(cast[number - RaceTrackCharacterCars.CastFirst]).ToString())
+            : HandMade.GetValueOrDefault(number, Feel.Jeep);
+        var (a, t, h) = Profile(feel);
+        var s = new[] { a, t, h };
+        var hash = (uint)(number + 1000) * 2654435761u;
+        hash ^= hash >> 13;
+        hash *= 0x5bd1e995u;
+        hash ^= hash >> 15;
+        var moves = new[] { (0, 1), (1, 0), (1, 2), (2, 1), (0, 2), (2, 0) };
+        var pick = (int)(hash % 8);
+        if (pick < 7)
+        {
+            var (from, to) = moves[pick < 6 ? pick : (int)(hash >> 8) % 6];
+            var amount = pick == 6 ? 1.0 : 0.5;
+            if (s[from] - amount >= 0.5 && s[to] + amount <= 5) { s[from] -= amount; s[to] += amount; }
+        }
+        return (s[0], s[1], s[2], feel.ToString().ToLowerInvariant());
     }
 
     // Where LBA1's own temple music (its CD track 6) is: the chosen LBA1 folder when its CD image (GOG's LBA.GOG + LBA.DAT) or the track
