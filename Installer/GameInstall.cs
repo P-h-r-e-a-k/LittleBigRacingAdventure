@@ -271,6 +271,14 @@ internal static class GameInstall
         log("the menu's picture: SCREEN.HQR entry 4");
         using (var engine = typeof(GameInstall).Assembly.GetManifestResourceStream("engine.exe") ?? throw new InvalidDataException("The installer has no engine in it."))
         using (var exe = File.Create(Path.Combine(target, GameExe))) engine.CopyTo(exe);
+        // (the game's own icon in the exe, the pumpkin, in place of the engine's: its window, the taskbar and Explorer show it -- GameIcon)
+        using (var ico = typeof(GameInstall).Assembly.GetManifestResourceStream("game/" + IconFile) ?? throw new InvalidDataException("The installer has no icon in it."))
+        using (var bytes = new MemoryStream())
+        {
+            ico.CopyTo(bytes);
+            try { log($"{GameExe}: the game's icon ({GameIcon.Replace(Path.Combine(target, GameExe), bytes.ToArray())} pictures) in place of the engine's"); }
+            catch (Exception e) when (e is IOException or InvalidDataException) { log($"{GameExe} keeps the engine's icon: {e.Message}"); }
+        }
         // (LBA Assembler's engine is a console program -- its headless runs log to the console -- so Windows would open a console window
         // beside the game: the game's copy is marked a windowed program instead; output redirected by a caller still works)
         if (WindowedProgram(Path.Combine(target, GameExe))) log($"{GameExe}: a windowed program (no console window)");
