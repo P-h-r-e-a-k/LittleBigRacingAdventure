@@ -155,6 +155,18 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
 - **Time trial display**: over the lap the display shows **Best time** -- the track's best lap from Best laps (`--:--.--` before there
   is one), or the trial's own fastest lap as soon as one beats it. At the end of every lap, in races and time trials, the lap's time
   stays on the lap line for two seconds before the next lap's clock runs, in gold when it is a new best time.
+- **Ghost car** (2026-10-24): every time-trial lap is recorded, and a lap faster than your best one becomes that track's ghost. From the
+  next lap on, the ghost drives round with you as a see-through car. At each checkpoint and at the line, the display says how far
+  **ahead** (green) or **behind** (red) of it you are; the line above Best time shows the ghost's lap time. A sprint (Polar Island, the
+  palace) records its run from start to finish the same way.
+  - The recording isn't your key presses. The game moves the car by however long each frame took, so the same keys would drive a
+    different lap on another PC. It records where the car was at each moment, so a ghost looks the same on any machine.
+  - **Best laps** shows each track's ghost under its laps: **Enter** plays it back, the camera behind it, round and round until Esc.
+    **G** picks what your time trials race: **the fastest ghost** (the first time), **your best lap**, or **no ghost** (`ghost=2|1|0`
+    in `RACEGAME_SETTINGS.TXT`). **O** opens the ghosts' folder.
+  - **Sharing**: ghosts are text files in `User\LBA2\GHOSTS\` (yours are named after the track, e.g. `Otringal.ghost`). To share one,
+    send the file; the other player renames it (e.g. `Otringal - Sam.ghost`) and puts it in their own `GHOSTS` folder. Their time
+    trials then race whichever ghost of that track is fastest, and Best laps can play it back.
 - **Mini-map**: a small map of the whole track in the bottom-right corner while you race, with a dot for every car -- yours the big
   yellow one, each monster its own colour. Options > **Camera, window, updates** > **Mini-map: On / Off** turns it off or back on
   (`minimap=` in `RACEGAME_SETTINGS.TXT`; on at first). It is hidden behind the menu and the pause, and once you finish.

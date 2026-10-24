@@ -71,6 +71,7 @@
     <Compile Include="$(Lba)\Assets\**\*.cs" Link="Lba\Assets\%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="$(Lba)\Grids\**\*.cs" Link="Lba\Grids\%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="$(Lba)\Maps\**\*.cs" Link="Lba\Maps\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="$(Lba)\Characters\**\*.cs" Link="Lba\Characters\%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="$(Lba)\Lba1\Lba1GridRenderer.cs" Link="Lba\Lba1\Lba1GridRenderer.cs" />
     <Compile Include="$(Lba)\Lba2Areas.cs" Link="Lba\Lba2Areas.cs" />
     <Compile Include="$(Lba)\Lba2Interiors.cs" Link="Lba\Lba2Interiors.cs" />
