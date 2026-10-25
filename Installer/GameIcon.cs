@@ -88,6 +88,22 @@ internal static class GameIcon
         {
             if (!EndUpdateResource(update, !done) && done) throw new IOException($"{Path.GetFileName(exe)}'s icons could not be written (error {Marshal.GetLastWin32Error()}).");
         }
+        Refresh(exe);
         return images.Count;
+    }
+
+    // Explorer told the exe has changed, and its icon cache emptied: it keeps the icon it showed for a path, and an update writes the new
+    // exe at the same path -- the window had the pumpkin, the file in Explorer the engine's icon still (the user, 2026-10-25: "the exe icon
+    // for LBRA still retains the engine icon"; its icons were the pumpkin's alone).
+    private const int ShcneUpdateItem = 0x2000, ShcneAssocChanged = 0x08000000;
+    private const uint ShcnfIdList = 0x0, ShcnfPathW = 0x5, ShcnfFlush = 0x1000;
+
+    [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
+    private static extern void SHChangeNotify(int eventId, uint flags, string? item1, IntPtr item2);
+
+    public static void Refresh(string exe)
+    {
+        SHChangeNotify(ShcneUpdateItem, ShcnfPathW | ShcnfFlush, exe, IntPtr.Zero);
+        SHChangeNotify(ShcneAssocChanged, ShcnfIdList | ShcnfFlush, null, IntPtr.Zero);
     }
 }
