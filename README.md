@@ -87,7 +87,7 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
 
   Each track: a **Race** (its own line-up and power-ups, three laps; a sprint once from start to finish -- won or lost, the menu
   follows, no story's waking up) or a **Time trial** (Twinsen alone, no power-ups; its fastest lap, or a sprint's time, goes to Best
-  laps); then the **car grid**; then, for a race, the qualifying question as for the specials (not on a sprint). Best laps goes
+  laps, and it first asks which **ghost** to race, see below); then the **car grid**; then, for a race, the qualifying question as for the specials (not on a sprint). Best laps goes
   through every track once Track select is open.
 - **The car grid** (Track select's car page): every car of the game, 7 x 7 on a page (222 cars: five pages) -- Twinsen's Halloween
   buggy first, his pumpkin F1 (locked as on the Halloween car page until the Halloween race is won, then for time trials), Halloween's
@@ -148,7 +148,7 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
 - **Qualifying**: the first race always starts with a qualifying lap (no power-ups on it; its time places Twinsen on the grid; the
   monsters wait in the slip lane beside the start line meanwhile). After that, a race asks after the car page: **Qualifying lap**, or
   **Skip** and start at the back of the grid. The last answer is remembered.
-- **Best laps**: the ten fastest laps of each track, with the car: each time trial's fastest lap and every qualifying lap -- the laps
+- **Best laps**: the fastest laps of each track (the page shows five), with the car: each time trial's fastest lap and every qualifying lap -- the laps
   driven with no power-ups (a time trial is the same at every difficulty; a race's laps never count). At the end of a time trial the screen shows its best lap and the rank it
   took, and the whole time under it. The whole five-lap times kept by earlier versions stay in `BESTTIMES.TXT` but aren't shown as laps.
 - After a race the game goes back to the menu by itself.
@@ -164,15 +164,21 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
   - **Ghosts to beat** (2026-10-25): every track comes with an **Easy**, a **Medium** and a **Hard** ghost, in the game folder's
     `ghosts\`. Easy and Medium are Twinsen's Halloween buggy driven at an easy and a steady pace. Hard is the quickest car for that
     track, flat out, taking the track's shortcuts (on the Temple of Bú: the hidden passage and the drop off the end spiral). The
-    display names the ghost you race ("Hard ghost 0:46.28") and says **You beat the Hard ghost!** the first time you do.
+    display names the ghost you race ("Hard ghost 0:46.28").
     On Wannies Island the frog's mouth decides every lap, so its three ghosts are only a fraction of a second apart.
-  - **Best laps** shows the track's ghosts under its laps: **Up**, **Down** go through yours and the Easy, Medium and Hard ones;
-    **Enter** plays the one shown back, the camera behind it, round and round until Esc. **G** picks what your time trials race:
-    **the fastest ghost** (the first time), **your best lap**, **the Easy / Medium / Hard ghost**, or **no ghost** (`ghost=2|1|3|4|5|0`
-    in `RACEGAME_SETTINGS.TXT`). **O** opens the ghosts' folder.
+  - **Racing a ghost** (2026-10-25): pick the track, then **Time trial**, and the **Race a ghost** page asks what to race: **No
+    ghost**, **Your best lap**, or the **Easy**, **Medium** or **Hard** ghost, each with its lap time. Medium is locked until you beat
+    Easy on that track, and Hard until you beat Medium ("Medium ghost: beat Easy"). Beat one and the display says **You beat the Easy
+    ghost! Medium unlocked**. Each track keeps its own unlocks (`ghost_beaten=` lines in `RACEGAME_SETTINGS.TXT`), and the page opens
+    on your last choice. Esc on the car page goes back to it.
+  - **Best laps**: one track at a time, its **five fastest laps** with their cars, and under them **Watch**: **Your best lap** or
+    **Ghost: Easy / Medium / Hard**. **Up**, **Down** move between the track's name and the two Watch lines. On the track's name,
+    **Left**, **Right** go through the tracks; on the ghost line they go round Easy, Medium and Hard. **Enter** plays the line chosen
+    back, the camera behind it, round and round until Esc. Any level can be watched, locked or not.
+  - "Your best lap" says **Your recorded lap** when a faster lap in the list has no ghost (laps driven before ghosts were recorded).
   - **Sharing**: ghosts are text files in `User\LBA2\GHOSTS\` (yours are named after the track, e.g. `Otringal.ghost`). To share one,
-    send the file; the other player renames it (e.g. `Otringal - Sam.ghost`) and puts it in their own `GHOSTS` folder. Their time
-    trials then race whichever ghost of that track is fastest, and Best laps can play it back.
+    send the file; the other player renames it (e.g. `Otringal - Sam.ghost`) and puts it in their own `GHOSTS` folder. When it is
+    faster than their own, the "Your best lap" line becomes **Shared ghost** on both pages, and it is the one raced and watched.
 - **Mini-map**: a small map of the whole track in the bottom-right corner while you race, with a dot for every car -- yours the big
   yellow one, each monster its own colour. Options > **Camera, window, updates** > **Mini-map: On / Off** turns it off or back on
   (`minimap=` in `RACEGAME_SETTINGS.TXT`; on at first). It is hidden behind the menu and the pause, and once you finish.
