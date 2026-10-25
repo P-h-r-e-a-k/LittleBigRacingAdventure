@@ -87,7 +87,8 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
 
   Each track: a **Race** (its own line-up and power-ups, three laps; a sprint once from start to finish -- won or lost, the menu
   follows, no story's waking up) or a **Time trial** (Twinsen alone, no power-ups; its fastest lap, or a sprint's time, goes to Best
-  laps, and it first asks which **ghost** to race, see below); then the **car grid**; then, for a race, the qualifying question as for the specials (not on a sprint). Best laps goes
+  laps, and it first asks **how many laps** -- 1, 3, 5, 10 or **Endless: until you stop** -- and which **ghost** to race, see
+  below); then the **car grid**; then, for a race, the qualifying question as for the specials (not on a sprint). Best laps goes
   through every track once Track select is open.
 - **The car grid** (Track select's car page): every car of the game, 7 x 7 on a page (222 cars: five pages) -- Twinsen's Halloween
   buggy first, his pumpkin F1 (locked as on the Halloween car page until the Halloween race is won, then for time trials), Halloween's
@@ -151,7 +152,7 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
 - **Best laps**: the fastest laps of each track (the page shows five), with the car: each time trial's fastest lap and every qualifying lap -- the laps
   driven with no power-ups (a time trial is the same at every difficulty; a race's laps never count). At the end of a time trial the screen shows its best lap and the rank it
   took, and the whole time under it. The whole five-lap times kept by earlier versions stay in `BESTTIMES.TXT` but aren't shown as laps.
-- After a race the game goes back to the menu by itself.
+- After a race the game goes back to the menu by itself, on the line you chose last (Track select, Specials or Best laps).
 - **Time trial display**: over the lap the display shows **Best time** -- the track's best lap from Best laps (`--:--.--` before there
   is one), or the trial's own fastest lap as soon as one beats it. At the end of every lap, in races and time trials, the lap's time
   stays on the lap line for two seconds before the next lap's clock runs, in gold when it is a new best time.
@@ -169,8 +170,13 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
   - **Racing a ghost** (2026-10-25): pick the track, then **Time trial**, and the **Race a ghost** page asks what to race: **No
     ghost**, **Your best lap**, or the **Easy**, **Medium** or **Hard** ghost, each with its lap time. Medium is locked until you beat
     Easy on that track, and Hard until you beat Medium ("Medium ghost: beat Easy"). Beat one and the display says **You beat the Easy
-    ghost! Medium unlocked**. Each track keeps its own unlocks (`ghost_beaten=` lines in `RACEGAME_SETTINGS.TXT`), and the page opens
-    on your last choice. Esc on the car page goes back to it.
+    ghost! Medium unlocked**. A lap faster than a harder ghost's time unlocks past it too: racing Easy and beating Medium's time
+    says **You beat Easy and Medium! Medium and Hard unlocked**. Each track keeps its own unlocks (`ghost_beaten=` lines in
+    `RACEGAME_SETTINGS.TXT`), and the page opens on your last choice. Esc on the car page goes back to it.
+  - **Laps** (2026-10-25): before the ghost, a time trial asks **How many laps?**: 1, 3, 5, 10, or **Endless: until you stop**
+    (`trial_laps=` in `RACEGAME_SETTINGS.TXT`; the last choice comes up first). An endless trial counts "Lap 7" with no end; its
+    fastest lap goes into Best laps as soon as you drive it, so stopping through the menu loses nothing. The sprints (Polar Island,
+    the palace) have no laps to choose.
   - **Best laps**: one track at a time, its **five fastest laps** with their cars, and under them **Watch**: **Your best lap** or
     **Ghost: Easy / Medium / Hard**. **Up**, **Down** move between the track's name and the two Watch lines. On the track's name,
     **Left**, **Right** go through the tracks; on the ghost line they go round Easy, Medium and Hard. **Enter** plays the line chosen

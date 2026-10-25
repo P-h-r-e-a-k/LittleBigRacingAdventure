@@ -12,10 +12,14 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0">
-            <TextBlock Text="Little Big" FontSize="18" Foreground="#C9B8E8" FontStyle="Italic"/>
-            <TextBlock Text="HALLOWEEN RACING ADVENTURE" FontSize="30" FontWeight="Black" Foreground="{StaticResource Pumpkin}">
-                <TextBlock.Effect><DropShadowEffect Color="#FF4A00" BlurRadius="18" ShadowDepth="0" Opacity="0.7"/></TextBlock.Effect>
-            </TextBlock>
+            <!-- The title on one line, one height: Halloween alone orange and italic, glowing -->
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Little Big " FontSize="28" FontWeight="Black" Foreground="#C9B8E8"/>
+                <TextBlock Text="Halloween" FontSize="28" FontWeight="Black" FontStyle="Italic" Foreground="{StaticResource Pumpkin}">
+                    <TextBlock.Effect><DropShadowEffect Color="#FF4A00" BlurRadius="18" ShadowDepth="0" Opacity="0.7"/></TextBlock.Effect>
+                </TextBlock>
+                <TextBlock Text=" Racing Adventure" FontSize="28" FontWeight="Black" Foreground="#C9B8E8"/>
+            </StackPanel>
             <TextBlock TextWrapping="Wrap" Margin="0,6,0,0" Foreground="#BFAFCB">
                 A Halloween special: a race through LBA1's Temple of Bú, ported to LBA2's engine. The game is made from your own copies of
                 Little Big Adventure and Little Big Adventure 2: choose their folders and a folder to install into. Their files are copied,
