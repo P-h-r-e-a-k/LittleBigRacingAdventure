@@ -161,8 +161,14 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
   palace) records its run from start to finish the same way.
   - The recording isn't your key presses. The game moves the car by however long each frame took, so the same keys would drive a
     different lap on another PC. It records where the car was at each moment, so a ghost looks the same on any machine.
-  - **Best laps** shows each track's ghost under its laps: **Enter** plays it back, the camera behind it, round and round until Esc.
-    **G** picks what your time trials race: **the fastest ghost** (the first time), **your best lap**, or **no ghost** (`ghost=2|1|0`
+  - **Ghosts to beat** (2026-10-25): every track comes with an **Easy**, a **Medium** and a **Hard** ghost, in the game folder's
+    `ghosts\`. Easy and Medium are Twinsen's Halloween buggy driven at an easy and a steady pace. Hard is the quickest car for that
+    track, flat out, taking the track's shortcuts (on the Temple of Bú: the hidden passage and the drop off the end spiral). The
+    display names the ghost you race ("Hard ghost 0:46.28") and says **You beat the Hard ghost!** the first time you do.
+    On Wannies Island the frog's mouth decides every lap, so its three ghosts are only a fraction of a second apart.
+  - **Best laps** shows the track's ghosts under its laps: **Up**, **Down** go through yours and the Easy, Medium and Hard ones;
+    **Enter** plays the one shown back, the camera behind it, round and round until Esc. **G** picks what your time trials race:
+    **the fastest ghost** (the first time), **your best lap**, **the Easy / Medium / Hard ghost**, or **no ghost** (`ghost=2|1|3|4|5|0`
     in `RACEGAME_SETTINGS.TXT`). **O** opens the ghosts' folder.
   - **Sharing**: ghosts are text files in `User\LBA2\GHOSTS\` (yours are named after the track, e.g. `Otringal.ghost`). To share one,
     send the file; the other player renames it (e.g. `Otringal - Sam.ghost`) and puts it in their own `GHOSTS` folder. Their time

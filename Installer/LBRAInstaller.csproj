@@ -103,6 +103,8 @@
     <!-- the menu's picture (made by tools\make_art.ps1), and the icon put beside the game for its shortcut -->
     <EmbeddedResource Include="..\Game\menu.png" LogicalName="art/menu.png" />
     <EmbeddedResource Include="pumpkin.ico" LogicalName="game/pumpkin.ico" />
+    <!-- the game's ghosts to beat, Easy, Medium and Hard for each track (the race engine reads the game folder's ghosts\) -->
+    <EmbeddedResource Include="..\Game\ghosts\*.ghost" LogicalName="game/ghosts/%(Filename)%(Extension)" />
     <Resource Include="pumpkin.ico" />
   </ItemGroup>
 
