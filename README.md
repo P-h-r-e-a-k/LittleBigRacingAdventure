@@ -153,6 +153,8 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
   driven with no power-ups (a time trial is the same at every difficulty; a race's laps never count). At the end of a time trial the screen shows its best lap and the rank it
   took, and the whole time under it. The whole five-lap times kept by earlier versions stay in `BESTTIMES.TXT` but aren't shown as laps.
 - After a race the game goes back to the menu by itself, on the line you chose last (Track select, Specials or Best laps).
+- **Restart**: the menu in a race (Esc) has **Restart the race** / **Restart the time trial** under Resume Game -- the same track,
+  car, difficulty, ghost and laps from the start (watching a ghost: **Watch again from the start**).
 - **Time trial display**: over the lap the display shows **Best time** -- the track's best lap from Best laps (`--:--.--` before there
   is one), or the trial's own fastest lap as soon as one beats it. At the end of every lap, in races and time trials, the lap's time
   stays on the lap line for two seconds before the next lap's clock runs, in gold when it is a new best time.
@@ -166,20 +168,27 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
     `ghosts\`. Easy and Medium are Twinsen's Halloween buggy driven at an easy and a steady pace. Hard is the quickest car for that
     track, flat out, taking the track's shortcuts (on the Temple of Bú: the hidden passage and the drop off the end spiral). The
     display names the ghost you race ("Hard ghost 0:46.28").
-    On Wannies Island the frog's mouth decides every lap, so its three ghosts are only a fraction of a second apart.
+    On Wannies Island the frog's mouth decides every lap, so its ghosts are only a fraction of a second apart.
+  - **Extreme** (2026-10-25): a fourth ghost on every track, meant to be almost impossible to beat. It is the fastest of several cars
+    for that track, each driven flat out with everything the test pilot has: the track's shortcuts, a racing line pulled tight
+    across the road (cutting the bends as wide as the road allows), and **handbrake slides** round the bends where a slide turns
+    the car quicker than the steering can. Its lap is the fastest of all those tries.
   - **Racing a ghost** (2026-10-25): pick the track, then **Time trial**, and the **Race a ghost** page asks what to race: **No
-    ghost**, **Your best lap**, or the **Easy**, **Medium** or **Hard** ghost, each with its lap time. Medium is locked until you beat
-    Easy on that track, and Hard until you beat Medium ("Medium ghost: beat Easy"). Beat one and the display says **You beat the Easy
+    ghost**, **Your best lap**, or the **Easy**, **Medium**, **Hard** or **Extreme** ghost, each with its lap time. Medium is locked
+    until you beat Easy on that track, Hard until you beat Medium, and Extreme until you beat Hard ("Medium ghost: beat Easy"). Beat one and the display says **You beat the Easy
     ghost! Medium unlocked**. A lap faster than a harder ghost's time unlocks past it too: racing Easy and beating Medium's time
     says **You beat Easy and Medium! Medium and Hard unlocked**. Each track keeps its own unlocks (`ghost_beaten=` lines in
     `RACEGAME_SETTINGS.TXT`), and the page opens on your last choice. Esc on the car page goes back to it.
   - **Laps** (2026-10-25): before the ghost, a time trial asks **How many laps?**: 1, 3, 5, 10, or **Endless: until you stop**
     (`trial_laps=` in `RACEGAME_SETTINGS.TXT`; the last choice comes up first). An endless trial counts "Lap 7" with no end; its
-    fastest lap goes into Best laps as soon as you drive it, so stopping through the menu loses nothing. The sprints (Polar Island,
-    the palace) have no laps to choose.
+    fastest lap goes into Best laps as soon as you drive it, so stopping through the menu loses nothing. On the sprints (Polar Island,
+    the palace) the page asks **How many runs?** instead: over the finish line, the run's time stays on the display a moment and the
+    car is put back on the grid for the next run ("Run 2/3"), no restart needed; each run counts as a lap does (ghost, Best laps).
+  - **A missed checkpoint** in a time trial: crossing the line after it starts the lap again, its clock from zero ("Missed
+    checkpoint 3: the lap starts again"). In a race the lap still just doesn't count until you go back for the checkpoint.
   - **Best laps**: one track at a time, its **five fastest laps** with their cars, and under them **Watch**: **Your best lap** or
-    **Ghost: Easy / Medium / Hard**. **Up**, **Down** move between the track's name and the two Watch lines. On the track's name,
-    **Left**, **Right** go through the tracks; on the ghost line they go round Easy, Medium and Hard. **Enter** plays the line chosen
+    **Ghost: Easy / Medium / Hard / Extreme**. **Up**, **Down** move between the track's name and the two Watch lines. On the
+    track's name, **Left**, **Right** go through the tracks; on the ghost line they go round Easy, Medium, Hard and Extreme. **Enter** plays the line chosen
     back, the camera behind it, round and round until Esc. Any level can be watched, locked or not.
   - "Your best lap" says **Your recorded lap** when a faster lap in the list has no ghost (laps driven before ghosts were recorded).
   - **Sharing**: ghosts are text files in `User\LBA2\GHOSTS\` (yours are named after the track, e.g. `Otringal.ghost`). To share one,
