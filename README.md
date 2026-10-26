@@ -183,7 +183,9 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
     ghost**, **Your best lap**, or the **Easy**, **Medium**, **Hard** or **Extreme** ghost, each with its lap time. Medium is locked
     until you beat Easy on that track, Hard until you beat Medium, and Extreme until you beat Hard ("Medium ghost: beat Easy"). Beat one and the display says **You beat the Easy
     ghost! Medium unlocked**. A lap faster than a harder ghost's time unlocks past it too: racing Easy and beating Medium's time
-    says **You beat Easy and Medium! Medium and Hard unlocked**. Each track keeps its own unlocks (`ghost_beaten=` lines in
+    says **You beat Easy and Medium! Medium and Hard unlocked**. Whichever ghost you race -- No ghost, Your best lap or another
+    person's -- a lap faster than a game ghost's time counts as beating it: **You beat the Hard ghost's time! Extreme unlocked**
+    (a player's report, 2026-10-26: beating Hard's time with no ghost raced unlocked nothing). Each track keeps its own unlocks (`ghost_beaten=` lines in
     `RACEGAME_SETTINGS.TXT`), and the page opens on your last choice. Esc on the car page goes back to it.
   - **Laps** (2026-10-25): before the ghost, a time trial asks **How many laps?**: 1, 3, 5, 10, or **Endless: until you stop**
     (`trial_laps=` in `RACEGAME_SETTINGS.TXT`; the last choice comes up first). An endless trial counts "Lap 7" with no end; its
