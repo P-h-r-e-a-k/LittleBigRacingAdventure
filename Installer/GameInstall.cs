@@ -88,6 +88,10 @@ internal static class GameInstall
         ["Polar Island"] = "8 10 5888 1300 27136 2048",
     };
 
+    // The tracks raced with no sky layer (RACEMOD.CPP sky=0): the island's flat sky sheet stands lower than the road climbs -- Wannies
+    // Island's goes up to 25,000 (2026-10-26, the user: "Let's remove the sky layer for Wannies Island")
+    public static readonly HashSet<string> NoSky = new() { "Wannies Island" };
+
     // The cars to choose from (RACECARS.JSON's numbers): Twinsen's Halloween buggy first -- his own buggy painted orange, with bats, the one
     // the car page opens on (HalloweenBuggy: not a RACECARS.JSON car) -- then Twinsen's pumpkin F1, the Temple's own car, held back until
     // the player wins a race (2026-10-20, the user: "Let's hold this car back until it's unlocked": PumpkinUnlock), then for time trials;
@@ -242,6 +246,8 @@ internal static class GameInstall
             Setup().WriteEngineFile(race, track, prefix: file + "_");
             TrialSetup().WriteEngineFile(trial, track, prefix: file + "_trial_");
             if (TrialStarts.TryGetValue(name, out var trialStart)) File.AppendAllText(trial, $"trial_start={trialStart}\n");
+            // (no sky layer: Wannies Island's road climbs up through it -- RACEMOD.CPP sky=0; the user, 2026-10-26)
+            if (NoSky.Contains(name)) foreach (var f in new[] { race, trial }) File.AppendAllText(f, "sky=0\n");
             foreach (var written in new[] { race, trial })
             {
                 // (a sprint the story dreams or ends with -- Polar Island's dream, the palace's teleporter --: the race alone, start to
