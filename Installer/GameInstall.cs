@@ -80,6 +80,14 @@ internal static class GameInstall
         ["Celebration 2"] = "Celebration Island: the statue",
     };
 
+    // A time trial's own start where the racing line gives no run-up (RACEMOD.CPP trial_start=: cube x, cube z, x, y, z, beta) -- a sprint's
+    // line begins on its start line. Polar Island's (2026-10-26, the user: "set Polar as far back as we can do"): back down the dock's
+    // straight to its last grid row, 20.5 cells behind the line, the road's rounded end and the sea just past it
+    public static readonly Dictionary<string, string> TrialStarts = new()
+    {
+        ["Polar Island"] = "8 10 5888 1300 27136 2048",
+    };
+
     // The cars to choose from (RACECARS.JSON's numbers): Twinsen's Halloween buggy first -- his own buggy painted orange, with bats, the one
     // the car page opens on (HalloweenBuggy: not a RACECARS.JSON car) -- then Twinsen's pumpkin F1, the Temple's own car, held back until
     // the player wins a race (2026-10-20, the user: "Let's hold this car back until it's unlocked": PumpkinUnlock), then for time trials;
@@ -233,6 +241,7 @@ internal static class GameInstall
             var trial = Path.Combine(tracksDir, file + "_trial.txt");
             Setup().WriteEngineFile(race, track, prefix: file + "_");
             TrialSetup().WriteEngineFile(trial, track, prefix: file + "_trial_");
+            if (TrialStarts.TryGetValue(name, out var trialStart)) File.AppendAllText(trial, $"trial_start={trialStart}\n");
             foreach (var written in new[] { race, trial })
             {
                 // (a sprint the story dreams or ends with -- Polar Island's dream, the palace's teleporter --: the race alone, start to
