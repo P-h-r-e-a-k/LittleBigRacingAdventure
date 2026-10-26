@@ -26,13 +26,16 @@ internal static class UpdateLook
 
     public static StackPanel Header()
     {
-        var panel = new StackPanel();
-        panel.Children.Add(new TextBlock { Text = "Little Big", FontSize = 15, FontStyle = FontStyles.Italic, Foreground = new SolidColorBrush(Color.FromRgb(0xC9, 0xB8, 0xE8)) });
+        // (the setup window's title, MainWindow.xaml: one line, Halloween alone orange and italic)
+        var lilac = new SolidColorBrush(Color.FromRgb(0xC9, 0xB8, 0xE8));
+        var panel = new StackPanel { Orientation = Orientation.Horizontal };
+        panel.Children.Add(new TextBlock { Text = "Little Big ", FontSize = 22, FontWeight = FontWeights.Black, Foreground = lilac });
         panel.Children.Add(new TextBlock
         {
-            Text = "HALLOWEEN RACING ADVENTURE", FontSize = 22, FontWeight = FontWeights.Black, Foreground = Brush("Pumpkin"),
+            Text = "Halloween", FontSize = 22, FontWeight = FontWeights.Black, FontStyle = FontStyles.Italic, Foreground = Brush("Pumpkin"),
             Effect = new DropShadowEffect { Color = Color.FromRgb(0xFF, 0x4A, 0x00), BlurRadius = 14, ShadowDepth = 0, Opacity = 0.7 },
         });
+        panel.Children.Add(new TextBlock { Text = " Racing Adventure", FontSize = 22, FontWeight = FontWeights.Black, Foreground = lilac });
         return panel;
     }
 }

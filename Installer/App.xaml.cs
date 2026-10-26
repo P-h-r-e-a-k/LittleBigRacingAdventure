@@ -46,6 +46,19 @@ public partial class App : Application
             Shutdown(code);
             return;
         }
+        // (--export-ghosts / --import-ghosts <the user's GHOSTS folder>: the game's "Share my ghosts..." and "Import ghosts...", GhostShare.cs)
+        if (e.Args is ["--export-ghosts", var mine, ..])
+        {
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            Shutdown(GhostShare.Export(mine));
+            return;
+        }
+        if (e.Args is ["--import-ghosts", var theirs, ..])
+        {
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            Shutdown(GhostShare.Import(theirs, e.Args.Skip(2).ToArray()));
+            return;
+        }
         if (e.Args is ["--update", var into, ..])
         {
             ShutdownMode = ShutdownMode.OnExplicitShutdown;

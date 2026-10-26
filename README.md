@@ -150,7 +150,8 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
   monsters wait in the slip lane beside the start line meanwhile). After that, a race asks after the car page: **Qualifying lap**, or
   **Skip** and start at the back of the grid. The last answer is remembered.
 - **Best laps**: the fastest laps of each track (the page shows five), with the car: each time trial's fastest lap and every qualifying lap -- the laps
-  driven with no power-ups (a time trial is the same at every difficulty; a race's laps never count). At the end of a time trial the screen shows its best lap and the rank it
+  driven with no power-ups (a time trial is the same at every difficulty; a race's laps never count). A time trial's best lap is kept
+  the moment it is over the line -- leave the trial early and it stays. At the end of a time trial the screen shows its best lap and the rank it
   took, and the whole time under it. The whole five-lap times kept by earlier versions stay in `BESTTIMES.TXT` but aren't shown as laps.
 - After a race the game goes back to the menu by itself, on the line you chose last (Track select, Specials or Best laps).
 - **Restart**: the menu in a race (Esc) has **Restart the race** / **Restart the time trial** under Resume Game -- the same track,
@@ -191,9 +192,14 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
     track's name, **Left**, **Right** go through the tracks; on the ghost line they go round Easy, Medium, Hard and Extreme. **Enter** plays the line chosen
     back, the camera behind it, round and round until Esc. Any level can be watched, locked or not.
   - "Your best lap" says **Your recorded lap** when a faster lap in the list has no ghost (laps driven before ghosts were recorded).
-  - **Sharing**: ghosts are text files in `User\LBA2\GHOSTS\` (yours are named after the track, e.g. `Otringal.ghost`). To share one,
-    send the file; the other player renames it (e.g. `Otringal - Sam.ghost`) and puts it in their own `GHOSTS` folder. When it is
-    faster than their own, the "Your best lap" line becomes **Shared ghost** on both pages, and it is the one raced and watched.
+  - **Sharing** (2026-10-26): the Race a ghost page's last line, **Other people's ghosts**, lists the ghosts other players shared
+    with you for that track -- each person's quickest, by name and lap time; choose one to race it (the display names them). Under
+    the list:
+    - **Share my ghosts...** puts all your ghosts (your best lap of each track) into one zip under the name you give (remembered for
+      next time), saved where you choose: `LBRA ghosts - <name>.zip`. Send it to a friend.
+    - **Import ghosts...** takes a zip a friend sent (or `.ghost` files) and installs them; the page shows them at once.
+    Ghosts are text files in `User\LBA2\GHOSTS\`: yours are named after the track (`Otringal.ghost`), other people's
+    `<track> - <name>.ghost`. "Your best lap" is always your own.
 - **Mini-map**: a small map of the whole track in the bottom-right corner while you race, with a dot for every car -- yours the big
   yellow one, each monster its own colour. Options > **Camera, window, updates** > **Mini-map: On / Off** turns it off or back on
   (`minimap=` in `RACEGAME_SETTINGS.TXT`; on at first). It is hidden behind the menu and the pause, and once you finish.
