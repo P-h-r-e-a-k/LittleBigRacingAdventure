@@ -2,7 +2,7 @@
 # Put it in another player's GHOSTS folder (under a name of its own) and their time trials race against it.
 # Each line after points=: ms into the lap, x y z (island units), alpha beta gamma, body, animation, island.
 ghost=2
-track=Celebration Island: the statue
+track=Celebration 2
 lap=20000
 car=Twinsen's Halloween buggy
 date=2026-10-25

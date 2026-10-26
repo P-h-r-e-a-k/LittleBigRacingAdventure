@@ -52,20 +52,32 @@ internal static class GameInstall
     public static readonly (string IleFile, RaceTrackIsland Island, string Name, string File)[] Tracks =
     {
         ("POLAR.ILE", RaceTrackIsland.Polar, "Polar Island", "polar"),
-        ("CITADEL.ILE", RaceTrackIsland.Citadel, "Citadel Island: the storm", "citadel"),
-        ("CITABAU.ILE", RaceTrackIsland.Citadel, "Citadel Island: the town", "citabau"),
+        ("CITADEL.ILE", RaceTrackIsland.Citadel, "Citadel 1", "citadel"),
+        ("CITABAU.ILE", RaceTrackIsland.Citadel, "Citadel 2", "citabau"),
         ("DESERT.ILE", RaceTrackIsland.Desert, "Desert Island", "desert"),
-        ("EMERAUDE.ILE", RaceTrackIsland.Emerald, "The Emerald Moon", "emeraude"),
+        ("EMERAUDE.ILE", RaceTrackIsland.Emerald, "Emerald Moon", "emeraude"),
         ("OTRINGAL.ILE", RaceTrackIsland.Otringal, "Otringal", "otringal"),
-        ("CELEBRAT.ILE", RaceTrackIsland.CelebrationLava, "Celebration Island: the lava lake", "celebrat"),
+        ("CELEBRAT.ILE", RaceTrackIsland.CelebrationLava, "Celebration 1", "celebrat"),
         ("KNARTAS.ILE", RaceTrackIsland.Knartas, "Island of the Francos", "knartas"),
         ("ASCENCE.ILE", RaceTrackIsland.Elevator, "The Elevator Platform", "ascence"),
         ("PLATFORM.ILE", RaceTrackIsland.Wannies, "Wannies Island", "platform"),
         ("MOSQUIBE.ILE", RaceTrackIsland.Mosquibe, "Mosquibees Island", "mosquibe"),
         ("SOUSCELB.ILE", RaceTrackIsland.Volcano, "Volcano Island", "souscelb"),
         ("CXTOWER.ILE", RaceTrackIsland.CxTower, "Island CX", "cxtower"),
-        ("PALACE.ILE", RaceTrackIsland.Palace, "The Emperor's palace", "palace"),
-        ("CELEBRA2.ILE", RaceTrackIsland.Celebration, "Celebration Island: the statue", "celebra2"),
+        ("PALACE.ILE", RaceTrackIsland.Palace, "The Palace", "palace"),
+        ("CELEBRA2.ILE", RaceTrackIsland.Celebration, "Celebration 2", "celebra2"),
+    };
+
+    // Tracks renamed (2026-10-26): the new name and the old, written as the track= line's was= -- the game moves a player's best laps,
+    // ghosts beaten and ghost files over to the new name (RACEGAME.CPP RenamedTracks)
+    public static readonly Dictionary<string, string> Renamed = new()
+    {
+        ["Citadel 1"] = "Citadel Island: the storm",
+        ["Citadel 2"] = "Citadel Island: the town",
+        ["Emerald Moon"] = "The Emerald Moon",
+        ["Celebration 1"] = "Celebration Island: the lava lake",
+        ["The Palace"] = "The Emperor's palace",
+        ["Celebration 2"] = "Celebration Island: the statue",
     };
 
     // The cars to choose from (RACECARS.JSON's numbers): Twinsen's Halloween buggy first -- his own buggy painted orange, with bats, the one
@@ -228,7 +240,8 @@ internal static class GameInstall
                 if (raced.Dream is not null) WithoutStory(written);
                 Relative(written, target);
             }
-            menu.Append($"track={name}|{TracksFolder}/{Path.GetFileName(race)}|{TracksFolder}/{Path.GetFileName(trial)}|{raced.StartScene}\n");
+            menu.Append($"track={name}|{TracksFolder}/{Path.GetFileName(race)}|{TracksFolder}/{Path.GetFileName(trial)}|{raced.StartScene}" +
+                        (Renamed.TryGetValue(name, out var was) ? $"|was={was}" : "") + "\n");
             trackCount++;
             var opponents = (raced.Drivers ?? new()).Where(d => !d.Ghost).Select(d => d.Name).ToList();
             var laps = raced.Dream is not null ? "a sprint, start to finish" : built.RaceLaps is int own ? $"{own} laps" : $"{Laps} laps";
@@ -288,6 +301,11 @@ internal static class GameInstall
             try { File.Delete(old); log($"{OldGameExe} removed (the game is {GameExe} now)"); }
             catch (Exception e) when (e is IOException or UnauthorizedAccessException) { log($"{OldGameExe} not removed: {e.Message}"); }
         }
+        // (the game's own ghosts to beat put in afresh: one of a track since renamed would stay, its old name matching no track)
+        var gameGhosts = Path.Combine(target, "ghosts");
+        if (Directory.Exists(gameGhosts))
+            foreach (var shipped in Directory.GetFiles(gameGhosts, "*.ghost"))
+                try { File.Delete(shipped); } catch (Exception e) when (e is IOException or UnauthorizedAccessException) { log($"{shipped} not removed: {e.Message}"); }
         foreach (var res in typeof(GameInstall).Assembly.GetManifestResourceNames().Where(r => r.StartsWith("game/")))
         {
             var to = Path.Combine(target, res["game/".Length..].Replace('/', Path.DirectorySeparatorChar));

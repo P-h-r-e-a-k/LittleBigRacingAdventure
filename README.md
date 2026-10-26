@@ -68,27 +68,32 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
   shows as a star, Backspace takes one back), **Enter** to open, **Esc** back. A wrong code says "Wrong code" and empties; the right
   one (**1234**) opens Track select for the rest of the run (it isn't kept: the next start asks again). The code is the installer's
   `tracks_code=` line in `RACEGAME.TXT`, so it can change without a new engine; without the line there is no code.
-  Then the tracks, in this order, each with its best lap beside it (up and down, Enter, Esc back; the mouse too):
+  Then the tracks, in this order, each with its best lap beside it (up and down, Enter, Esc back; the mouse too -- the scrollbar at
+  the list's right edge shows where you are, and a click or a drag on it, or the mouse wheel, scrolls the list):
   1. Polar Island (a sprint from the dock to the peak: start to finish once)
-  2. Citadel Island: the storm (in the rain, against Raph's time)
-  3. Citadel Island: the town (the town circuit, once the storm is over)
+  2. Citadel 1 (the storm: in the rain, against Raph's time)
+  3. Citadel 2 (the town circuit, once the storm is over)
   4. Desert Island
-  5. The Emerald Moon
+  5. Emerald Moon
   6. Otringal
-  7. Celebration Island: the lava lake
+  7. Celebration 1 (the lava lake)
   8. Island of the Francos
   9. The Elevator Platform (the rollercoaster)
   10. Wannies Island
   11. Mosquibees Island
   12. Volcano Island
   13. Island CX
-  14. The Emperor's palace (a sprint through its rooms, out of the round window)
-  15. Celebration Island: the statue
+  14. The Palace (the Emperor's palace: a sprint through its rooms, out of the round window)
+  15. Celebration 2 (the statue)
+
+  (Renamed on 26 October 2026 from Citadel Island: the storm / the town, The Emerald Moon, Celebration Island: the lava lake /
+  the statue and The Emperor's palace: an update keeps your best laps and your ghosts of them under the new names.)
 
   Each track: a **Race** (its own line-up and power-ups, three laps; a sprint once from start to finish -- won or lost, the menu
   follows, no story's waking up) or a **Time trial** (Twinsen alone, no power-ups; its fastest lap, or a sprint's time, goes to Best
   laps, and it first asks **how many laps** -- 1, 3, 5, 10 or **Endless: until you stop** -- and which **ghost** to race, see
-  below); then the **car grid**; then, for a race, the qualifying question as for the specials (not on a sprint). Best laps goes
+  below) -- a time trial starts a run-up behind the start line, with the 3, 2, 1 countdown, so the car is up to speed as
+  the first lap starts; then the **car grid**; then, for a race, the qualifying question as for the specials (not on a sprint). Best laps goes
   through every track once Track select is open.
 - **The car grid** (Track select's car page): every car of the game, 7 x 7 on a page (222 cars: five pages) -- Twinsen's Halloween
   buggy first, his pumpkin F1 (locked as on the Halloween car page until the Halloween race is won, then for time trials), Halloween's
