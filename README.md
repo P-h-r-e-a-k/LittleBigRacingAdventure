@@ -158,6 +158,10 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
   driven with no power-ups (a time trial is the same at every difficulty; a race's laps never count). A time trial's best lap is kept
   the moment it is over the line -- leave the trial early and it stays. At the end of a time trial the screen shows its best lap and the rank it
   took, and the whole time under it. The whole five-lap times kept by earlier versions stay in `BESTTIMES.TXT` but aren't shown as laps.
+  Each track's page shows the ghost of the hardest level you have unlocked there. After the tracks (with Track select open: page 17),
+  **All tracks** lists every track's best lap and the **sum of best**: Enter on the sum plays your best lap of every track back, one
+  after another; **Copy as an image** puts a picture of it -- your name, Track name / Time / Car used, the sum of best -- on the
+  clipboard to paste into a chat, and saves it as `Best laps.png` beside your settings.
 - After a race the game goes back to the menu by itself, on the line you chose last (Track select, Specials or Best laps).
 - **Restart**: the menu in a race (Esc) has **Restart the race** / **Restart the time trial** under Resume Game -- the same track,
   car, difficulty, ghost and laps from the start (watching a ghost: **Watch again from the start**).
