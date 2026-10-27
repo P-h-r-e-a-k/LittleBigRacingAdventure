@@ -95,8 +95,8 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
   below) -- a time trial starts a run-up behind the start line, with the 3, 2, 1 countdown, so the car is up to speed as
   the first lap starts; then the **car grid**; then, for a race, the qualifying question as for the specials (not on a sprint). Best laps goes
   through every track once Track select is open.
-- **The car grid** (Track select's car page): every car of the game, 7 x 7 on a page (222 cars: five pages) -- Twinsen's Halloween
-  buggy first, his pumpkin F1 (locked as on the Halloween car page until the Halloween race is won, then for time trials), Halloween's
+- **The car grid** (Track select's car page): every car of the game, 7 x 7 on a page (223 cars: five pages) -- Twinsen's Halloween
+  buggy first, his pumpkin F1 (locked as on the Halloween car page until the Halloween race is won, then for time trials), the digger, Halloween's
   monsters' cars (the vampire's coffin, the witch's broomstick, the zombie's hearse), then the cars made by hand for the islands' people
   and the cast's cars. The arrows go through them (a row up and down, on to the next page past the ends), **Page up** / **Page down** a
   page; the car chosen is framed in orange and shown large on the right, turning, with its name and stars; **Enter** (or a click on
@@ -122,7 +122,7 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
 
   The last one chosen comes up first next time. Then the car, each turning on the page (left and right to choose, Enter to race, Esc
   back): Twinsen's Halloween buggy (his own buggy painted pumpkin orange, with bats on its sides and its back; the page opens on it),
-  Twinsen's pumpkin F1 (locked until you win), Zoe's car, the Emperor's car, the Dark Monk's car, the priest's car, the guitarist's
+  Twinsen's pumpkin F1 (locked until you win), the digger (LBA1's Polar Island bulldozer, Twinsen at its wheel), Zoe's car, the Emperor's car, the Dark Monk's car, the priest's car, the guitarist's
   guitar, the trooper's tank, Dino-Fly, the Tralu's cave, the skeleton's ghost car, the little Tralu's monster truck and the third
   quetch child's kart. Under each car's name its stats, 0 to 5 stars in half stars: **Acceleration**, **Top speed** and
   **Handling**. Every car's stars add up to the same 7.5, so what a car has more of it pays for in the others, and the race drives it
@@ -140,6 +140,7 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
   | --- | :-: | :-: | :-: |
   | Twinsen's Halloween buggy | 2.5 | 2.5 | 2.5 |
   | Twinsen's pumpkin F1 (won: time trials) | 2.5 | 2.5 | 2.5 |
+  | The digger (the buggy's, slower away: 7 stars, not 7.5) | 2 | 2.5 | 2.5 |
   | Zoe's car | 3 | 1.5 | 3 |
   | The Emperor's car | 2 | 4.5 | 1 |
   | The Dark Monk's car | 1.5 | 4 | 2 |

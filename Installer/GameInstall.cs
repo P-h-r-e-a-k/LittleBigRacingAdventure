@@ -114,6 +114,7 @@ internal static class GameInstall
     {
         (HalloweenBuggy, RaceTrackCharacterCars.HalloweenBuggyName, 2.5, 2.5, 2.5),   // the all-rounder: the Temple's setup as it is
         (RaceTrackCharacterCars.PumpkinNumber, "Twinsen's pumpkin F1", 2.5, 2.5, 2.5),   // the same, won: for time trials
+        (RaceTrackCharacterCars.DiggerNumber, RaceTrackCharacterCars.DiggerName, 2, 2.5, 2.5),   // LBA1's Polar Island tractor: the buggy's, slower away (the user, 2026-10-27)
         (4, "Zoe's car", 3, 1.5, 3),                            // a nippy runabout: quick away and into the bends, not fast
         (3, "The Emperor's car", 2, 4.5, 1),                    // the fastest at the top, heavy in the bends
         (10, "The Dark Monk's car", 1.5, 4, 2),                 // fast once going, slow to get there
