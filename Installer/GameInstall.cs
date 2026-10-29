@@ -132,17 +132,21 @@ internal static class GameInstall
         ("statue", RaceTrackIsland.Celebration.Name, "unlock_win", "Win Celebration 2 in Story Mode"),
     };
     // Raph's car (RACECARS.JSON 6), and the cars of the characters inside Celebration Island's statue -- FunFrock, the Dark Monk, the Sup
-    // priest, and of the cast the Franco priest and the monster guarding the protection spell (their bodies 310, 456)
+    // priest, and of the cast the Franco priest (body 310). The monster guarding the protection spell (body 456) is won with Desert
+    // Island's cars (the user, 2026-10-29: "The monster guarding the protection spell needs to be with desert island")
     private const int RaphCar = 6;
-    private static readonly int[] StatueCast = { 310, 456 };
+    private static readonly int[] StatueCast = { 310 };
+    private static readonly int[] DesertCast = { 456 };
+    private static IEnumerable<int> CastCars(int[] bodies) =>
+        RaceTrackCharacterCars.Cast.Select((c, i) => (c, i)).Where(x => bodies.Contains(x.c.Character)).Select(x => RaceTrackCharacterCars.CastFirst + x.i);
     private static HashSet<int> StatueCars() =>
         new HashSet<int> { RaceTrackCharacterCars.FunFrock.Generic, RaceTrackCharacterCars.DarkMonk.Generic, RaceTrackCharacterCars.Priest.Generic }
-            .Concat(RaceTrackCharacterCars.Cast.Select((c, i) => (c, i)).Where(x => StatueCast.Contains(x.c.Character)).Select(x => RaceTrackCharacterCars.CastFirst + x.i))
+            .Concat(CastCars(StatueCast))
             .ToHashSet();
     // A car's story unlock (its unlock= and hint= options), by its island in RACECARS.JSON; "" for one the story doesn't hold back
     private static string StoryOptions(int number, string? island, HashSet<int> statue)
     {
-        var id = number == RaphCar ? "raph" : island switch
+        var id = number == RaphCar ? "raph" : CastCars(DesertCast).Contains(number) ? "desert" : island switch
         {
             RaceTrackCharacterCars.Citadel => "citadel",
             RaceTrackCharacterCars.Desert => "desert",
