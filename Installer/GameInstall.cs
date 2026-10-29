@@ -64,6 +64,8 @@ internal static class GameInstall
         ("MOSQUIBE.ILE", RaceTrackIsland.Mosquibe, "Mosquibees Island", "mosquibe"),
         ("SOUSCELB.ILE", RaceTrackIsland.Volcano, "Volcano Island", "souscelb"),
         ("CXTOWER.ILE", RaceTrackIsland.CxTower, "Island CX", "cxtower"),
+        // (Island CX twice as big, kept beside it for now -- the user, 2026-10-29: "we'll keep both islands for now, then select one to keep later")
+        ("CXTOWERMK2.ILE", RaceTrackIsland.CxTowerMk2, "Island CX Mk2", "cxtowermk2"),
         ("PALACE.ILE", RaceTrackIsland.Palace, "The Palace", "palace"),
         ("CELEBRA2.ILE", RaceTrackIsland.Celebration, "Celebration 2", "celebra2"),
     };

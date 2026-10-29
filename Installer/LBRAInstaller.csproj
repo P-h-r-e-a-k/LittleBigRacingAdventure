@@ -82,6 +82,7 @@
     <EmbeddedResource Include="$(Lba)\docs\racetrack\temple_track_plan.json" LogicalName="RaceTrackPlan.Temple.json" />
     <EmbeddedResource Include="$(Lba)\docs\racetrack\palace_track_plan.json" LogicalName="RaceTrackPlan.Palace.json" />
     <EmbeddedResource Include="$(Lba)\docs\racetrack\cxtower_track_plan.json" LogicalName="RaceTrackPlan.CxTower.json" />
+    <EmbeddedResource Include="$(Lba)\docs\racetrack\cxtowermk2_track_plan.json" LogicalName="RaceTrackPlan.CxTowerMk2.json" />
     <EmbeddedResource Include="$(Lba)\docs\racetrack\polar_track_plan.json" LogicalName="RaceTrackPlan.Polar.json" />
     <EmbeddedResource Include="$(Lba)\docs\racetrack\track_plan.json" LogicalName="RaceTrackPlan.Desert.json" />
     <!-- (Track select's tracks, 2026-10-22: every island's, in the user's order, GameInstall.Tracks) -->
