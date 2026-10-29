@@ -121,15 +121,43 @@ internal static class GameInstall
     // The cars the story wins (the user, 2026-10-29: "beating Raph's time on citadel unlocks Raph's vehicle for time trials, winning the
     // citabau race unlocks all of the other citadel island related cars. Beating Desert island unlocks the desert island cars, defeating
     // Celebration 1 unlocks all the celebration island characters, defeating Celebration 2 unlocks Funfrock and all the characters based in
-    // the inside of the statue"): each unlock's id (the cars' unlock=<id> story), the story track that wins it -- the island it is raced
-    // as in the set -- and how (RACEMOD.CPP unlock_beat=: Raph's time beaten; unlock_win=: the race won), and what the padlock says
+    // the inside of the statue"; and "All islands need story mode unlock": every other island's cars won by winning its race there): each
+    // unlock's id (the cars' unlock=<id> story), the story track that wins it -- the island it is raced as in the set -- and how
+    // (RACEMOD.CPP unlock_beat=: Raph's time beaten; unlock_win=: the race won), and what the padlock says. Island CX's cars are won on
+    // either of its tracks (the first won unlocks them).
     private static readonly (string Id, string Island, string Key, string Hint)[] StoryUnlocks =
     {
+        ("polar", RaceTrackIsland.Polar.Name, "unlock_win", "Win the Polar Island dream in Story Mode"),
         ("raph", RaceTrackIsland.CitadelStorm.Name, "unlock_beat", "Beat Raph's time in Story Mode"),
         ("citadel", RaceTrackIsland.Citadel.Name, "unlock_win", "Win Citadel 2 in Story Mode"),
         ("desert", RaceTrackIsland.Desert.Name, "unlock_win", "Win Desert Island in Story Mode"),
+        ("moon", RaceTrackIsland.Emerald.Name, "unlock_win", "Win the Emerald Moon in Story Mode"),
+        ("otringal", RaceTrackIsland.Otringal.Name, "unlock_win", "Win Otringal in Story Mode"),
         ("celebration", RaceTrackIsland.CelebrationLava.Name, "unlock_win", "Win Celebration 1 in Story Mode"),
+        ("francos", RaceTrackIsland.Knartas.Name, "unlock_win", "Win the Island of the Francos in Story Mode"),
+        ("elevator", RaceTrackIsland.Elevator.Name, "unlock_win", "Win the Elevator Platform in Story Mode"),
+        ("wannies", RaceTrackIsland.Wannies.Name, "unlock_win", "Win Wannies Island in Story Mode"),
+        ("mosquibees", RaceTrackIsland.Mosquibe.Name, "unlock_win", "Win Mosquibees Island in Story Mode"),
+        ("volcano", RaceTrackIsland.Volcano.Name, "unlock_win", "Win Volcano Island in Story Mode"),
+        ("cx", RaceTrackIsland.CxTower.Name, "unlock_win", "Win Island CX in Story Mode"),
+        ("cx", RaceTrackIsland.CxTowerMk2.Name, "unlock_win", "Win Island CX in Story Mode"),
         ("statue", RaceTrackIsland.Celebration.Name, "unlock_win", "Win Celebration 2 in Story Mode"),
+    };
+    // The unlock of each island's cars (their island in RACECARS.JSON), less Celebration Island's (StoryOptions: the statue's or the lava
+    // lake's) and Raph's car; the Temple of Bú's are the Halloween special's, the story has no race there
+    private static readonly Dictionary<string, string> IslandUnlock = new()
+    {
+        [RaceTrackIsland.Polar.Name] = "polar",
+        [RaceTrackCharacterCars.Citadel] = "citadel",
+        [RaceTrackCharacterCars.Desert] = "desert",
+        [RaceTrackCharacterCars.Moon] = "moon",
+        [RaceTrackCharacterCars.Otringal] = "otringal",
+        [RaceTrackCharacterCars.Francos] = "francos",
+        [RaceTrackCharacterCars.Elevator] = "elevator",
+        [RaceTrackCharacterCars.Wannies] = "wannies",
+        [RaceTrackCharacterCars.Mosquibees] = "mosquibees",
+        [RaceTrackCharacterCars.UnderCelebration] = "volcano",
+        [RaceTrackCharacterCars.IslandCX] = "cx",
     };
     // Raph's car (RACECARS.JSON 6), and the cars of the characters inside Celebration Island's statue -- FunFrock, the Dark Monk, the Sup
     // priest, and of the cast the Franco priest (body 310). The monster guarding the protection spell (body 456) is won with Desert
@@ -146,13 +174,9 @@ internal static class GameInstall
     // A car's story unlock (its unlock= and hint= options), by its island in RACECARS.JSON; "" for one the story doesn't hold back
     private static string StoryOptions(int number, string? island, HashSet<int> statue)
     {
-        var id = number == RaphCar ? "raph" : CastCars(DesertCast).Contains(number) ? "desert" : island switch
-        {
-            RaceTrackCharacterCars.Citadel => "citadel",
-            RaceTrackCharacterCars.Desert => "desert",
-            RaceTrackCharacterCars.Celebration => statue.Contains(number) ? "statue" : "celebration",
-            _ => null,
-        };
+        var id = number == RaphCar ? "raph" : CastCars(DesertCast).Contains(number) ? "desert"
+            : island == RaceTrackCharacterCars.Celebration ? (statue.Contains(number) ? "statue" : "celebration")
+            : island is not null ? IslandUnlock.GetValueOrDefault(island) : null;
         return id is null ? "" : $"|unlock={id} story|hint={StoryUnlocks.First(u => u.Id == id).Hint}";
     }
     public static readonly (int Number, string Name, double Accel, double Top, double Handling)[] Cars =
