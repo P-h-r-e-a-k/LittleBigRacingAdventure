@@ -112,6 +112,45 @@ internal static class GameInstall
     // RACEGAME_SETTINGS.TXT pumpkin_unlocked=1), and what the car page says of it until then
     public const string PumpkinUnlock = "pumpkin";
     public const string PumpkinHint = "Win the Halloween race to unlock";
+
+    // Story Mode (2026-10-29, the user: "Let's temporarily passcode gate story mode with the code 4 3 2 1"): LBA2 played as a game, each
+    // island's track raced where the story has it -- LBA Assembler's story set (RaceCarEngineFile.WriteStorySet) in story\, RACEGAME.TXT
+    // story_file= and story_code=
+    public const string StoryFolder = "story";
+    public const string StoryCode = "4321";
+    // The cars the story wins (the user, 2026-10-29: "beating Raph's time on citadel unlocks Raph's vehicle for time trials, winning the
+    // citabau race unlocks all of the other citadel island related cars. Beating Desert island unlocks the desert island cars, defeating
+    // Celebration 1 unlocks all the celebration island characters, defeating Celebration 2 unlocks Funfrock and all the characters based in
+    // the inside of the statue"): each unlock's id (the cars' unlock=<id> story), the story track that wins it -- the island it is raced
+    // as in the set -- and how (RACEMOD.CPP unlock_beat=: Raph's time beaten; unlock_win=: the race won), and what the padlock says
+    private static readonly (string Id, string Island, string Key, string Hint)[] StoryUnlocks =
+    {
+        ("raph", RaceTrackIsland.CitadelStorm.Name, "unlock_beat", "Beat Raph's time in Story Mode"),
+        ("citadel", RaceTrackIsland.Citadel.Name, "unlock_win", "Win Citadel 2 in Story Mode"),
+        ("desert", RaceTrackIsland.Desert.Name, "unlock_win", "Win Desert Island in Story Mode"),
+        ("celebration", RaceTrackIsland.CelebrationLava.Name, "unlock_win", "Win Celebration 1 in Story Mode"),
+        ("statue", RaceTrackIsland.Celebration.Name, "unlock_win", "Win Celebration 2 in Story Mode"),
+    };
+    // Raph's car (RACECARS.JSON 6), and the cars of the characters inside Celebration Island's statue -- FunFrock, the Dark Monk, the Sup
+    // priest, and of the cast the Franco priest and the monster guarding the protection spell (their bodies 310, 456)
+    private const int RaphCar = 6;
+    private static readonly int[] StatueCast = { 310, 456 };
+    private static HashSet<int> StatueCars() =>
+        new HashSet<int> { RaceTrackCharacterCars.FunFrock.Generic, RaceTrackCharacterCars.DarkMonk.Generic, RaceTrackCharacterCars.Priest.Generic }
+            .Concat(RaceTrackCharacterCars.Cast.Select((c, i) => (c, i)).Where(x => StatueCast.Contains(x.c.Character)).Select(x => RaceTrackCharacterCars.CastFirst + x.i))
+            .ToHashSet();
+    // A car's story unlock (its unlock= and hint= options), by its island in RACECARS.JSON; "" for one the story doesn't hold back
+    private static string StoryOptions(int number, string? island, HashSet<int> statue)
+    {
+        var id = number == RaphCar ? "raph" : island switch
+        {
+            RaceTrackCharacterCars.Citadel => "citadel",
+            RaceTrackCharacterCars.Desert => "desert",
+            RaceTrackCharacterCars.Celebration => statue.Contains(number) ? "statue" : "celebration",
+            _ => null,
+        };
+        return id is null ? "" : $"|unlock={id} story|hint={StoryUnlocks.First(u => u.Id == id).Hint}";
+    }
     public static readonly (int Number, string Name, double Accel, double Top, double Handling)[] Cars =
     {
         (HalloweenBuggy, RaceTrackCharacterCars.HalloweenBuggyName, 2.5, 2.5, 2.5),   // the all-rounder: the Temple's setup as it is
@@ -213,9 +252,11 @@ internal static class GameInstall
         menu.Append($"title={Title}\n");
         // (the window's title bar: the series' name, not the engine's -- RACEGAME.CPP RaceGame_WindowTitle, read before the window is made)
         menu.Append($"window_title={WindowTitle}\n");
-        // (Story Mode greyed: the full game's, still to come; Track select open behind a code -- RACEGAME.CPP CodePage: "temporarily password
-        // gate them with the password 1234", the user, 2026-10-22: no tracks_code= line and it asks none)
-        menu.Append($"story=0\ntracks=1\ntracks_code={TracksCode}\nlaps={Laps}\nend_to_menu={EndToMenuMs}\n");
+        // (Story Mode behind a code, its set written below -- "temporarily passcode gate story mode with the code 4 3 2 1", the user,
+        // 2026-10-29; Track select open behind a code -- RACEGAME.CPP CodePage: "temporarily password gate them with the password 1234", the
+        // user, 2026-10-22: no tracks_code= line and it asks none)
+        menu.Append($"story=1\nstory_file={StoryFolder}/story.txt\nstory_code={StoryCode}\n");
+        menu.Append($"tracks=1\ntracks_code={TracksCode}\nlaps={Laps}\nend_to_menu={EndToMenuMs}\n");
         foreach (var (island, name, file) in Specials)
         {
             var track = RaceTrackService.RaceFor(target, island.IleFile) ?? info;
@@ -267,6 +308,21 @@ internal static class GameInstall
                 (opponents.Count > 0 ? $"against {string.Join(", ", opponents)}" : "no opponents") +
                 ((raced.Drivers ?? new()).Any(d => d.Ghost) ? ", a time to beat" : "") + (raced.Mushrooms is { Count: > 0 } m ? $", {m.Count} power-up spots" : ""));
         }
+        // Story Mode's set: every track raced where the story has it, the cars each one wins in its file (StoryUnlocks); the files named
+        // from the game's folder (the game finds them beside its data: RACEGAME.CPP StoryResolved)
+        var storyDir = Path.Combine(target, StoryFolder);
+        if (Directory.Exists(storyDir)) Directory.Delete(storyDir, true);
+        Directory.CreateDirectory(storyDir);
+        Setup().WriteStorySet(Path.Combine(storyDir, "story.txt"), info,
+            extra: island => StoryUnlocks.Where(u => u.Island == island).Select(u => $"{u.Key}={u.Id}"));
+        foreach (var written in Directory.GetFiles(storyDir, "*.txt")) StoryRelative(written, target);
+        log($"Story Mode: {Directory.GetFiles(storyDir, "racecar_track*.txt").Length} tracks in its set, behind the code {StoryCode}; " +
+            $"cars won there: {string.Join(", ", StoryUnlocks.Select(u => $"{u.Id} ({u.Island}, {u.Key})"))}");
+        foreach (var u in StoryUnlocks)
+            if (!Directory.GetFiles(storyDir, "racecar_track*.txt").Any(f => File.ReadLines(f).Contains($"{u.Key}={u.Id}")))
+                log($"Story Mode: WARNING: no track of the set wins {u.Id} ({u.Island})");
+        var statue = StatueCars();
+        var islandOf = RaceTrackCharacterCars.Catalogue(target).ToDictionary(e => e.Number, e => e.Island);
         var cars = 0;
         foreach (var (number, name, accel, top, handling) in Cars)
         {
@@ -287,6 +343,8 @@ internal static class GameInstall
             if (drive is null) { log($"no car {number} ({name}) in this build: left out"); continue; }
             // (the pumpkin F1: won by winning a race, then for time trials -- RACEGAME.CPP's padlock until then)
             if (number == RaceTrackCharacterCars.PumpkinNumber) options += $"|unlock={PumpkinUnlock} trial|hint={PumpkinHint}";
+            // (one the story wins: locked until then)
+            else options += StoryOptions(number, islandOf.GetValueOrDefault(number), statue);
             // (its stars: acceleration, top speed, handling -- RACEGAME.CPP reads a line without them as a car with none, driven as the
             // track sets it)
             string S(double v) => v.ToString("0.#", CultureInfo.InvariantCulture);
@@ -294,7 +352,7 @@ internal static class GameInstall
             menu.Append($"car={name}|{drive}|{S(accel)} {S(top)} {S(handling)}{options}\n");
             cars++;
         }
-        var grid = GridCars(target, log);
+        var grid = GridCars(target, log, statue);
         foreach (var line in grid) menu.Append(line).Append('\n');
         File.WriteAllText(Path.Combine(target, MenuFile), menu.ToString(), new UTF8Encoding(false));
         // the menu's picture: the Halloween backdrop in LBA2's own palette, in the copy's SCREEN.HQR
@@ -366,6 +424,18 @@ internal static class GameInstall
         File.WriteAllLines(raceFile, lines);
     }
 
+    // A Story Mode file's paths named from the game's folder, wherever on a line they are -- the set's track= lines end in their track's
+    // file (RACEGAME.CPP StoryResolved finds both kinds beside the game's data)
+    private static void StoryRelative(string file, string target)
+    {
+        var root = Path.GetFullPath(target).TrimEnd('\\', '/') + Path.DirectorySeparatorChar;
+        File.WriteAllLines(file, File.ReadAllLines(file).Select(l =>
+        {
+            var at = l.IndexOf(root, StringComparison.OrdinalIgnoreCase);
+            return at < 0 || l.StartsWith('#') ? l : l[..at] + l[(at + root.Length)..].Replace('\\', '/');
+        }));
+    }
+
     // A Track select race file of a sprint the story dreams or ends with (Polar Island's dream, the Emperor's palace's teleporter to
     // Celebration Island): its story's lines taken out -- the dream's intro and loss lines, the waking up a win leads to and the game
     // variable it sets -- so the race is the race alone: start to finish, then the menu (RACEMOD.CPP: a lost sprint isn't run again
@@ -394,7 +464,7 @@ internal static class GameInstall
         "The Franco dog's basket car", "The mechanic owl's glider", "The small spider's monster truck",
     };
 
-    private static List<string> GridCars(string target, Action<string> log)
+    private static List<string> GridCars(string target, Action<string> log, HashSet<int> statue)
     {
         string S(double v) => v.ToString("0.#", CultureInfo.InvariantCulture);
         var lines = new List<string>();
@@ -426,6 +496,7 @@ internal static class GameInstall
             else drive = RaceCarEngineFile.DriveAsLine(target, number)?.Split('\n').FirstOrDefault(l => l.StartsWith("drive_as="))?["drive_as=".Length..].Trim();
             if (drive is null) { log($"the car grid: no car {number} ({name}) in this build: left out"); continue; }
             if (number == RaceTrackCharacterCars.PumpkinNumber) options += $"|unlock={PumpkinUnlock} trial|hint={PumpkinHint}";
+            else options += StoryOptions(number, catalogue.FirstOrDefault(e => e.Number == number)?.Island, statue);
             var (accel, top, handling, feel) = given.Name is not null ? (given.Accel, given.Top, given.Handling, "hand-set") : CarStats(number);
             if (Math.Abs(accel + top + handling - StarTotal) > 0.01) log($"the car grid: {name}'s stars add up to {S(accel + top + handling)}, not {S(StarTotal)}");
             made[feel] = made.GetValueOrDefault(feel) + 1;
