@@ -101,7 +101,9 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
   monsters' cars (the vampire's coffin, the witch's broomstick, the zombie's hearse), then the cars made by hand for the islands' people
   and the cast's cars. The arrows go through them (a row up and down, on to the next page past the ends), **Page up** / **Page down** a
   page; the car chosen is framed in orange and shown large on the right, turning, with its name and stars; **Enter** (or a click on
-  it) races it, **Esc** goes back. The small cars are drawn once as their page opens. The last car taken is remembered
+  it) races it, **Esc** goes back. **Type letters** to find a car by name (**Backspace** takes one back), and **Tab** (or a click on its
+  line) shows the cars strongest in Acceleration, Top speed or Handling, the strongest first; **Esc** clears these first.
+  The small cars are drawn once as their page opens. The last car taken is remembered
   (`grid_car=` in `RACEGAME_SETTINGS.TXT`).
   Every car has its own stats, adding up to the same 7.5 stars (the pumpkin F1, a prize, has more): the Halloween car page's cars keep their own (the table below); every
   other car's come from what it is -- karts and bubble cars nimble and quick away but slow at the top, trucks and tanks slow but sure
