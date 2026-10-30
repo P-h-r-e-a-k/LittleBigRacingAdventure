@@ -191,7 +191,7 @@ internal static class GameInstall
     public static readonly (int Number, string Name, double Accel, double Top, double Handling)[] Cars =
     {
         (HalloweenBuggy, RaceTrackCharacterCars.HalloweenBuggyName, 2.5, 2.5, 2.5),   // the all-rounder: the Temple's setup as it is
-        (RaceTrackCharacterCars.PumpkinNumber, "Twinsen's pumpkin F1", 2.5, 2.5, 2.5),   // the same, won: for time trials
+        (RaceTrackCharacterCars.PumpkinNumber, "Twinsen's pumpkin F1", 5, 2.5, 5),   // the prize, won, for time trials: the buggy's top speed with the most pull and steering there is, past StarTotal (the user, 2026-10-30)
         (RaceTrackCharacterCars.DiggerNumber, RaceTrackCharacterCars.DiggerName, 2, 2.5, 2.5),   // LBA1's Polar Island tractor: the buggy's, slower away (the user, 2026-10-27)
         (4, "Zoe's car", 3, 1.5, 3),                            // a nippy runabout: quick away and into the bends, not fast
         (3, "The Emperor's car", 2, 4.5, 1),                    // the fastest at the top, heavy in the bends

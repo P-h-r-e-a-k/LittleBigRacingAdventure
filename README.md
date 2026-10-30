@@ -63,6 +63,7 @@ The setup is published at <https://lbabirthdayevent.com/LBRA-Setup.exe>; uploadi
 
 The main menu: **Story Mode** (greyed until the full game), **Track select**, **Specials**, **Best laps**, the game's own
 **Options** (with **Race controls, power-ups** and **Camera, window, updates** at the end), **Quit**; **Resume Game** while a race is on.
+**Quit** asks first, "Quit the game?": **No** (the row it opens on, or **Esc**) goes back, **Yes, quit** leaves. The window's X closes the game straight away.
 
 - **Track select** (for now behind a code): choosing it asks for the code -- type the digits (the keyboard's row or its keypad; each
   shows as a star, Backspace takes one back), **Enter** to open, **Esc** back. A wrong code says "Wrong code" and empties; the right
@@ -102,7 +103,7 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
   page; the car chosen is framed in orange and shown large on the right, turning, with its name and stars; **Enter** (or a click on
   it) races it, **Esc** goes back. The small cars are drawn once as their page opens. The last car taken is remembered
   (`grid_car=` in `RACEGAME_SETTINGS.TXT`).
-  Every car has its own stats, adding up to the same 7.5 stars: the Halloween car page's cars keep their own (the table below); every
+  Every car has its own stats, adding up to the same 7.5 stars (the pumpkin F1, a prize, has more): the Halloween car page's cars keep their own (the table below); every
   other car's come from what it is -- karts and bubble cars nimble and quick away but slow at the top, trucks and tanks slow but sure
   in the bends, rockets and gliders fast and floaty, monster trucks all pull, ghost cars lively and floaty, boats fast on the
   straights, mine carts as on rails -- with half a star (now and then a whole one) moved between two stats by the car's own number, so
@@ -125,7 +126,8 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
   Twinsen's pumpkin F1 (locked until you win), the digger (LBA1's Polar Island bulldozer, Twinsen at its wheel), Zoe's car, the Emperor's car, the Dark Monk's car, the priest's car, the guitarist's
   guitar, the trooper's tank, Dino-Fly, the Tralu's cave, the skeleton's ghost car, the little Tralu's monster truck and the third
   quetch child's kart. Under each car's name its stats, 0 to 5 stars in half stars: **Acceleration**, **Top speed** and
-  **Handling**. Every car's stars add up to the same 7.5, so what a car has more of it pays for in the others, and the race drives it
+  **Handling**. Every car's stars add up to the same 7.5, so what a car has more of it pays for in the others (all but the pumpkin F1,
+  the prize: the most acceleration and handling there is, for 12.5 stars), and the race drives it
   by them: the Halloween buggy's 2.5 stars each are the track's own car; from there, up to 5 stars gives up to half as much pull again,
   8 % more top speed and a fifth more steering, and fewer stars as much less. (A time trial uses the car too; Best laps shows it.)
 
@@ -139,7 +141,7 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
   | Car | Acceleration | Top speed | Handling |
   | --- | :-: | :-: | :-: |
   | Twinsen's Halloween buggy | 2.5 | 2.5 | 2.5 |
-  | Twinsen's pumpkin F1 (won: time trials) | 2.5 | 2.5 | 2.5 |
+  | Twinsen's pumpkin F1 (won: time trials; 12.5 stars, not 7.5) | 5 | 2.5 | 5 |
   | The digger (the buggy's, slower away: 7 stars, not 7.5) | 2 | 2.5 | 2.5 |
   | Zoe's car | 3 | 1.5 | 3 |
   | The Emperor's car | 2 | 4.5 | 1 |
