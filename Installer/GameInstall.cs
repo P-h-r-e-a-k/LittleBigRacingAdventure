@@ -36,6 +36,15 @@ internal static class GameInstall
     private static readonly string[] DataFolders = { "VOX", "VIDEO", "MUSIC" };
     private const string Kept = ".before-racetrack";
 
+    // The LBA2 CD's movie bank in a drive now (LBA2\VIDEO\VIDEO.HQR, or VIDEO\VIDEO.HQR at its root), or null -- as the game looks for it
+    private static string? CdVideos()
+    {
+        foreach (var drive in DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.CDRom && d.IsReady))
+            foreach (var place in new[] { Path.Combine("LBA2", "VIDEO", "VIDEO.HQR"), Path.Combine("VIDEO", "VIDEO.HQR") })
+                if (File.Exists(Path.Combine(drive.RootDirectory.FullName, place))) return Path.Combine(drive.RootDirectory.FullName, place);
+        return null;
+    }
+
     // The specials: the special tracks' islands, their names in the menu, their race files' names (specials\<file>.txt, <file>_trial.txt)
     public static readonly (RaceTrackIsland Island, string Name, string File)[] Specials =
     {
@@ -242,6 +251,12 @@ internal static class GameInstall
             progress(0.01 + 0.44 * done / total, $"Copying LBA2's data: {Path.GetFileName(to)}");
         }
         log($"LBA2: {files.Count} files copied ({total / (1024 * 1024)} MB)");
+        // (no cinematics in the LBA2 folder -- no VIDEO folder, no disc image to read them out of: the game plays them from the LBA2 CD
+        // in a drive, looking for it as each one comes, and skips them without it -- PLAYACF.CPP Acf_FindOnDisc; the user, 2026-10-30)
+        if (images.Count == 0 && !files.Any(f => string.Equals(Path.GetFileName(Path.GetDirectoryName(f.To)), "VIDEO", StringComparison.OrdinalIgnoreCase)))
+            log(CdVideos() is { } cd
+                ? $"LBA2's cinematics: not in {lba2} -- the game plays them from the LBA2 CD in a drive ({cd} now)"
+                : $"LBA2's cinematics: not in {lba2}, and no LBA2 CD in a drive -- the game plays them from the LBA2 CD when it is in one, else skips them");
         MenuMusicInto(lba2, target, log, music2);
         RetailFromDisc(images.Select(f => f.From).FirstOrDefault(), files.Select(f => f.To).ToList(), log);
 
