@@ -63,7 +63,7 @@ The setup is published at <https://lbabirthdayevent.com/LBRA-Setup.exe>; uploadi
 
 The main menu: **Story Mode** (greyed until the full game), **Track select**, **Specials**, **Best laps**, the game's own
 **Options** (with **Race controls, power-ups** and **Camera, window, updates** at the end), **Quit**; **Resume Game** while a race is on.
-**Quit** asks first, "Quit the game?": **No** (the row it opens on, or **Esc**) goes back, **Yes, quit** leaves. The window's X closes the game straight away.
+**Quit** asks first, "Quit the game?": **No** (the row it opens on, or **Esc**) goes back, **Yes** leaves. The window's X closes the game straight away.
 
 - **Track select** (for now behind a code): choosing it asks for the code -- type the digits (the keyboard's row or its keypad; each
   shows as a star, Backspace takes one back), **Enter** to open, **Esc** back. A wrong code says "Wrong code" and empties; the right
