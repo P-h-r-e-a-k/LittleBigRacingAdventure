@@ -10,7 +10,7 @@ using System.Windows;
 namespace LBRAInstaller;
 
 // The game's updates (2026-10-19). The installer leaves a copy of itself in the game's folder, Update\LBRA-Setup.exe, and what it
-// installed from in Update\install.json. The game (LBA Assembler's engine: RACEGAME.CPP) starts that copy once a week, hidden, as
+// installed from in Update\install.json. The game (LBA Assembler's engine: RACEGAME.CPP) starts that copy hidden when a check is due (each launch by default, weekly or never: RACEGAME_SETTINGS.TXT update_check=), as
 //     LBRA-Setup.exe --check-update "<install dir>" --wait-pid <the game's pid> [--manual]
 // which looks at the setup on the site (a HEAD: its ETag, Last-Modified and length against the ones installed from), downloads a new one
 // to Update\LBRA-Setup.new.exe, checks it is a whole LBRA setup no older than this one, waits for the game to close, then -- the player's
@@ -161,7 +161,7 @@ internal static class Updater
         installDir = Path.GetFullPath(installDir).TrimEnd('\\', '/');
         var dir = Path.Combine(installDir, Folder);
         void L(string s) => Log(installDir, s);
-        L($"---- check ({(manual ? "asked for in the game" : "the weekly one")}), setup {OwnVersion}, game pid {waitPid?.ToString() ?? "none"}");
+        L($"---- check ({(manual ? "asked for in the game" : "at the game's start")}), setup {OwnVersion}, game pid {waitPid?.ToString() ?? "none"}");
         using var mutex = new Mutex(false, @"Local\LBRA-Update-" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(installDir.ToUpperInvariant())))[..16]);
         try
         {

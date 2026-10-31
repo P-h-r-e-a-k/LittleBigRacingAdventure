@@ -39,10 +39,11 @@ the player's `User\` folder is never touched.
 
 The game updates from the newest release on GitHub, <https://github.com/P-h-r-e-a-k/LittleBigRacingAdventure/releases/latest/download/LBRA-Setup.exe>: publishing a release with `LBRA-Setup.exe` attached is all it takes. A draft or a pre-release isn't offered. Installs from before this change still look at <https://lbabirthdayevent.com/LBRA-Setup.exe>, so a setup with this change has to go up there once to bring them over.
 
-- **When**: the game, at its start, once a week (`update_checked=` in `RACEGAME_SETTINGS.TXT`; never in LBA Assembler's Play or any
-  run with the engine's command harness), starts `Update\LBRA-Setup.exe --check-update "<folder>" --wait-pid <the game>` hidden, and
-  plays on. Options > **Camera, window, updates**: **Updates: Automatic / Ask first / Off** (`updates=auto|ask|off`, Enter goes round them) and
-  **Check for updates now** (also with updates off: asked first then); under them what the last check said (`Update\status.txt`).
+- **When**: the game, at its start (never in LBA Assembler's Play, any run with the engine's command harness, or player 2's game), starts
+  `Update\LBRA-Setup.exe --check-update "<folder>" --wait-pid <the game>` hidden, and plays on: it doesn't wait for the check. Options >
+  **Camera, window, updates** > **Updates**: **Check for updates: On launch / Weekly / Manually** (`update_check=launch|weekly|manual`, on
+  launch by default; a game with the old `updates=off` becomes Manually), **New versions: Automatic / Ask first** (`updates=auto|ask`), and
+  **Check for updates now**; under them what the last check said (`Update\status.txt`).
 - **The check** (no window): a HEAD request over HTTPS; a new version is an ETag other than the one installed from -- or, for an install
   whose source isn't known (a setup run by hand), a file newer than the install or of another size. It is downloaded to
   `Update\LBRA-Setup.new.exe` (three tries) and kept only if it is whole (its length as the server said, a Windows program, .NET's
@@ -72,7 +73,7 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
   Online times don't go in Best laps. Games with the same tracks and cars can race whatever their builds; if yours differs from the host's, it says which versions.
   **Two players on this PC** splits the screen side by side or one above the other, or gives each player a screen of their own, picked from a list. Player 2 has **W A S D**
   to drive, **Q** for items (and to pick in the menus), **E** the handbrake and **R** the view, and a controller if there is one for them; with two controllers each player has one.
-- **Options, Camera, window, updates:** the camera's view, full screen or a window, the mini-map, **Sky in races** (off by default: the sky goes for the race and comes back when it ends), and Updates.
+- **Options, Camera, window, updates:** the camera's view, full screen or a window, the mini-map, **Sky in races** (off by default: the sky goes for the race and comes back when it ends), and **Updates**: when to check (on launch by default, weekly or manually) and whether a new version installs itself or asks first.
 - **Track select** (for now behind a code): choosing it asks for the code -- type the digits (the keyboard's row or its keypad; each
   shows as a star, Backspace takes one back), **Enter** to open, **Esc** back. A wrong code says "Wrong code" and empties; the right
   one (**1234**) opens Track select for the rest of the run (it isn't kept: the next start asks again). The code is the installer's
