@@ -1,5 +1,6 @@
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace LBRAInstaller;
 
@@ -90,6 +91,74 @@ internal static class GameIcon
         }
         Refresh(exe);
         return images.Count;
+    }
+
+    // The game's name in the exe's version resource in place of the engine's: Task Manager heads the program with its file description (the
+    // user, 2026-10-31: "This is how LBRA displays in task manager": "A community source port of Little Big Adventure 2"). LBA Assembler
+    // runs the same engine under its own description, so the game's copy is the one renamed, as with its icon.
+    private const int RtVersion = 16;
+
+    public static void Name(string exe, string name, string fileName, Version version)
+    {
+        ushort language = 0;
+        var module = LoadLibraryEx(exe, IntPtr.Zero, LoadLibraryAsDatafile | LoadLibraryAsImageResource);
+        if (module == IntPtr.Zero) throw new IOException($"{Path.GetFileName(exe)} could not be read for its name (error {Marshal.GetLastWin32Error()}).");
+        try { EnumResourceLanguages(module, (IntPtr)RtVersion, (IntPtr)1, (m, t, n, l, p) => { language = l; return false; }, IntPtr.Zero); }
+        finally { FreeLibrary(module); }
+        var data = VersionResource(name, fileName, version);
+        var update = BeginUpdateResource(exe, false);
+        if (update == IntPtr.Zero) throw new IOException($"{Path.GetFileName(exe)} could not be opened for its name (error {Marshal.GetLastWin32Error()}).");
+        var done = false;
+        try
+        {
+            if (!UpdateResource(update, (IntPtr)RtVersion, (IntPtr)1, language, data, (uint)data.Length)) throw new IOException($"the name could not be put in (error {Marshal.GetLastWin32Error()}).");
+            done = true;
+        }
+        finally
+        {
+            if (!EndUpdateResource(update, !done) && done) throw new IOException($"{Path.GetFileName(exe)}'s name could not be written (error {Marshal.GetLastWin32Error()}).");
+        }
+        Refresh(exe);
+    }
+
+    // VS_VERSIONINFO: the fixed part (the same numbers the engine's resource script writes), then the strings, English in code page 1252
+    private static byte[] VersionResource(string name, string fileName, Version version)
+    {
+        uint Pair(int high, int low) => (uint)(Math.Max(high, 0) << 16 | Math.Max(low, 0) & 0xFFFF);
+        var fixedInfo = new[]
+        {
+            0xFEEF04BD, 0x00010000u, Pair(version.Major, version.Minor), Pair(version.Build, version.Revision),
+            Pair(version.Major, version.Minor), Pair(version.Build, version.Revision), 0x3Fu, 0u, 0x00040004u /* VOS_NT_WINDOWS32 */, 1u /* VFT_APP */, 0u, 0u, 0u,
+        }.SelectMany(BitConverter.GetBytes).ToArray();
+        byte[] Text(string key, string value) => Block(key, 1, Encoding.Unicode.GetBytes(value + "\0"), (ushort)(value.Length + 1));
+        var strings = Block("040904E4", 1, [], 0,
+            Text("ProductName", name), Text("FileDescription", name), Text("OriginalFilename", fileName),
+            Text("InternalName", Path.GetFileNameWithoutExtension(fileName)), Text("ProductVersion", version.ToString()), Text("FileVersion", version.ToString()));
+        var translation = Block("Translation", 0, [0x09, 0x04, 0xE4, 0x04], 4);
+        return Block("VS_VERSION_INFO", 0, fixedInfo, (ushort)fixedInfo.Length, Block("StringFileInfo", 1, [], 0, strings), Block("VarFileInfo", 1, [], 0, translation));
+    }
+
+    // One block: its length, its value's, its type (1: text), its key, then its value and the blocks inside it, each on a 4-byte boundary
+    private static byte[] Block(string key, ushort type, byte[] value, ushort valueLength, params byte[][] children)
+    {
+        using var stream = new MemoryStream();
+        using var writer = new BinaryWriter(stream);
+        writer.Write((ushort)0);
+        writer.Write(valueLength);
+        writer.Write(type);
+        writer.Write(Encoding.Unicode.GetBytes(key + "\0"));
+        void Align() { while (stream.Length % 4 != 0) writer.Write((byte)0); }
+        Align();
+        writer.Write(value);
+        foreach (var child in children)
+        {
+            Align();
+            writer.Write(child);
+        }
+        writer.Flush();
+        var bytes = stream.ToArray();
+        BitConverter.GetBytes((ushort)bytes.Length).CopyTo(bytes, 0);
+        return bytes;
     }
 
     // Explorer told the exe has changed, and its icon cache emptied: it keeps the icon it showed for a path, and an update writes the new

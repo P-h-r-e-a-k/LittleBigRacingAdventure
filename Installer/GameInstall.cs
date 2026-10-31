@@ -411,6 +411,13 @@ internal static class GameInstall
             try { log($"{GameExe}: the game's icon ({GameIcon.Replace(Path.Combine(target, GameExe), bytes.ToArray())} pictures) in place of the engine's"); }
             catch (Exception e) when (e is IOException or InvalidDataException) { log($"{GameExe} keeps the engine's icon: {e.Message}"); }
         }
+        // (and its name, which Task Manager shows -- GameIcon.Name)
+        try
+        {
+            GameIcon.Name(Path.Combine(target, GameExe), "Little Big Racing Adventure", GameExe, typeof(GameInstall).Assembly.GetName().Version ?? new Version(1, 0, 0, 0));
+            log($"{GameExe}: the game's name in place of the engine's");
+        }
+        catch (IOException e) { log($"{GameExe} keeps the engine's name: {e.Message}"); }
         // (LBA Assembler's engine is a console program -- its headless runs log to the console -- so Windows would open a console window
         // beside the game: the game's copy is marked a windowed program instead; output redirected by a caller still works)
         if (WindowedProgram(Path.Combine(target, GameExe))) log($"{GameExe}: a windowed program (no console window)");
