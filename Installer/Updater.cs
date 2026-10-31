@@ -23,7 +23,8 @@ namespace LBRAInstaller;
 // leaves the game closed after an update.
 internal static class Updater
 {
-    public const string Url = "https://lbabirthdayevent.com/LBRA-Setup.exe";
+    // (the newest release on GitHub: a link that doesn't change, redirected to the file, whose ETag, Last-Modified and length the check compares -- 2026-10-31)
+    public const string Url = "https://github.com/P-h-r-e-a-k/LittleBigRacingAdventure/releases/latest/download/LBRA-Setup.exe";
     public const string Folder = "Update";
     public const string SetupFile = "LBRA-Setup.exe";
     public const string NewFile = "LBRA-Setup.new.exe";
