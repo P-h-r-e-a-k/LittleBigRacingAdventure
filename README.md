@@ -61,14 +61,16 @@ The setup is published at <https://lbabirthdayevent.com/LBRA-Setup.exe>; uploadi
 
 ## The game
 
-The main menu: **Story Mode** (greyed until the full game), **Track select**, **Specials**, **Best laps**, the game's own
+The main menu: **Story Mode** (greyed until the full game), **Track select**, **Specials**, **Multiplayer**, **Best laps**, the game's own
 **Options** (with **Race controls, power-ups** and **Camera, window, updates** at the end), **Quit**; **Resume Game** while a race is on.
 **Quit** asks first, "Quit the game?": **No** (the row it opens on, or **Esc**) goes back, **Yes** leaves. The window's X closes the game straight away.
 
-- **Online race:** race other people, one of you hosting. **Host a race** asks your router to open UDP port 21997 and shows the address to give your friends (and
+- **Multiplayer:** race other people, one of you hosting. **Host a race** asks your router to open UDP port 21997 and shows the address to give your friends (and
   tells you if the router said no: forward the port by hand then). **Join a race** takes that address, typed or pasted with Ctrl+V. The host picks the track, its laps
   and their car; everyone else picks a car in the lobby with Enter. Cars pass through each other, each with its player's name over it, and each game's power-ups are its
   own. Everyone needs the same version.
+  **Two players on this PC** splits the screen side by side or one above the other, or gives each player a screen of their own, picked from a list. Player 2 needs a
+  controller; with two, each player has one, and with one, player 1 uses the keyboard.
 - **Track select** (for now behind a code): choosing it asks for the code -- type the digits (the keyboard's row or its keypad; each
   shows as a star, Backspace takes one back), **Enter** to open, **Esc** back. A wrong code says "Wrong code" and empties; the right
   one (**1234**) opens Track select for the rest of the run (it isn't kept: the next start asks again). The code is the installer's
