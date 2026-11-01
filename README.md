@@ -211,8 +211,9 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
     fastest lap goes into Best laps as soon as you drive it, so stopping through the menu loses nothing. On the sprints (Polar Island,
     the palace) the page asks **How many runs?** instead: over the finish line, the run's time stays on the display a moment and the
     car is put back on the grid for the next run ("Run 2/3"), no restart needed; each run counts as a lap does (ghost, Best laps).
-  - **A missed checkpoint** in a time trial: crossing the line after it starts the lap again, its clock from zero ("Missed
-    checkpoint 3: the lap starts again"). In a race the lap still just doesn't count until you go back for the checkpoint.
+  - **A missed checkpoint** (2026-11-01): in every mode, as soon as the game sees you've missed one, "Missed checkpoint 3" comes
+    up and the car is put back on the road just before it, so a cut corner costs seconds, not a lap. Crossing the start line of a
+    time trial with one still missed starts the lap again, its clock from zero.
   - **Best laps**: one track at a time, its **five fastest laps** with their cars, and under them **Watch**: **Your best lap** or
     **Ghost: Easy / Medium / Hard / Extreme**. **Up**, **Down** move between the track's name and the two Watch lines. On the
     track's name, **Left**, **Right** go through the tracks; on the ghost line they go round Easy, Medium, Hard and Extreme. **Enter** plays the line chosen

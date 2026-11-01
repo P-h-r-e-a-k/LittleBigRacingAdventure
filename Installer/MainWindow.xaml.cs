@@ -19,26 +19,10 @@ public partial class MainWindow : Window
         InitializeComponent();
         this.source = source;
         // (the usual places: GOG's, Steam's)
-        Lba1Box.Text = lba1 ?? LBAAssembler.Terrain.Temple.TempleMusic.InstalledLba1Folders().FirstOrDefault(GameInstall.IsLba1Folder) ?? Guess("Little Big Adventure", GameInstall.IsLba1Folder);
-        Lba2Box.Text = lba2 ?? Guess("Little Big Adventure 2", GameInstall.IsLba2Folder);
+        Lba1Box.Text = lba1 ?? LBAAssembler.Terrain.Temple.TempleMusic.InstalledLba1Folders().FirstOrDefault(GameInstall.IsLba1Folder) ?? "";
+        Lba2Box.Text = lba2 ?? LBAAssembler.Terrain.Temple.TempleMusic.InstalledLba2Folders().FirstOrDefault(GameInstall.IsLba2Folder) ?? "";
         // (the series' name, not the Halloween edition's: the user, 2026-10-20)
         TargetBox.Text = target ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", GameInstall.WindowTitle);
-    }
-
-    private static string Guess(string name, Func<string, bool> ok)
-    {
-        var roots = DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.Fixed && d.IsReady).Select(d => d.RootDirectory.FullName);
-        foreach (var root in roots)
-            foreach (var where in new[] { "GOG Games", Path.Combine("Program Files (x86)", "GOG Galaxy", "Games"), Path.Combine("Program Files (x86)", "Steam", "steamapps", "common"),
-                         Path.Combine("SteamLibrary", "steamapps", "common") })
-            {
-                var dir = Path.Combine(root, where, name);
-                try { if (ok(dir)) return dir; } catch (Exception e) when (e is IOException or UnauthorizedAccessException) { }
-                // (Steam's copy keeps the data in a CommonClassic or its own subfolder)
-                foreach (var sub in new[] { "CommonClassic", "Common", "LBA2", "LBA" })
-                    try { if (ok(Path.Combine(dir, sub))) return Path.Combine(dir, sub); } catch (Exception e) when (e is IOException or UnauthorizedAccessException) { }
-            }
-        return "";
     }
 
     private void Browse_Click(object sender, RoutedEventArgs e)

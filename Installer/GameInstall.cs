@@ -688,17 +688,14 @@ internal static class GameInstall
         return InstalledLba2Folders().FirstOrDefault(d => !Same(d, lba2) && HasMenuMusic(d));
     }
 
-    // GOG's and Steam's LBA2 folders on this PC, the usual places on every fixed drive
+    // GOG's and Steam's LBA2 folders on this PC: each one's data folder and the one it's in (the music can be beside a Common folder)
     public static IEnumerable<string> InstalledLba2Folders()
     {
-        foreach (var drive in DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.Fixed && d.IsReady))
-            foreach (var where in new[] { "GOG Games", Path.Combine("Program Files (x86)", "GOG Galaxy", "Games"), Path.Combine("Program Files (x86)", "Steam", "steamapps", "common"),
-                         Path.Combine("SteamLibrary", "steamapps", "common") })
-                foreach (var name in new[] { "Little Big Adventure 2", Path.Combine("Little Big Adventure 2", "LBA2"), Path.Combine("Little Big Adventure 2", "Common") })
-                {
-                    var dir = Path.Combine(drive.RootDirectory.FullName, where, name);
-                    if (Directory.Exists(dir)) yield return dir;
-                }
+        foreach (var dir in LBAAssembler.Terrain.Temple.TempleMusic.InstalledLba2Folders())
+        {
+            yield return dir;
+            if (Path.GetDirectoryName(dir) is { } parent && Path.GetFileName(dir).Equals("Common", StringComparison.OrdinalIgnoreCase)) yield return parent;
+        }
     }
 
     // The menu music into the install when the copy of the LBA2 folder hasn't got it: from the chosen folder, or a GOG or Steam LBA2 on this
