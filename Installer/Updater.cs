@@ -31,6 +31,9 @@ internal static class Updater
     private const string PartFile = "LBRA-Setup.download";
     public const string InfoFile = "install.json";
     public const string LogFile = "update.log";
+    private const string NowFile = "update_now.txt";       // Update\update_now.txt: the player said yes in the game (online): no asking when it closes
+    private const string BeforeFolder = "before";          // Update\before: the game as it was, while an update runs
+    private const string FailVariable = "LBRA_UPDATE_TEST_FAIL";   // (tests: =1 stops the update half way through its build)
     public const string StatusFile = "status.txt";
     private const string UrlVariable = "LBRA_UPDATE_URL";
     private const string NoRelaunchVariable = "LBRA_UPDATE_NO_RELAUNCH";
@@ -230,6 +233,7 @@ internal static class Updater
             {
                 TryDelete(fresh);
                 info.Pending = null;
+                Status(installDir, "Downloading a new version...");
                 var part = Path.Combine(dir, PartFile);
                 TryDelete(part);
                 Source? got = null;
@@ -292,6 +296,8 @@ internal static class Updater
                     L("the game closed");
                 }
             }
+            var now = Path.Combine(dir, NowFile);
+            if (File.Exists(now)) { TryDelete(now); mode = "auto"; L("the player said yes in the game: no asking"); }
             if (mode == "ask" && !Ask(version))
             {
                 L("Later: the download is kept for the next check");
@@ -480,6 +486,8 @@ internal static class Updater
         }
         var window = new UpdateProgressWindow();
         window.Show();
+        var before = Path.Combine(installDir, "Update", BeforeFolder);
+        var kept = false;
         try
         {
             // (the game closed: its exe can't be opened for writing while it runs)
@@ -491,9 +499,19 @@ internal static class Updater
                 window.Report(0, "Waiting for the game to close...");
                 await Task.Delay(1000);
             }
+            // (an update builds the game again from the first files on: one that stops half way left the game's original files under what the last build had written
+            // -- a player's game on 2026-11-01, "cannot start", body 949 of the 470 in the original BODY.HQR. So the game as it was is kept until the new one is whole)
+            window.Report(0, "Keeping a copy of the game...");
+            kept = await Task.Run(() => KeepGame(installDir, before, L));
             var lines = new List<string>();
-            await Task.Run(() => GameInstall.Run(lba1, lba2, installDir, (f, what) => window.Dispatcher.Invoke(() => window.Report(f, what)), lines.Add, pending, info?.Music, info?.MenuMusic));
+            var failTest = Environment.GetEnvironmentVariable(FailVariable) == "1";
+            await Task.Run(() => GameInstall.Run(lba1, lba2, installDir, (f, what) =>
+            {
+                if (failTest && f > 0.5) throw new OverflowException("a test: the update stopped half way");
+                window.Dispatcher.Invoke(() => window.Report(f, what));
+            }, lines.Add, pending, info?.Music, info?.MenuMusic));
             File.WriteAllLines(Path.Combine(installDir, "setup.log"), lines);
+            if (kept) try { Directory.Delete(before, true); } catch (Exception e) when (e is IOException or UnauthorizedAccessException) { L("the copy of the game not removed: " + e.Message); }
             foreach (var line in lines.Where(l => l.StartsWith("updates:") || l.StartsWith("the game:") || l.Contains("shortcut") || l.StartsWith(GameInstall.OldGameExe))) L(line);
             L($"INSTALLED version {OwnVersion}; User\\ kept");
             Status(installDir, $"Updated to version {OwnVersion} on {Today()}.");
@@ -501,6 +519,16 @@ internal static class Updater
         catch (Exception e)
         {
             L("FAILED: " + e);
+            if (kept && await Task.Run(() => PutGameBack(installDir, before, L)))
+            {
+                window.Close();
+                // (not tried again until there is a newer version: the same update would stop the same way, at every launch)
+                if (info is not null) { info.Rejected = pending ?? info.Rejected; info.Pending = null; Save(installDir, info); }
+                Status(installDir, "An update failed, so the game stayed as it was.");
+                MessageBox.Show($"The update failed: {e.Message}\n\nYour game is back as it was, and your saves and settings are kept. If you can, please send the file Update\\{LogFile} to whoever gave you the game.",
+                    GameInstall.Title, MessageBoxButton.OK, MessageBoxImage.Warning);
+                return (1, null);
+            }
             window.Close();
             MessageBox.Show($"The update failed: {e.Message}\n\nThe setup window opens to install the game again. Your saves and settings are kept.", GameInstall.Title, MessageBoxButton.OK, MessageBoxImage.Warning);
             return (1, new MainWindow(lba1, lba2, installDir, pending));
@@ -525,6 +553,62 @@ internal static class Updater
         await Task.Delay(1200);
         window.Done();
         return (0, null);
+    }
+
+    // Every file of the game, not the player's (User\) nor the updater's (Update\).
+    private static IEnumerable<string> GameFiles(string root)
+    {
+        var keep = new[] { Path.Combine(root, "User") + Path.DirectorySeparatorChar, Path.Combine(root, "Update") + Path.DirectorySeparatorChar };
+        return Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories).Where(f => !keep.Any(k => f.StartsWith(k, StringComparison.OrdinalIgnoreCase)));
+    }
+
+    private static bool KeepGame(string installDir, string before, Action<string> L)
+    {
+        try
+        {
+            if (Directory.Exists(before)) Directory.Delete(before, true);
+            var files = 0;
+            foreach (var file in GameFiles(installDir).ToList())
+            {
+                var to = Path.Combine(before, Path.GetRelativePath(installDir, file));
+                Directory.CreateDirectory(Path.GetDirectoryName(to)!);
+                File.Copy(file, to);
+                files++;
+            }
+            L($"the game kept in {before} ({files} files) until the update is whole");
+            return true;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            L("the game not kept (the update goes on without it): " + e.Message);
+            try { if (Directory.Exists(before)) Directory.Delete(before, true); } catch (Exception f) when (f is IOException or UnauthorizedAccessException) { }
+            return false;
+        }
+    }
+
+    private static bool PutGameBack(string installDir, string before, Action<string> L)
+    {
+        try
+        {
+            foreach (var file in GameFiles(installDir).ToList())
+                if (!File.Exists(Path.Combine(before, Path.GetRelativePath(installDir, file)))) File.Delete(file);
+            var files = 0;
+            foreach (var file in Directory.EnumerateFiles(before, "*", SearchOption.AllDirectories).ToList())
+            {
+                var to = Path.Combine(installDir, Path.GetRelativePath(before, file));
+                Directory.CreateDirectory(Path.GetDirectoryName(to)!);
+                File.Copy(file, to, true);
+                files++;
+            }
+            Directory.Delete(before, true);
+            L($"the game put back as it was ({files} files)");
+            return true;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            L("the game not put back: " + e.Message);
+            return false;
+        }
     }
 
     // A program running: its file can't be opened for writing

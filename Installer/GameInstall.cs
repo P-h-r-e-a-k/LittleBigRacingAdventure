@@ -261,7 +261,9 @@ internal static class GameInstall
             log(CdVideos() is { } cd
                 ? $"LBA2's cinematics: not in {lba2} -- the game plays them from the LBA2 CD in a drive ({cd} now)"
                 : $"LBA2's cinematics: not in {lba2}, and no LBA2 CD in a drive -- the game plays them from the LBA2 CD when it is in one, else skips them");
-        MenuMusicInto(lba2, target, log, music2);
+        // (music is a nicety: whatever a player's copy of it does, it doesn't stop the install)
+        try { MenuMusicInto(lba2, target, log, music2); }
+        catch (Exception e) { log($"LBA2's menu music: WARNING: left out: {e}"); }
         RetailFromDisc(images.Select(f => f.From).FirstOrDefault(), files.Select(f => f.To).ToList(), log);
 
         // ---- 2. LBA1
@@ -276,7 +278,8 @@ internal static class GameInstall
         progress(0.5, "Building the race tracks");
         Environment.SetEnvironmentVariable("LBA1_DIR", lba1Target);
         // (LBA1's own temple music, CD track 6, from the player's LBA1 folder -- its CD image beside the HQRs copied above: TempleMusic)
-        Environment.SetEnvironmentVariable("LBA1_MUSIC_DIR", MusicFolder(lba1, log, music));
+        try { Environment.SetEnvironmentVariable("LBA1_MUSIC_DIR", MusicFolder(lba1, log, music)); }
+        catch (Exception e) { log($"LBA1's music: WARNING: left out: {e}"); }
         // (Track select's tracks, then the specials: each island once -- Citadel Island's build carries both its tracks)
         var builds = Tracks.Select(t => t.Island).Concat(Specials.Select(s => s.Island)).Distinct()
             .Select(island => new RaceTrackService.TrackBuild(RaceTrackPlan.Built(island), RaceTrackOptions.For(island))).ToList();
