@@ -71,8 +71,8 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
   Ctrl+V, and asks for the password if there is one. The host picks from every track, with no code, then its laps and their car; everyone else picks a car in the lobby with
   Enter. You can join a race that has already started. Cars touch, and power-ups work between players: mushrooms, balls, penguins, oil and lightning all reach the others.
   Online times don't go in Best laps. Games with the same tracks and cars can race whatever their builds; if yours differs from the host's, it says which versions.
-  **Two players on this PC** splits the screen side by side or one above the other, or gives each player a screen of their own, picked from a list. Player 2 has **W A S D**
-  to drive, **Q** for items (and to pick in the menus), **E** the handbrake and **R** the view, and a controller if there is one for them; with two controllers each player has one.
+  **Two players on this PC** splits the screen side by side or one above the other, or gives each player a screen of their own, picked from a list. Each player has their side of the keyboard in a race: player 1, on the left, **W A S D**,
+  **Q** for items, **E** the handbrake and **R** the view; player 2, on the right, the **arrow keys**, **right Ctrl** for items (and to pick in the menus), **right Shift** the handbrake and **/** the view. A controller if there is one for them; with two controllers each player has one.
 - **Options, Camera, window, updates:** the camera's view, full screen or a window, the mini-map, **Sky in races** (off by default: the sky goes for the race and comes back when it ends), and **Updates**: when to check (on launch by default, weekly or manually) and whether a new version installs itself or asks first.
 - **Track select** (for now behind a code): choosing it asks for the code -- type the digits (the keyboard's row or its keypad; each
   shows as a star, Backspace takes one back), **Enter** to open, **Esc** back. A wrong code says "Wrong code" and empties; the right

@@ -72,9 +72,9 @@ internal static class GameInstall
         ("PLATFORM.ILE", RaceTrackIsland.Wannies, "Wannies Island", "platform"),
         ("MOSQUIBE.ILE", RaceTrackIsland.Mosquibe, "Mosquibees Island", "mosquibe"),
         ("SOUSCELB.ILE", RaceTrackIsland.Volcano, "Volcano Island", "souscelb"),
-        ("CXTOWER.ILE", RaceTrackIsland.CxTower, "Island CX", "cxtower"),
-        // (Island CX twice as big, kept beside it for now -- the user, 2026-10-29: "we'll keep both islands for now, then select one to keep later")
-        ("CXTOWERMK2.ILE", RaceTrackIsland.CxTowerMk2, "Island CX Mk2", "cxtowermk2"),
+        // (Island CX twice as big, the one kept -- the user, 2026-10-31: "remove the CX Tower track on LBRA, but keep it in LBAAssembler, then
+        // rename CXTowerMk2 to just Island CX")
+        ("CXTOWERMK2.ILE", RaceTrackIsland.CxTowerMk2, "Island CX", "cxtowermk2"),
         ("PALACE.ILE", RaceTrackIsland.Palace, "The Palace", "palace"),
         ("CELEBRA2.ILE", RaceTrackIsland.Celebration, "Celebration 2", "celebra2"),
     };
@@ -89,7 +89,12 @@ internal static class GameInstall
         ["Celebration 1"] = "Celebration Island: the lava lake",
         ["The Palace"] = "The Emperor's palace",
         ["Celebration 2"] = "Celebration Island: the statue",
+        ["Island CX"] = "Island CX Mk2",
     };
+
+    // A track gone whose name a renamed one has taken (2026-11-01): the new name's old times and ghosts, a different track's, set aside as
+    // "<name> (old track)" once, before the renamed track's are moved over (RACEGAME.CPP RetiredTracks), written as the track= line's retire=1
+    public static readonly HashSet<string> RetiresName = new() { "Island CX" };
 
     // A time trial's own start where the racing line gives no run-up (RACEMOD.CPP trial_start=: cube x, cube z, x, y, z, beta) -- a sprint's
     // line begins on its start line. Polar Island's (2026-10-26, the user: "set Polar as far back as we can do"): back down the dock's
@@ -148,7 +153,6 @@ internal static class GameInstall
         ("wannies", RaceTrackIsland.Wannies.Name, "unlock_win", "Win Wannies Island in Story Mode"),
         ("mosquibees", RaceTrackIsland.Mosquibe.Name, "unlock_win", "Win Mosquibees Island in Story Mode"),
         ("volcano", RaceTrackIsland.Volcano.Name, "unlock_win", "Win Volcano Island in Story Mode"),
-        ("cx", RaceTrackIsland.CxTower.Name, "unlock_win", "Win Island CX in Story Mode"),
         ("cx", RaceTrackIsland.CxTowerMk2.Name, "unlock_win", "Win Island CX in Story Mode"),
         ("statue", RaceTrackIsland.Celebration.Name, "unlock_win", "Win Celebration 2 in Story Mode"),
     };
@@ -343,7 +347,7 @@ internal static class GameInstall
                 Relative(written, target);
             }
             menu.Append($"track={name}|{TracksFolder}/{Path.GetFileName(race)}|{TracksFolder}/{Path.GetFileName(trial)}|{raced.StartScene}" +
-                        (Renamed.TryGetValue(name, out var was) ? $"|was={was}" : "") + "\n");
+                        (Renamed.TryGetValue(name, out var was) ? $"|was={was}" + (RetiresName.Contains(name) ? "|retire=1" : "") : "") + "\n");
             trackCount++;
             var opponents = (raced.Drivers ?? new()).Where(d => !d.Ghost).Select(d => d.Name).ToList();
             var laps = raced.Dream is not null ? "a sprint, start to finish" : built.RaceLaps is int own ? $"{own} laps" : $"{Laps} laps";

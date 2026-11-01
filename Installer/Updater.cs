@@ -458,6 +458,10 @@ internal static class Updater
         installDir = Path.GetFullPath(installDir).TrimEnd('\\', '/');
         void L(string s) => Log(installDir, s);
         L($"---- update: setup {OwnVersion} ({Environment.ProcessPath}) into {installDir}");
+        // (one at a time: two launches close together each started an update, and the two built the same folder at once, one failing with a
+        // message about the island's bodies, 2026-11-01)
+        using var one = new System.Threading.Mutex(false, "LBRA-Update-" + installDir.ToLowerInvariant().Replace('\\', '_').Replace(':', '_'));
+        if (!one.WaitOne(0)) { L("another update is running here: this one stops"); return (0, null); }
         var info = Load(installDir);
         string lba1 = info?.Lba1 ?? "", lba2 = info?.Lba2 ?? "";
         var pending = info?.Pending;
