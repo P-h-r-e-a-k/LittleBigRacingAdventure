@@ -32,6 +32,13 @@ public partial class App : Application
             Shutdown(code);
             return;
         }
+        // (--send-report <install folder>: the game's bug report, Update\\report_note.txt saying what: BugReport)
+        if (e.Args is ["--send-report", var reporting, ..])
+        {
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            Shutdown(await BugReport.Send(reporting));
+            return;
+        }
         if (e.Args is ["--check-update", var game, ..])
         {
             ShutdownMode = ShutdownMode.OnExplicitShutdown;

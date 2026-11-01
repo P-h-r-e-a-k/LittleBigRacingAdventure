@@ -28,8 +28,16 @@ if (-not (Test-Path (Join-Path $root 'Game\menu.png')) -or -not (Test-Path (Join
 
 $out = if ($Out) { $Out } else { Join-Path $root 'out' }
 if (-not $Version) { $Version = (Get-Date).ToString('yyyy.M.d.HHmm') }
+# (the bug reports' key: a file beside the repos, never in them. Masked as BugReport.cs unmasks it. Without one the setup sends no reports)
+$keyFile = Join-Path (Split-Path $root) 'lbra_report_key.txt'
+$reportKey = ''
+if (Test-Path $keyFile) {
+    $mask = [Text.Encoding]::ASCII.GetBytes('LBRA-reports')
+    $plain = [Text.Encoding]::ASCII.GetBytes((Get-Content $keyFile -Raw).Trim())
+    $reportKey = -join (0..($plain.Length - 1) | ForEach-Object { ($plain[$_] -bxor $mask[$_ % $mask.Length]).ToString('X2') })
+} else { Write-Host "No $keyFile`: this setup won't send bug reports" }
 dotnet publish (Join-Path $root 'Installer\LBRAInstaller.csproj') -c Release -r win-x64 --self-contained true `
-    -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true "-p:Version=$Version" "-p:Lba=$lba" -o $out
+    -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true "-p:Version=$Version" "-p:Lba=$lba" "-p:ReportKey=$reportKey" -o $out
 if ($LASTEXITCODE -ne 0) { throw 'The installer did not build.' }
 $exe = Join-Path $out 'LBRA-Setup.exe'
 "{0} ({1:N0} MB), version {2}" -f $exe, ((Get-Item $exe).Length / 1MB), $Version

@@ -514,14 +514,18 @@ internal static class Updater
             if (kept) try { Directory.Delete(before, true); } catch (Exception e) when (e is IOException or UnauthorizedAccessException) { L("the copy of the game not removed: " + e.Message); }
             foreach (var line in lines.Where(l => l.StartsWith("updates:") || l.StartsWith("the game:") || l.Contains("shortcut") || l.StartsWith(GameInstall.OldGameExe))) L(line);
             L($"INSTALLED version {OwnVersion}; User\\ kept");
+            // (the game was closed for this, not crashed)
+            TryDelete(Path.Combine(installDir, Folder, "running.txt"));
             Status(installDir, $"Updated to version {OwnVersion} on {Today()}.");
         }
         catch (Exception e)
         {
             L("FAILED: " + e);
-            if (kept && await Task.Run(() => PutGameBack(installDir, before, L)))
+            var putBack = kept && await Task.Run(() => PutGameBack(installDir, before, L));
+            window.Close();
+            await BugReport.AfterFailedUpdate(installDir, e);
+            if (putBack)
             {
-                window.Close();
                 // (not tried again until there is a newer version: the same update would stop the same way, at every launch)
                 if (info is not null) { info.Rejected = pending ?? info.Rejected; info.Pending = null; Save(installDir, info); }
                 Status(installDir, "An update failed, so the game stayed as it was.");
@@ -529,7 +533,6 @@ internal static class Updater
                     GameInstall.Title, MessageBoxButton.OK, MessageBoxImage.Warning);
                 return (1, null);
             }
-            window.Close();
             MessageBox.Show($"The update failed: {e.Message}\n\nThe setup window opens to install the game again. Your saves and settings are kept.", GameInstall.Title, MessageBoxButton.OK, MessageBoxImage.Warning);
             return (1, new MainWindow(lba1, lba2, installDir, pending));
         }

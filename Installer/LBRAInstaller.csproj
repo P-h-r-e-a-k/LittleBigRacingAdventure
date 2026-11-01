@@ -22,6 +22,11 @@
     <Lba>..\..\LBAAssembler</Lba>
   </PropertyGroup>
 
+  <!-- the bug reports' key, masked, from build.ps1: BugReport.cs -->
+  <ItemGroup Condition="'$(ReportKey)' != ''">
+    <AssemblyMetadata Include="ReportKey" Value="$(ReportKey)" />
+  </ItemGroup>
+
   <ItemGroup>
     <Compile Include="$(Lba)\LbaScript\**\*.cs" Link="Lba\LbaScript\%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="$(Lba)\HqrArchive.cs" Link="Lba\HqrArchive.cs" />

@@ -66,6 +66,7 @@ The main menu: **Story Mode** (greyed until the full game), **Track select**, **
 **Options** (with **Race controls, power-ups** and **Camera, window, updates** at the end), **Quit**; **Resume Game** while a race is on.
 **Quit** asks first, "Quit the game?": **No** (the row it opens on, or **Esc**) goes back, **Yes** leaves. The window's X closes the game straight away.
 
+- **Bug reports:** if the game stops unexpectedly or an update fails, it asks once whether to send reports, then does as you said. A report is an issue on this project's public GitHub page with the game's log in it, with names, folders and addresses removed first. Options, Camera, window, updates, Bug reports turns them on or off, and sends one yourself.
 - **Multiplayer:** race other people, one of you hosting. Host a race and Join a race look for a new version first, and offer to update and start again, so everyone is on the same one. **Host a race** takes a password if you want one (Enter for none), asks your router to open UDP port 21997 and
   shows the address to give your friends (and tells you if the router said no: forward the port by hand then). A PC with its own IPv6 address on the internet shows that too. **Join a race** takes either address, typed or pasted with
   Ctrl+V, and asks for the password if there is one. The host picks from every track, with no code, then its laps and their car; everyone else picks a car in the lobby with
