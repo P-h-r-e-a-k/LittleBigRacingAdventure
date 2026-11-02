@@ -85,6 +85,9 @@
     <Compile Include="$(Lba)\Lba2ScriptFixes.cs" Link="Lba\Lba2ScriptFixes.cs" />
     <!-- the tracks' routes, as LBA Assembler builds them in -->
     <EmbeddedResource Include="$(Lba)\docs\racetrack\temple_track_plan.json" LogicalName="RaceTrackPlan.Temple.json" />
+    <EmbeddedResource Include="$(Lba)\docs\racetrack\harvest_track_plan.json" LogicalName="RaceTrackPlan.Harvest.json" />
+    <EmbeddedResource Include="$(Lba)\docs\racetrack\harvest_ground.bin" LogicalName="RaceTrackPlan.HarvestGround.bin" />
+    <EmbeddedResource Include="$(Lba)\docs\racetrack\harvest_decor.json" LogicalName="RaceTrackPlan.HarvestDecor.json" />
     <EmbeddedResource Include="$(Lba)\docs\racetrack\palace_track_plan.json" LogicalName="RaceTrackPlan.Palace.json" />
     <EmbeddedResource Include="$(Lba)\docs\racetrack\cxtower_track_plan.json" LogicalName="RaceTrackPlan.CxTower.json" />
     <EmbeddedResource Include="$(Lba)\docs\racetrack\cxtowermk2_track_plan.json" LogicalName="RaceTrackPlan.CxTowerMk2.json" />

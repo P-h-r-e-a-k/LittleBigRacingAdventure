@@ -124,7 +124,9 @@ The main menu: **Story Mode** (greyed until the full game), **Racing**, the game
   straights, mine carts as on rails -- with half a star (now and then a whole one) moved between two stats by the car's own number, so
   two cars of a kind differ; the same on every install.
 
-- **Specials**: the Halloween track, then a **Race** (five laps against Halloween's monsters -- the vampire in his coffin, the one
+- **Specials**: **Thanksgiving: The Long Table** is an island made from nothing, Canada in October and the United States in November: a figure of eight over a giant
+  harvest table and under it, with geese, gravy, footballs, pumpkin boats and parade balloons; a **Race** of three laps or a **Time trial**.
+  The Halloween track, then a **Race** (five laps against Halloween's monsters -- the vampire in his coffin, the one
   to beat, the witch on her broomstick and the zombie in his hearse -- with the power-ups: the pumpkins on the road; the School
   of Magic's assistant drops the flag at the start, standing on the road between the grid's two columns with the cars setting off
   either side of her, then hops off to her plinth beside the road at the line to wave the chequered flag at the finish; the red magic

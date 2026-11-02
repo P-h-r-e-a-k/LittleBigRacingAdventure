@@ -49,6 +49,7 @@ internal static class GameInstall
     public static readonly (RaceTrackIsland Island, string Name, string File)[] Specials =
     {
         (RaceTrackIsland.Temple, "Halloween Temple of Bu", "temple"),
+        (RaceTrackIsland.Harvest, "Thanksgiving: The Long Table", "harvest"),
     };
 
     // Track select's tracks (2026-10-22 -- the user: "Pull all tracks into LBRA under Track select, but temporarily password gate them with
