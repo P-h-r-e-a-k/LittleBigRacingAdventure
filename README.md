@@ -63,9 +63,9 @@ The game updates from the newest release on GitHub, <https://github.com/P-h-r-e-
 ## The game
 
 The main menu: **Story Mode** (greyed until the full game), **Track select**, **Specials**, **Multiplayer**, **Best laps**, the game's own
-**Options** (with **Race controls, power-ups** and **Camera, window, updates** at the end), **Report bug**, **Request feature**, **Quit**.
+**Options** (with **Race controls, power-ups** and **Camera, window, updates** at the end), **Feedback**, **Quit**.
 **Esc** in a race or time trial opens the pause menu instead: **Resume Game**, **Restart**, **Change car**, **Change track** and **Main menu** (Esc goes back, and Esc there resumes). Online and in the story, Esc opens the main menu with **Resume Game** at the top.
-**Report bug** takes a short description (up to 120 characters) and puts it on this project's public GitHub page with the game's logs, with names, folders and addresses removed first. **Request feature** does the same with your idea, and sends no logs. Three a day from a PC at most.
+**Feedback** holds **Report bug**, which takes a short description (up to 120 characters) and puts it on this project's public GitHub page with the game's logs, with names, folders and addresses removed first, and **Request feature**, which does the same with your idea and sends no logs.
 **Quit** asks first, "Quit the game?": **No** (the row it opens on, or **Esc**) goes back, **Yes** leaves. The window's X closes the game straight away.
 
 - **Bug reports:** if the game stops unexpectedly or an update fails, it asks once whether to send reports, then does as you said. A report is an issue on this project's public GitHub page with the game's log in it, with names, folders and addresses removed first. Options, Camera, window, updates, Bug reports turns them on or off, and sends one yourself.

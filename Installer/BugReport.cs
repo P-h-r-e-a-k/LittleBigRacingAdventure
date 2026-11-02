@@ -16,7 +16,8 @@ namespace LBRAInstaller;
 //     LBRA-Setup.exe --send-report <install folder>     Update\report_note.txt (the game's): its first line the kind, crash or manual, the rest the player's words
 //
 // Update\report_note.txt's kind may also be feature: a feature request, the player's words alone, no log. A failed update sends its own (AfterFailedUpdate). What is sent, the player says first: settings' reports=ask (asked once, then auto or off), auto or off. The issue is public, so
-// the log is scrubbed first (Scrub): names, folders, addresses. One report of a kind a week from a PC, three a day at most; a report like an open one is a comment on it.
+// the log is scrubbed first (Scrub): names, folders, addresses. An automatic report of a kind once a week from a PC, for each version (the user, 2026-11-02: "a bug reported in a newer version than the one it was originally reported in is probably a
+// failed fix"; no limit a day, and none on what a player sends himself); a report like an open one is a comment on it, its version in it.
 // The key, in the setup only (build.ps1, -p:ReportKey, from a file outside the repos, masked so that the file carries no key in the clear): issues on this repo and nothing else.
 // For tests LBRA_REPORT_URL points the reports at http://localhost/... (nothing else is taken).
 internal static class BugReport
@@ -26,7 +27,7 @@ internal static class BugReport
     public const string NoteFile = "report_note.txt";
     private const string SentFile = "reports_sent.txt", Settings = "RACEGAME_SETTINGS.TXT";
     // (GitHub's limit is 65,536 characters a body)
-    private const int ChunkMax = 60000, CommentsMax = 4, ResendDays = 7, DayMax = 3;
+    private const int ChunkMax = 60000, CommentsMax = 4, ResendDays = 7;
     private static readonly byte[] Mask = Encoding.ASCII.GetBytes("LBRA-reports");
 
     private static string? Key()
@@ -163,7 +164,6 @@ internal static class BugReport
         var today = DateTime.UtcNow.Date;
         var lines = File.Exists(path) ? File.ReadAllLines(path) : Array.Empty<string>();
         var recent = lines.Select(l => l.Split(' ')).Where(p => p.Length == 2 && DateTime.TryParse(p[0], out _)).Select(p => (Day: DateTime.Parse(p[0]), Hash: p[1])).ToList();
-        if (recent.Count(r => r.Day == today) >= DayMax) { L($"{DayMax} reports today already: no more"); return true; }
         if (!manual && recent.Any(r => r.Hash == hash && (today - r.Day).TotalDays < ResendDays)) { L("that report was sent this week: not again"); return true; }
         return false;
     }
@@ -181,8 +181,9 @@ internal static class BugReport
         try
         {
             var asked = kind is "manual" or "feature";
-            if (TooSoon(installDir, hash, asked, L)) return 0;
             var version = Updater.OwnVersion;
+            var sent = $"{hash}-{version}";
+            if (TooSoon(installDir, sent, asked, L)) return 0;
             var head = $"[{kind}] {signature}";
             var title = $"{head} ({version})";
             var about = $"**Version** {version}  \n**Kind** {kind}  \n**Windows** {Environment.OSVersion.Version}  \n**Report** {hash}\n\n";
@@ -210,7 +211,7 @@ internal static class BugReport
                     if (await Post(http, $"{api}/issues/{number}/comments", new { body = piece }, L) is null) return 1;
                 L($"sent as issue {number}");
             }
-            NoteSent(installDir, hash);
+            NoteSent(installDir, sent);
             return 0;
         }
         catch (Exception e) when (e is HttpRequestException or TaskCanceledException or IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or KeyNotFoundException)
