@@ -59,6 +59,7 @@ internal static class GameInstall
     // of Bú stays a special.
     public const string TracksFolder = "tracks";
     public const string TracksCode = "1234";
+    public const string LongTableCode = "0000", LongTableUnlock = "thanksgiving";
     public static readonly (string IleFile, RaceTrackIsland Island, string Name, string File)[] Tracks =
     {
         ("POLAR.ILE", RaceTrackIsland.Polar, "Polar Island", "polar"),
@@ -188,6 +189,8 @@ internal static class GameInstall
     // A car's story unlock (its unlock= and hint= options), by its island in RACECARS.JSON; "" for one the story doesn't hold back
     private static string StoryOptions(int number, string? island, HashSet<int> statue)
     {
+        // (the Long Table's own cars open with it: RACEGAME.CPP SpecialCodeTyped)
+        if (island == RaceTrackCharacterCars.LongTable) return $"|unlock={LongTableUnlock}cars|hint=Under development";
         var id = number == RaphCar ? "raph" : CastCars(DesertCast).Contains(number) ? "desert"
             : island == RaceTrackCharacterCars.Celebration ? (statue.Contains(number) ? "statue" : "celebration")
             : island is not null ? IslandUnlock.GetValueOrDefault(island) : null;
@@ -319,6 +322,8 @@ internal static class GameInstall
             TrialSetup().WriteEngineFile(trial, track, prefix: file + "_trial_");
             foreach (var written in new[] { race, trial }) Relative(written, target);
             menu.Append($"special={name}|{SpecialsFolder}/{Path.GetFileName(race)}|{SpecialsFolder}/{Path.GetFileName(trial)}|{track.StartScene}\n");
+            // (the Long Table greyed on the Specials page until 0000 is typed there, the user, 2026-11-02, under a banner while it is built)
+            if (island == RaceTrackIsland.Harvest) menu.Append($"special_lock={LongTableCode}|{LongTableUnlock}|Under development\n");
             log($"{name}: starts in scene {track.StartScene}; against {string.Join(", ", (track.Drivers ?? new()).Where(d => !d.Ghost).Select(d => d.Name))}" +
                 (island.Levels is not null ? "; easy, medium and hard (the menu's difficulty page)" : ""));
         }
@@ -607,6 +612,7 @@ internal static class GameInstall
         [57] = Feel.Flyer, [58] = Feel.Roadster, [59] = Feel.Racer, [60] = Feel.Jeep, [61] = Feel.Cart, [62] = Feel.Jeep, [63] = Feel.Robot,
         [RaceTrackCharacterCars.VampireNumber] = Feel.Ghost, [RaceTrackCharacterCars.WitchNumber] = Feel.Flyer,
         [RaceTrackCharacterCars.ZombieNumber] = Feel.Truck,
+        [RaceTrackCharacterCars.TurkeyNumber] = Feel.Cart, [RaceTrackCharacterCars.GooseNumber] = Feel.Boat,
     };
 
     // A car's stats: its kind's (a cast's car by the style its kind drives, RaceTrackCharacterCars.StyleOf; a car made by hand by HandMade),

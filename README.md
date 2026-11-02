@@ -125,7 +125,8 @@ The main menu: **Story Mode** (greyed until the full game), **Racing**, the game
   two cars of a kind differ; the same on every install.
 
 - **Specials**: **Thanksgiving: The Long Table** is an island made from nothing, Canada in October and the United States in November: a figure of eight over a giant
-  harvest table and under it, with geese, gravy, footballs, pumpkin boats and parade balloons; a **Race** of three laps or a **Time trial**.
+  harvest table and under it, with geese, gravy, cranberry spills, footballs, pumpkin boats and parade balloons; a **Race** of three laps or a **Time trial**. Still under
+  development: greyed on the page, under a banner, until its code is typed there.
   The Halloween track, then a **Race** (five laps against Halloween's monsters -- the vampire in his coffin, the one
   to beat, the witch on her broomstick and the zombie in his hearse -- with the power-ups: the pumpkins on the road; the School
   of Magic's assistant drops the flag at the start, standing on the road between the grid's two columns with the cars setting off
