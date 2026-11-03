@@ -15,14 +15,15 @@ namespace LBRAInstaller;
 // island, beside the island's own track (RaceTrackIsland.Shared), raced from the game's Racing > Shared tracks (RACEGAME.CPP: shared=).
 // The game's "Add or remove tracks..." starts this setup's copy beside it:
 //     LBRA-Setup.exe --shared-tracks "<install folder>"   -- the tracks there, added and taken out; built in, the game closing for it
+//     LBRA-Setup.exe --shared-tracks "<install folder>" --build   -- straight to building them in: the game saw new files in the folder
+// Every file in the folder is built in, as many as there are (the user, 2026-11-03: "Let's allow the game to take an unlimited amount of
+// shared tracks and just pick up all tracks in a shared track folder"): the game tells the folder from what was built (FolderKey).
 // Two players racing each other online need the same shared tracks: the game's key for the races it can share is made from its files.
 internal static class SharedTracks
 {
     public const string FolderName = "Tracks";
     // (the copies' scenes from 400: past every island's own and the race tracks' -- the Long Table's from 350)
     public const int FirstScene = 400;
-    // (the most the game lists: the online vote's page holds Track select's fifteen and these, RACEGAME.CPP VotePage)
-    public const int Most = 8;
     // (Update\shared_now.txt: what the game's page waits for -- "build", the game closes for it; "closed", nothing to do)
     private const string NowFile = "shared_now.txt";
 
@@ -50,18 +51,18 @@ internal static class SharedTracks
         // (and their race files: share01.txt, share01_trial.txt, share01_racepath.txt ...)
         var tracksDir = Path.Combine(target, GameInstall.TracksFolder);
         var raceFiles = Directory.Exists(tracksDir)
-            ? Directory.GetFiles(tracksDir, "share*.txt").Where(f => System.Text.RegularExpressions.Regex.IsMatch(Path.GetFileName(f), @"^share\d\d(_.*)?\.txt$", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+            ? Directory.GetFiles(tracksDir, "share*.txt").Where(f => System.Text.RegularExpressions.Regex.IsMatch(Path.GetFileName(f), @"^share\d+(_.*)?\.txt$", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
             : Enumerable.Empty<string>();
-        foreach (var stale in Directory.GetFiles(target, "SHARE??.ILE").Concat(Directory.GetFiles(target, "SHARE??.OBL")).Concat(raceFiles))
+        var islandFiles = Directory.GetFiles(target, "SHARE*.*").Where(f => System.Text.RegularExpressions.Regex.IsMatch(Path.GetFileName(f), @"^SHARE\d+\.(ILE|OBL)$", System.Text.RegularExpressions.RegexOptions.IgnoreCase));
+        foreach (var stale in islandFiles.Concat(raceFiles))
             try { File.Delete(stale); } catch (Exception e) when (e is IOException or UnauthorizedAccessException) { log($"{stale} not removed: {e.Message}"); }
         var tracks = new List<(RaceTrackShare.Track, RaceTrackIsland, string)>();
         var scene = FirstScene;
         foreach (var e in List(target))
         {
             if (e.Track is not { } track) { log($"shared track {Path.GetFileName(e.File)}: left out, {e.Problem}"); continue; }
-            if (tracks.Count >= Most) { log($"shared track {Path.GetFileName(e.File)}: left out, the game races {Most} shared tracks at most"); continue; }
             var island = RaceTrackIsland.Shared(track.Island, tracks.Count, $"Shared track {tracks.Count + 1}: {track.Name}", scene);
-            scene = island.LastScene + 1;
+            scene = island.SharedNextScene;
             RaceTrackIsland.SharedIslands.Add(island);
             tracks.Add((track, island, e.File));
             log($"shared track {Path.GetFileName(e.File)}: \"{track.Name}\" on {track.Island.Name}, as {island.IleFile} in scenes {island.FirstScene}-{island.LastScene}");
@@ -69,28 +70,51 @@ internal static class SharedTracks
         return tracks;
     }
 
-    // What the last install built from the folder (tracks\shared_built.txt: each file's name and length): the window's Build is on where the
-    // folder has changed since
+    // What the last install built from the folder: its files' names and lengths, hashed (FNV-1a over each name in ASCII lower case, a 0, its
+    // length in digits, a 0, the names in order) -- RACEMOD's twin, RACEGAME.CPP SharedFolderKey, compares it with RACEGAME.TXT's
+    // shared_folder= and offers to build new files in; the window's Build is on where the folder has changed since
     private static string BuiltFile(string installDir) => Path.Combine(installDir, GameInstall.TracksFolder, "shared_built.txt");
-    private static string Signature(string installDir) =>
-        string.Join("\n", List(installDir).Select(e => $"{Path.GetFileName(e.File)} {new FileInfo(e.File).Length}"));
-    public static void RecordBuilt(string installDir) => File.WriteAllText(BuiltFile(installDir), Signature(installDir), new UTF8Encoding(false));
+    public static string FolderKey(string installDir)
+    {
+        var dir = Folder(installDir);
+        static string Lower(string s) => new(s.Select(c => c is >= 'A' and <= 'Z' ? (char)(c + 32) : c).ToArray());
+        var files = Directory.Exists(dir)
+            ? Directory.GetFiles(dir, "*" + RaceTrackShare.Extension).Select(f => (Name: Lower(Path.GetFileName(f)), Length: new FileInfo(f).Length))
+                .OrderBy(f => Encoding.UTF8.GetBytes(f.Name), Comparer<byte[]>.Create((a, b) => a.AsSpan().SequenceCompareTo(b))).ToList()
+            : new();
+        var h = 2166136261u;
+        void Add(byte b) { h ^= b; h *= 16777619u; }
+        foreach (var (name, length) in files)
+        {
+            foreach (var b in Encoding.UTF8.GetBytes(name)) Add(b);
+            Add(0);
+            foreach (var c in length.ToString(System.Globalization.CultureInfo.InvariantCulture)) Add((byte)c);
+            Add(0);
+        }
+        return h.ToString("x8");
+    }
+    public static void RecordBuilt(string installDir) => File.WriteAllText(BuiltFile(installDir), FolderKey(installDir), new UTF8Encoding(false));
     public static bool Changed(string installDir) =>
-        File.Exists(BuiltFile(installDir)) ? File.ReadAllText(BuiltFile(installDir)) != Signature(installDir) : List(installDir).Count > 0;
+        File.Exists(BuiltFile(installDir)) ? File.ReadAllText(BuiltFile(installDir)).Trim() != FolderKey(installDir) : List(installDir).Count > 0;
 
     // ---- --shared-tracks ------------------------------------------------------------------------------------------------------------
 
     // The window: the tracks in the folder, added and taken out, and built into the game -- the game closed for it, built again and started
     // (Updater.Update). Its exit code: 0.
-    public static async Task<int> Manage(string installDir)
+    // (`buildNow`: no window, the folder's files built in -- the game's "Build in the new tracks")
+    public static async Task<int> Manage(string installDir, bool buildNow = false)
     {
         installDir = Path.GetFullPath(installDir).TrimEnd('\\', '/');
-        var owner = new Window { Width = 0, Height = 0, WindowStyle = WindowStyle.None, ShowInTaskbar = false, Topmost = true, ShowActivated = true, Left = -10000, Top = -10000 };
-        owner.Show();
-        owner.Activate();
-        var window = new SharedTracksWindow(installDir) { Owner = owner };
-        var build = window.ShowDialog() == true;
-        owner.Close();
+        var build = buildNow;
+        if (!buildNow)
+        {
+            var owner = new Window { Width = 0, Height = 0, WindowStyle = WindowStyle.None, ShowInTaskbar = false, Topmost = true, ShowActivated = true, Left = -10000, Top = -10000 };
+            owner.Show();
+            owner.Activate();
+            var window = new SharedTracksWindow(installDir) { Owner = owner };
+            build = window.ShowDialog() == true;
+            owner.Close();
+        }
         var now = Path.Combine(installDir, "Update", NowFile);
         try { File.WriteAllText(now, build ? "build\n" : "closed\n"); } catch (Exception e) when (e is IOException or UnauthorizedAccessException) { }
         if (!build) return 0;
@@ -160,13 +184,10 @@ internal sealed class SharedTracksWindow : Window
     {
         list.Items.Clear();
         var entries = SharedTracks.List(installDir);
-        var good = 0;
         foreach (var e in entries)
         {
             var name = Path.GetFileName(e.File);
-            var text = e.Track is { } t
-                ? (good++ < SharedTracks.Most ? $"{t.Name}  --  on {t.Island.Shown}" : $"{t.Name}  --  left out: the game races {SharedTracks.Most} at most")
-                : $"{name}  --  can't be raced: {e.Problem}";
+            var text = e.Track is { } t ? $"{t.Name}  --  on {t.Island.Shown}" : $"{name}  --  can't be raced: {e.Problem}";
             var item = new ListBoxItem { Content = text, Tag = e.File, ToolTip = e.File };
             list.Items.Add(item);
             if (select is not null && string.Equals(e.File, select, StringComparison.OrdinalIgnoreCase)) list.SelectedItem = item;

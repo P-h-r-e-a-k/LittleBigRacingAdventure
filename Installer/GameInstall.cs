@@ -414,7 +414,12 @@ internal static class GameInstall
             var trial = Path.Combine(tracksDir, stem + "_trial.txt");
             Setup().WriteEngineFile(race, track, prefix: stem + "_");
             TrialSetup().WriteEngineFile(trial, track, prefix: stem + "_trial_");
-            foreach (var written in new[] { race, trial }) Relative(written, target);
+            // (a sprint, start to finish once: no story's lines, as Track select's)
+            foreach (var written in new[] { race, trial })
+            {
+                if (raced.Dream is not null) WithoutStory(written);
+                Relative(written, target);
+            }
             menu.Append($"shared={name}|{TracksFolder}/{Path.GetFileName(race)}|{TracksFolder}/{Path.GetFileName(trial)}|{raced.StartScene}\n");
             sharedCount++;
             var opponents = (raced.Drivers ?? new()).Where(d => !d.Ghost).Select(d => d.Name).ToList();
@@ -428,6 +433,8 @@ internal static class GameInstall
         if (leftOut.Count > 2) leftOut = leftOut.Take(2).Append($"And {leftOut.Count - 2} more (setup.log says why).").ToList();
         if (leftOut.Count > 0) menu.Append($"shared_status={string.Join(" ", leftOut).Replace('\n', ' ').Replace('\r', ' ')}\n");
         SharedTracks.RecordBuilt(target);
+        // (the folder as built: the game offers to build in what is put there after -- RACEGAME.CPP SharedFolderKey)
+        menu.Append($"shared_folder={SharedTracks.FolderKey(target)}\n");
         // Story Mode's set: every track raced where the story has it, the cars each one wins in its file (StoryUnlocks); the files named
         // from the game's folder (the game finds them beside its data: RACEGAME.CPP StoryResolved)
         var storyDir = Path.Combine(target, StoryFolder);

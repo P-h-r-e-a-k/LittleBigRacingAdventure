@@ -67,10 +67,18 @@ public partial class App : Application
             return;
         }
         // (--shared-tracks <install folder>: the game's Racing > Shared tracks > "Add or remove tracks...", SharedTracks.cs)
+        // (--build-shared-tracks <install folder>: the game's "Build in the folder's tracks", no window)
+        if (e.Args is ["--build-shared-tracks", var building, ..])
+        {
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            var code = await SharedTracks.Manage(building, buildNow: true);
+            if (code >= 0) Shutdown(code);
+            return;
+        }
         if (e.Args is ["--shared-tracks", var sharing, ..])
         {
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
-            var code = await SharedTracks.Manage(sharing);
+            var code = await SharedTracks.Manage(sharing, e.Args.Contains("--build"));
             if (code >= 0) Shutdown(code);
             return;
         }

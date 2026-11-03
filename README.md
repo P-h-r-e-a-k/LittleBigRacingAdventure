@@ -125,17 +125,18 @@ The main menu: **Story Mode** (greyed until the full game), **Racing**, the game
   two cars of a kind differ; the same on every install.
 
 - **Shared tracks**: tracks people draw in [LBA Assembler](https://github.com/P-h-r-e-a-k/LBAAssembler) and share as `.lbrtrack` files
-  (its race track window's **Share for LBRA...**). A file holds only the route and the island it's drawn on, none of the game's data:
-  the game builds the track from your own copy of LBA2, on a copy of that island, so the island's own track stays as it is.
-  **Add or remove tracks...** at the bottom of the list opens the setup's window: **Add a track file...**, **Take out**, then **Build
-  them into the game**. The game closes, is built again with them (a few minutes, as an update is) and starts again. Your files are
-  kept in `User\LBA2\Tracks`, so updates build them in too. Each shared track has a **Race** and a **Time trial**, as Track
-  select's do, and they're in the online vote. To race a friend online, both of you need the same shared tracks: the game says
-  "+N shared" after its version when it turns someone away. Up to 8 are raced. Shared tracks can be drawn on the Desert island,
-  Citadel Island, Mosquibees Island, Celebration Island (either track), the Elevator Platform, either moon, Volcano Island and
-  Wannies Island; the islands the build makes or enlarges (Polar Island, the Francos, Otringal, Island CX, the palace, the
-  temple, the Long Table) can't be copied. A file that can't be read, or a track that can't be built, is left out, and the page
-  says why under its last row (`setup.log` has the details).
+  (its race track window's **Share for LBRA...**), on any of the islands. A file holds only the route and the island it's drawn on, none
+  of the game's data: the game builds the track from your own copy of LBA2 on a copy of that island, so the island's own track stays as
+  it is. Every file in the shared tracks folder (`User\LBA2\Tracks`) is built in, as many as there are. **Open the shared tracks
+  folder** at the bottom of the list opens it in Explorer: put files there, come back to the page, and **Build in the folder's new
+  tracks** appears at the bottom of the list. **Add or remove tracks...** does the same from the setup's window instead: **Add a
+  track file...**, **Take out**, then **Build them into the game**. Either way the game closes, is built again with them (a few
+  minutes, as an update is, longer with many tracks) and starts again; updates build them in too. Each shared track has a **Race**
+  and a **Time trial**, as Track select's do, and they're in the online vote (it scrolls when there are many). To race a friend
+  online, both of you need the same shared tracks: the game says "+N shared" after its version when it turns someone away. A file
+  that can't be read, or a track that can't be built, is left out on its own, and the page says why under its last row
+  (`setup.log` has the details). A copy is the island's ground and buildings: what its own track's build adds by name (the Long
+  Table's feast, the temple's Halloween, Island CX's cannons) stays with the island's own track.
 - **Specials**: **Thanksgiving: The Long Table** is an island made from nothing, Canada in October and the United States in November: a figure of eight over a giant
   harvest table and under it, with geese, gravy, cranberry spills, footballs, pumpkin boats and parade balloons; a **Race** of three laps or a **Time trial**. Still under
   development: greyed on the page, under a banner, until its code is typed there.
