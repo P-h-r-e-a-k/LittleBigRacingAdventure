@@ -66,6 +66,14 @@ public partial class App : Application
             Shutdown(GhostShare.Import(theirs, e.Args.Skip(2).ToArray()));
             return;
         }
+        // (--shared-tracks <install folder>: the game's Racing > Shared tracks > "Add or remove tracks...", SharedTracks.cs)
+        if (e.Args is ["--shared-tracks", var sharing, ..])
+        {
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            var code = await SharedTracks.Manage(sharing);
+            if (code >= 0) Shutdown(code);
+            return;
+        }
         if (e.Args is ["--update", var into, ..])
         {
             ShutdownMode = ShutdownMode.OnExplicitShutdown;

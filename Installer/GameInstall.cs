@@ -287,10 +287,31 @@ internal static class GameInstall
         // (Track select's tracks, then the specials: each island once -- Citadel Island's build carries both its tracks)
         var builds = Tracks.Select(t => t.Island).Concat(Specials.Select(s => s.Island)).Distinct()
             .Select(island => new RaceTrackService.TrackBuild(RaceTrackPlan.Built(island), RaceTrackOptions.For(island))).ToList();
+        // (and the shared tracks the player keeps, User\LBA2\Tracks -- each on a copy of its island: SharedTracks)
+        var shared = SharedTracks.Prepare(target, log);
+        builds.AddRange(shared.Select(s => new RaceTrackService.TrackBuild(s.Track.Plan, RaceTrackOptions.For(s.Island))));
         var buildWatch = System.Diagnostics.Stopwatch.StartNew();
         // (none of the editor's private special cars in the game: LBA Assembler's RaceTrackService.PrivateCars)
         RaceTrackService.PrivateCars = false;
-        var result = RaceTrackService.Build(target, builds, new Direct<RaceTrackService.BuildProgress>(p => progress(0.5 + 0.4 * p.Done, p.Doing)));
+        var doing = "";
+        var result = RaceTrackService.Build(target, builds, new Direct<RaceTrackService.BuildProgress>(p => { doing = p.Doing; progress(0.5 + 0.4 * p.Done, p.Doing); }));
+        // (a shared track the build can't make doesn't stop the game: the one it was building when it stopped -- its progress says which --
+        // left out and the rest built again, or all of them where it wasn't one of theirs; the Shared tracks page says so)
+        var sharedProblems = new List<string>();
+        while (!result.Ok && shared.Count > 0)
+        {
+            var failed = shared.Where(s => doing.StartsWith(s.Island.Name + " (", StringComparison.Ordinal)).ToList();
+            if (failed.Count == 0) failed = shared.ToList();
+            log($"the build stopped at \"{doing}\" ({result.Summary}): built again without {string.Join(", ", failed.Select(f => f.Track.Name))}");
+            foreach (var f in failed)
+            {
+                sharedProblems.Add($"{f.Track.Name} couldn't be built into the game.");
+                shared.Remove(f);
+                RaceTrackIsland.SharedIslands.Remove(f.Island);
+                builds.RemoveAll(b => b.Options.Island == f.Island);
+            }
+            result = RaceTrackService.Build(target, builds, new Direct<RaceTrackService.BuildProgress>(p => { doing = p.Doing; progress(0.5 + 0.4 * p.Done, p.Doing); }));
+        }
         foreach (var line in result.Log) log("  " + line);
         if (!result.Ok) throw new InvalidDataException(result.Summary);
         log(result.Summary);
@@ -364,6 +385,49 @@ internal static class GameInstall
                 (opponents.Count > 0 ? $"against {string.Join(", ", opponents)}" : "no opponents") +
                 ((raced.Drivers ?? new()).Any(d => d.Ghost) ? ", a time to beat" : "") + (raced.Mushrooms is { Count: > 0 } m ? $", {m.Count} power-up spots" : ""));
         }
+        // The shared tracks, after Track select's (the game's Racing > Shared tracks): each its race and its time trial, as Track select's,
+        // under its own name -- one a track of the game's has already, or another shared one, told apart
+        var sharedCount = 0;
+        var names = Tracks.Select(t => t.Name).Concat(Specials.Select(s => s.Name)).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        foreach (var (shareTrack, island, file) in shared)
+        {
+            var track = RaceTrackService.RaceFor(target, island.IleFile);
+            if (track is null || !string.Equals(track.Island, island.Name, StringComparison.OrdinalIgnoreCase))
+            {
+                log($"{island.Name}: WARNING: no track on {island.IleFile} in this build: left out of the shared tracks");
+                continue;
+            }
+            var raced = RaceTrackService.Raced(track);
+            // (a route off the island's scenes -- drawn off its ground -- has nowhere to start)
+            if (raced.StartScene < 0 || raced.StartLine is null)
+            {
+                log($"{island.Name}: WARNING: its start line is in none of the island's scenes: left out of the shared tracks");
+                sharedProblems.Add($"{shareTrack.Name} can't be raced: its start isn't on {shareTrack.Island.Shown}'s ground.");
+                continue;
+            }
+            var name = shareTrack.Name;
+            if (names.Contains(name)) name += " (shared)";
+            for (var k = 2; names.Contains(name); k++) name = $"{shareTrack.Name} ({k})";
+            names.Add(name);
+            var stem = island.RaceFile ?? $"share{sharedCount + 1:00}";
+            var race = Path.Combine(tracksDir, stem + ".txt");
+            var trial = Path.Combine(tracksDir, stem + "_trial.txt");
+            Setup().WriteEngineFile(race, track, prefix: stem + "_");
+            TrialSetup().WriteEngineFile(trial, track, prefix: stem + "_trial_");
+            foreach (var written in new[] { race, trial }) Relative(written, target);
+            menu.Append($"shared={name}|{TracksFolder}/{Path.GetFileName(race)}|{TracksFolder}/{Path.GetFileName(trial)}|{raced.StartScene}\n");
+            sharedCount++;
+            var opponents = (raced.Drivers ?? new()).Where(d => !d.Ghost).Select(d => d.Name).ToList();
+            log($"Shared track {sharedCount}: {name} ({Path.GetFileName(file)}, on {shareTrack.Island.Name} as {island.IleFile}): starts in scene {raced.StartScene}, " +
+                (opponents.Count > 0 ? $"against {string.Join(", ", opponents)}" : "no opponents"));
+        }
+        // (what the Shared tracks page says under its last row: the tracks left out, or the build that couldn't make them)
+        // (two of them at most, the page's room under its list; setup.log has them all)
+        var leftOut = SharedTracks.List(target).Where(e => e.Track is null).Select(e => e.Problem ?? $"{Path.GetFileName(e.File)} can't be raced.")
+            .Concat(sharedProblems).ToList();
+        if (leftOut.Count > 2) leftOut = leftOut.Take(2).Append($"And {leftOut.Count - 2} more (setup.log says why).").ToList();
+        if (leftOut.Count > 0) menu.Append($"shared_status={string.Join(" ", leftOut).Replace('\n', ' ').Replace('\r', ' ')}\n");
+        SharedTracks.RecordBuilt(target);
         // Story Mode's set: every track raced where the story has it, the cars each one wins in its file (StoryUnlocks); the files named
         // from the game's folder (the game finds them beside its data: RACEGAME.CPP StoryResolved)
         var storyDir = Path.Combine(target, StoryFolder);
@@ -457,7 +521,7 @@ internal static class GameInstall
         // (the race track build's own keepsakes -- the files as they were before it, its .bak copies -- of no use to the game: a reinstall
         // copies LBA2's files in afresh)
         foreach (var kept in Directory.GetFiles(target, "*" + Kept).Concat(Directory.GetFiles(target, "*.bak"))) File.Delete(kept);
-        log($"the game: {GameExe}, {MenuFile}, {Specials.Length} special track(s) ({cars} cars), Track select's {trackCount} tracks ({grid.Count} cars in the car grid)");
+        log($"the game: {GameExe}, {MenuFile}, {Specials.Length} special track(s) ({cars} cars), Track select's {trackCount} tracks ({grid.Count} cars in the car grid), {sharedCount} shared track(s)");
 
         // ---- 5. the updater
         progress(0.99, "Setting up the updates");

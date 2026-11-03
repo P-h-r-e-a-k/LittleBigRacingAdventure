@@ -459,18 +459,21 @@ internal static class Updater
 
     // This setup installed over the game in `installDir` with the folders it was installed from; then the game started again. Zero: done,
     // or handed to the setup window (the folders gone, or the install failed) -- `openWindow` set then.
-    public static async Task<(int Code, MainWindow? Window)> Update(string installDir)
+    // `sharedTracks`: not a new version but the game built again by its own setup, with the shared tracks the player chose (SharedTracks)
+    public static async Task<(int Code, MainWindow? Window)> Update(string installDir, bool sharedTracks = false)
     {
         installDir = Path.GetFullPath(installDir).TrimEnd('\\', '/');
         void L(string s) => Log(installDir, s);
-        L($"---- update: setup {OwnVersion} ({Environment.ProcessPath}) into {installDir}");
+        L(sharedTracks ? $"---- shared tracks: the game built again with them, setup {OwnVersion} ({Environment.ProcessPath}), {installDir}"
+                       : $"---- update: setup {OwnVersion} ({Environment.ProcessPath}) into {installDir}");
         // (one at a time: two launches close together each started an update, and the two built the same folder at once, one failing with a
         // message about the island's bodies, 2026-11-01)
         using var one = new System.Threading.Mutex(false, "LBRA-Update-" + installDir.ToLowerInvariant().Replace('\\', '_').Replace(':', '_'));
         if (!one.WaitOne(0)) { L("another update is running here: this one stops"); return (0, null); }
         var info = Load(installDir);
         string lba1 = info?.Lba1 ?? "", lba2 = info?.Lba2 ?? "";
-        var pending = info?.Pending;
+        // (a build with the shared tracks keeps the version it is: the site's file it came from)
+        var pending = info?.Pending ?? (sharedTracks ? info?.Source : null);
         if (!File.Exists(Path.Combine(installDir, GameInstall.MenuFile)))
         {
             L($"{installDir} has no game in it: the setup window instead");
@@ -484,7 +487,7 @@ internal static class Updater
                 GameInstall.Title, MessageBoxButton.OK, MessageBoxImage.Information);
             return (0, new MainWindow(GameInstall.IsLba1Folder(lba1) ? lba1 : null, GameInstall.IsLba2Folder(lba2) ? lba2 : null, installDir, pending));
         }
-        var window = new UpdateProgressWindow();
+        var window = new UpdateProgressWindow(sharedTracks);
         window.Show();
         var before = Path.Combine(installDir, "Update", BeforeFolder);
         var kept = false;
@@ -516,7 +519,7 @@ internal static class Updater
             L($"INSTALLED version {OwnVersion}; User\\ kept");
             // (the game was closed for this, not crashed)
             TryDelete(Path.Combine(installDir, Folder, "running.txt"));
-            Status(installDir, $"Updated to version {OwnVersion} on {Today()}.");
+            if (!sharedTracks) Status(installDir, $"Updated to version {OwnVersion} on {Today()}.");
         }
         catch (Exception e)
         {

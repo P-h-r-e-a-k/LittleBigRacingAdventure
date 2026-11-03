@@ -63,7 +63,7 @@ The game updates from the newest release on GitHub, <https://github.com/P-h-r-e-
 ## The game
 
 The main menu: **Story Mode** (greyed until the full game), **Racing**, the game's own **Options** (with **Race controls, power-ups** and
-**Camera, window, updates** at the end), **Feedback**, **Quit**. **Racing** holds **Track select**, **Specials**, **Multiplayer** and **Best laps**.
+**Camera, window, updates** at the end), **Feedback**, **Quit**. **Racing** holds **Track select**, **Specials**, **Multiplayer**, **Best laps** and **Shared tracks**.
 **Esc** in a race or time trial opens the pause menu instead: **Resume Game**, **Restart**, **Change car**, **Change track** and **Main menu** (Esc goes back, and Esc there resumes). Online and in the story, Esc opens the main menu with **Resume Game** at the top.
 **Feedback** holds **Report bug**, which takes a short description (up to 120 characters) and puts it on this project's public GitHub page with the game's logs, with names, folders and addresses removed first, and **Request feature**, which does the same with your idea and sends no logs.
 **Quit** asks first, "Quit the game?": **No** (the row it opens on, or **Esc**) goes back, **Yes** leaves. The window's X closes the game straight away.
@@ -124,6 +124,18 @@ The main menu: **Story Mode** (greyed until the full game), **Racing**, the game
   straights, mine carts as on rails -- with half a star (now and then a whole one) moved between two stats by the car's own number, so
   two cars of a kind differ; the same on every install.
 
+- **Shared tracks**: tracks people draw in [LBA Assembler](https://github.com/P-h-r-e-a-k/LBAAssembler) and share as `.lbrtrack` files
+  (its race track window's **Share for LBRA...**). A file holds only the route and the island it's drawn on, none of the game's data:
+  the game builds the track from your own copy of LBA2, on a copy of that island, so the island's own track stays as it is.
+  **Add or remove tracks...** at the bottom of the list opens the setup's window: **Add a track file...**, **Take out**, then **Build
+  them into the game**. The game closes, is built again with them (a few minutes, as an update is) and starts again. Your files are
+  kept in `User\LBA2\Tracks`, so updates build them in too. Each shared track has a **Race** and a **Time trial**, as Track
+  select's do, and they're in the online vote. To race a friend online, both of you need the same shared tracks: the game says
+  "+N shared" after its version when it turns someone away. Up to 8 are raced. Shared tracks can be drawn on the Desert island,
+  Citadel Island, Mosquibees Island, Celebration Island (either track), the Elevator Platform, either moon, Volcano Island and
+  Wannies Island; the islands the build makes or enlarges (Polar Island, the Francos, Otringal, Island CX, the palace, the
+  temple, the Long Table) can't be copied. A file that can't be read, or a track that can't be built, is left out, and the page
+  says why under its last row (`setup.log` has the details).
 - **Specials**: **Thanksgiving: The Long Table** is an island made from nothing, Canada in October and the United States in November: a figure of eight over a giant
   harvest table and under it, with geese, gravy, cranberry spills, footballs, pumpkin boats and parade balloons; a **Race** of three laps or a **Time trial**. Still under
   development: greyed on the page, under a banner, until its code is typed there.

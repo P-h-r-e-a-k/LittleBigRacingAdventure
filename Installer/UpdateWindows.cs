@@ -22,6 +22,13 @@ internal static class UpdateLook
         window.FontFamily = new FontFamily("Segoe UI");
         window.FontSize = 13;
         window.ShowInTaskbar = true;
+        // (tests: on the screen they are watched on, LBRA_SETUP_WINDOW_POS="x,y" -- as the game's LBA2_WINDOW_POS -- not the player's)
+        if (Environment.GetEnvironmentVariable("LBRA_SETUP_WINDOW_POS") is { } at && at.Split(',') is [var x, var y]
+            && double.TryParse(x, System.Globalization.CultureInfo.InvariantCulture, out var left) && double.TryParse(y, System.Globalization.CultureInfo.InvariantCulture, out var top))
+        {
+            window.WindowStartupLocation = WindowStartupLocation.Manual;
+            window.Left = left; window.Top = top;
+        }
     }
 
     public static StackPanel Header()
@@ -77,12 +84,13 @@ internal sealed class UpdateProgressWindow : Window
     private readonly TextBlock status;
     private bool done;
 
-    public UpdateProgressWindow()
+    // (`sharedTracks`: the game built again with the player's shared tracks -- SharedTracks -- not a new version)
+    public UpdateProgressWindow(bool sharedTracks = false)
     {
-        UpdateLook.Dress(this, $"{GameInstall.Title} - Update");
+        UpdateLook.Dress(this, $"{GameInstall.Title} - {(sharedTracks ? "Shared tracks" : "Update")}");
         var root = new StackPanel { Margin = new Thickness(22, 16, 22, 18), Width = 470 };
         root.Children.Add(UpdateLook.Header());
-        root.Children.Add(new TextBlock { Text = "Updating the game. Your saves, best laps and settings are kept.", TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 12, 0, 0) });
+        root.Children.Add(new TextBlock { Text = sharedTracks ? "Building the shared tracks into the game. Your saves, best laps and settings are kept." : "Updating the game. Your saves, best laps and settings are kept.", TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 12, 0, 0) });
         bar = new ProgressBar { Height = 10, Margin = new Thickness(0, 12, 0, 0), Minimum = 0, Maximum = 1, Foreground = UpdateLook.Brush("Pumpkin"), Background = UpdateLook.Brush("Panel"), BorderBrush = UpdateLook.Brush("Edge") };
         status = new TextBlock { Margin = new Thickness(0, 6, 0, 0), Foreground = new SolidColorBrush(Color.FromRgb(0xBF, 0xAF, 0xCB)), TextTrimming = TextTrimming.CharacterEllipsis };
         root.Children.Add(bar);
