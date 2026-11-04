@@ -97,6 +97,68 @@ internal static class SharedTracks
     public static bool Changed(string installDir) =>
         File.Exists(BuiltFile(installDir)) ? File.ReadAllText(BuiltFile(installDir)).Trim() != FolderKey(installDir) : List(installDir).Count > 0;
 
+    // ---- a .lbrtrack file double-clicked (the user, 2026-11-04: make track making and sharing "more accessible and user friendly") ----
+
+    // .lbrtrack files opened with this install's updater (Update\LBRA-Setup.exe --open-track "<file>"), for this Windows user (HKCU: no
+    // admin rights asked). Not for a folder under a TEMP folder: the tests' installs would take the files over from the player's own.
+    public static void RegisterFileType(string installDir, string setup, Action<string> log)
+    {
+        var full = Path.GetFullPath(installDir).TrimEnd('\\', '/');
+        if (full.Contains(@"\TEMP\", StringComparison.OrdinalIgnoreCase) || full.StartsWith(Path.GetFullPath(Path.GetTempPath()), StringComparison.OrdinalIgnoreCase))
+        {
+            log("shared tracks: .lbrtrack files not tied to this install (it's in a TEMP folder: a test's)");
+            return;
+        }
+        try
+        {
+            const string kind = "LBRA.SharedTrack";
+            using (var ext = Registry.CurrentUser.CreateSubKey(@"Software\Classes\" + RaceTrackShare.Extension)) ext.SetValue("", kind);
+            using (var type = Registry.CurrentUser.CreateSubKey(@"Software\Classes\" + kind))
+            {
+                type.SetValue("", "Little Big Racing Adventure shared track");
+                using (var icon = type.CreateSubKey("DefaultIcon")) icon.SetValue("", $"\"{Path.Combine(full, "LBRA.exe")}\",0");
+                using (var command = type.CreateSubKey(@"shell\open\command")) command.SetValue("", $"\"{setup}\" --open-track \"%1\" \"{full}\"");
+            }
+            SHChangeNotify(0x08000000, 0, IntPtr.Zero, IntPtr.Zero);
+            log("shared tracks: .lbrtrack files open with this install (double-click one to add it)");
+        }
+        catch (Exception e) when (e is UnauthorizedAccessException or System.Security.SecurityException or IOException)
+        {
+            log($"shared tracks: .lbrtrack files not tied to the game: {e.Message}");
+        }
+    }
+
+    [System.Runtime.InteropServices.DllImport("shell32.dll")]
+    private static extern void SHChangeNotify(int eventId, int flags, IntPtr item1, IntPtr item2);
+
+    // --open-track <file> <install folder>: the file copied into the shared tracks folder (unless the same file is there already), then the
+    // shared tracks window, Build ready
+    public static async Task<int> Open(string file, string installDir)
+    {
+        installDir = Path.GetFullPath(installDir).TrimEnd('\\', '/');
+        try
+        {
+            var folder = Folder(installDir);
+            Directory.CreateDirectory(folder);
+            var bytes = File.ReadAllBytes(file);
+            var there = Directory.EnumerateFiles(folder, "*" + RaceTrackShare.Extension).FirstOrDefault(f => File.ReadAllBytes(f).AsSpan().SequenceEqual(bytes));
+            if (there is null)
+            {
+                var name = Path.GetFileNameWithoutExtension(file);
+                var to = Path.Combine(folder, name + RaceTrackShare.Extension);
+                for (var n = 2; File.Exists(to); n++) to = Path.Combine(folder, $"{name}_{n}{RaceTrackShare.Extension}");
+                File.Copy(file, to);
+                Updater.Log(installDir, $"shared tracks: {file} added as {to}");
+            }
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            MessageBox.Show($"The track can't be added: {e.Message}", GameInstall.Title, MessageBoxButton.OK, MessageBoxImage.Warning);
+            return 1;
+        }
+        return await Manage(installDir);
+    }
+
     // ---- --shared-tracks ------------------------------------------------------------------------------------------------------------
 
     // The window: the tracks in the folder, added and taken out, and built into the game -- the game closed for it, built again and started
@@ -152,7 +214,7 @@ internal sealed class SharedTracksWindow : Window
         root.Children.Add(UpdateLook.Header());
         root.Children.Add(new TextBlock
         {
-            Text = "Tracks drawn in LBA Assembler and shared as .lbrtrack files (its race track window's \"Share for LBRA\"). The game builds each one from your own " +
+            Text = "Tracks you make here (Make a track...), or a friend's .lbrtrack file (made here, or in LBA Assembler with \"Share for LBRA\"). The game builds each one from your own " +
                    "copy of LBA2, on a copy of its island, and lists it under Racing > Shared tracks. To race a friend online, both of you add the same tracks.",
             TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 14, 0, 0),
         });
@@ -166,6 +228,10 @@ internal sealed class SharedTracksWindow : Window
         var add = new Button { Content = "Add a track file...", MinWidth = 140, Background = UpdateLook.Brush("Ember") };
         add.Click += (_, _) => Add();
         remove.Click += (_, _) => Remove();
+        // (a track of your own, made here: the user, 2026-11-04 -- no LBA Assembler needed)
+        var make = new Button { Content = "Make a track...", MinWidth = 120, Margin = new Thickness(0, 0, 10, 0), Background = UpdateLook.Brush("Ember") };
+        make.Click += (_, _) => Make();
+        row.Children.Add(make);
         row.Children.Add(add);
         row.Children.Add(remove);
         root.Children.Add(row);
@@ -243,6 +309,19 @@ internal sealed class SharedTracksWindow : Window
             said.Text = $"{Path.GetFileName(file)} taken out. Build them into the game to have it gone from there.";
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException) { said.Text = $"It couldn't be taken out: {e.Message}"; }
+    }
+
+    // Make a track...: the track maker (TrackMaker.cs); a track saved there is in the folder, ready to build
+    private void Make()
+    {
+        var maker = new TrackMakerWindow(installDir) { Owner = this };
+        Topmost = false;
+        var saved = maker.ShowDialog() == true ? maker.Saved : null;
+        Topmost = true;
+        if (saved is null) return;
+        changed = true;
+        Refresh(saved);
+        said.Text = $"Your track is saved as {Path.GetFileName(saved)}. Build them into the game to race it -- and send the file to friends to race them on it.";
     }
 
     private static bool SameBytes(string a, string b) => new FileInfo(a).Length == new FileInfo(b).Length && File.ReadAllBytes(a).AsSpan().SequenceEqual(File.ReadAllBytes(b));

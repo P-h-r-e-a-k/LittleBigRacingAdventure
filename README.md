@@ -124,8 +124,17 @@ The main menu: **Story Mode** (greyed until the full game), **Racing**, the game
   straights, mine carts as on rails -- with half a star (now and then a whole one) moved between two stats by the car's own number, so
   two cars of a kind differ; the same on every install.
 
-- **Shared tracks**: tracks people draw in [LBA Assembler](https://github.com/P-h-r-e-a-k/LBAAssembler) and share as `.lbrtrack` files
-  (its race track window's **Share for LBRA...**), on any of the islands. A file holds only the route and the island it's drawn on, none
+- **Make a track**: **Racing > Shared tracks > Add or remove tracks... > Make a track...** opens a track maker, no editor needed. Pick
+  one of the game's islands, then lay track pieces on its map: straights, bends, hairpins, a jump, a loop, the pit lane, the Ramp and
+  spirals. Click near a yellow ring to join a piece on; **Q**/**E** turn it, a right click takes one away, **Ctrl+Z** undoes. Or start
+  from a ready-made **Oval**, **Oval with jumps**, **Oval with loops** or **Spiral climb**, and **Close the lap** adds the pieces that
+  bring the road's end back round to its start. **The track** list checks it as you go: ✓ fine, • worth knowing, ✗ stops it, with
+  red rings on the map where the problem is. **Save to my shared tracks** puts it in your shared tracks folder as a `.lbrtrack`
+  file: build it in to race it, and send the file to friends to race them on it.
+- **Opening a track file**: double-click a `.lbrtrack` file a friend sent you and the game's setup adds it to your shared tracks and
+  opens the list, ready to build in.
+- **Shared tracks**: tracks made in the track maker, or drawn in [LBA Assembler](https://github.com/P-h-r-e-a-k/LBAAssembler) and
+  shared as `.lbrtrack` files (**Share for LBRA...** in its race track window or its Build > Race track panel), on any of the islands. A file holds only the route and the island it's drawn on, none
   of the game's data: the game builds the track from your own copy of LBA2 on a copy of that island, so the island's own track stays as
   it is. Every file in the shared tracks folder (`User\LBA2\Tracks`) is built in, as many as there are. **Open the shared tracks
   folder** at the bottom of the list opens it in Explorer: put files there, come back to the page, and **Build in the folder's new

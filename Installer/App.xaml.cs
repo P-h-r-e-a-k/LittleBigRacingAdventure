@@ -75,6 +75,26 @@ public partial class App : Application
             if (code >= 0) Shutdown(code);
             return;
         }
+        // (--open-track <file> [<install folder>]: a .lbrtrack double-clicked -- SharedTracks.RegisterFileType; the install, without one, the
+        // folder this setup's Update\ is in)
+        if (e.Args is ["--open-track", var track, ..])
+        {
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            var install = e.Args.Length > 2 ? e.Args[2] : Path.GetDirectoryName(Path.GetDirectoryName(Environment.ProcessPath ?? "")) ?? "";
+            var code = await SharedTracks.Open(track, install);
+            if (code >= 0) Shutdown(code);
+            return;
+        }
+        // (--make-track <install folder>: the track maker alone, for tests -- the player opens it from the shared tracks window)
+        if (e.Args is ["--make-track", var making, ..])
+        {
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            var maker = new TrackMakerWindow(Path.GetFullPath(making));
+            var made = maker.ShowDialog() == true ? maker.Saved : null;
+            Console.WriteLine(made is null ? "no track saved" : $"saved {made}");
+            Shutdown(made is null ? 1 : 0);
+            return;
+        }
         if (e.Args is ["--shared-tracks", var sharing, ..])
         {
             ShutdownMode = ShutdownMode.OnExplicitShutdown;

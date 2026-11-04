@@ -137,6 +137,8 @@ internal static class Updater
                 catch (IOException) when (attempt < 60) { Thread.Sleep(500); }
             log($"updates: this setup ({OwnVersion}) copied to {copy}");
         }
+        // (a .lbrtrack file opened from Explorer goes into the shared tracks: SharedTracks.RegisterFileType)
+        SharedTracks.RegisterFileType(installDir, copy, log);
         // (an earlier download, now installed or of no use)
         if (!string.Equals(self, Path.Combine(dir, NewFile), StringComparison.OrdinalIgnoreCase)) TryDelete(Path.Combine(dir, NewFile));
         TryDelete(Path.Combine(dir, PartFile));
