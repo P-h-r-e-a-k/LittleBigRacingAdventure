@@ -35,6 +35,8 @@ internal sealed class TrackMakerWindow : Window
     private TrackSection? armed;
     private TrackPiece? ghost, selected;
     private double heading;
+    // how high over the ground a piece being laid goes where it joins nothing (PgUp, PgDn), and the Ramp's climb (R, F)
+    private double lift, tilt;
     // the .lbrtrack written by Save, or null
     public string? Saved { get; private set; }
 
@@ -73,6 +75,10 @@ internal sealed class TrackMakerWindow : Window
         var tools = new WrapPanel { Margin = new Thickness(0, 6, 0, 0) };
         tools.Children.Add(Small("Turn (Q)", () => Turn(-1)));
         tools.Children.Add(Small("Turn (E)", () => Turn(1)));
+        tools.Children.Add(Small("Up (PgUp)", () => Lift(1)));
+        tools.Children.Add(Small("Down (PgDn)", () => Lift(-1)));
+        tools.Children.Add(Small("Ramp up (R)", () => Tilt(1)));
+        tools.Children.Add(Small("Ramp down (F)", () => Tilt(-1)));
         tools.Children.Add(Small("Delete", DeleteSelected));
         tools.Children.Add(Small("Undo", Undo));
         tools.Children.Add(Small("Clear", () => { Remember(); pieces.Pieces.Clear(); selected = null; Changed(); }));
@@ -197,7 +203,7 @@ internal sealed class TrackMakerWindow : Window
     {
         if (armed is null) return;
         var (x, z) = Cell(p);
-        ghost = pieces.Snapped(new TrackPiece(armed, x, z, Ground(x, z), heading));
+        ghost = pieces.Snapped(new TrackPiece(armed, x, z, Ground(x, z) + lift, heading, armed.Tilts ? tilt : 0));
         Draw();
     }
 
@@ -237,6 +243,10 @@ internal sealed class TrackMakerWindow : Window
         {
             case System.Windows.Input.Key.Q: Turn(-1); e.Handled = true; break;
             case System.Windows.Input.Key.E: Turn(1); e.Handled = true; break;
+            case System.Windows.Input.Key.PageUp: Lift(1); e.Handled = true; break;
+            case System.Windows.Input.Key.PageDown: Lift(-1); e.Handled = true; break;
+            case System.Windows.Input.Key.R: Tilt(1); e.Handled = true; break;
+            case System.Windows.Input.Key.F: Tilt(-1); e.Handled = true; break;
             case System.Windows.Input.Key.Delete: DeleteSelected(); e.Handled = true; break;
             case System.Windows.Input.Key.Escape: armed = null; ghost = null; Draw(); e.Handled = true; break;
             case System.Windows.Input.Key.Z when Keyboard.Modifiers == ModifierKeys.Control: Undo(); e.Handled = true; break;
@@ -254,6 +264,35 @@ internal sealed class TrackMakerWindow : Window
             selected = pieces.Pieces[i] = s with { Heading = s.Heading + way * step };
             Changed();
         }
+    }
+
+    // PgUp, PgDn: the piece being laid (where it joins nothing) or the one selected, 250 higher or lower -- a raised road on piers
+    private void Lift(int way)
+    {
+        const double step = 250;
+        if (armed is not null) { lift = Math.Max(0, lift + way * step); Say($"Laid {lift:0} over the ground where it joins nothing (a raised road)."); return; }
+        if (selected is not { } s) { Say("Choose a piece to lay, or click one to select it, first."); return; }
+        Remember();
+        var i = pieces.Pieces.IndexOf(s);
+        selected = pieces.Pieces[i] = s with { Y = Math.Max(Ground(s.X, s.Z), s.Y + way * step) };
+        Changed();
+        Say($"{s.Section.Name}: {selected.Y - Ground(s.X, s.Z):0} over the ground.");
+    }
+
+    // R, F: the Ramp being laid, or the one selected, 5 % steeper up or down (about its middle)
+    private void Tilt(int way)
+    {
+        if (armed is { Tilts: true }) { tilt = Math.Clamp(tilt + way * TrackPiece.TiltStep, -TrackPiece.TiltMost, TrackPiece.TiltMost); Say($"The Ramp climbs {tilt:0} over its length."); return; }
+        if (selected is { Section.Tilts: true } s)
+        {
+            Remember();
+            var i = pieces.Pieces.IndexOf(s);
+            selected = pieces.Pieces[i] = s.TiltedBy(way);
+            Changed();
+            Say($"The Ramp climbs {selected.Tilt:0} over its length.");
+            return;
+        }
+        Say("Only the Ramp tilts: choose the Ramp, or select one.");
     }
 
     private void DeleteSelected()
