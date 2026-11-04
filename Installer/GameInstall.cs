@@ -191,6 +191,9 @@ internal static class GameInstall
     {
         // (the Long Table's own cars open with it: RACEGAME.CPP SpecialCodeTyped)
         if (island == RaceTrackCharacterCars.LongTable) return $"|unlock={LongTableUnlock}cars|hint=Under development";
+        // (the Little Big Postcards' reward, an easter egg: the gold black car, given by the souvenir seller in the final once all thirteen
+        // are found -- the race-track mode's unlock_at=, LBA Assembler's RaceTrackStory.Eggs.Postcards.cs)
+        if (island == RaceTrackCharacterCars.Postcards) return $"|unlock={RaceTrackStory.PostcardUnlock} story|hint=Find all 13 postcards in Story Mode";
         var id = number == RaphCar ? "raph" : CastCars(DesertCast).Contains(number) ? "desert"
             : island == RaceTrackCharacterCars.Celebration ? (statue.Contains(number) ? "statue" : "celebration")
             : island is not null ? IslandUnlock.GetValueOrDefault(island) : null;
