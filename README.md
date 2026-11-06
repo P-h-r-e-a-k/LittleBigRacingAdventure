@@ -107,7 +107,12 @@ The main menu: **Story Mode** (greyed until the full game), **Racing**, the game
   follows, no story's waking up) or a **Time trial** (Twinsen alone, no power-ups; its fastest lap, or a sprint's time, goes to Best
   laps, and it first asks **how many laps** -- 1, 3, 5, 10 or **Endless: until you stop** -- and which **ghost** to race, see
   below) -- a time trial starts a run-up behind the start line, with the 3, 2, 1 countdown, so the car is up to speed as
-  the first lap starts; then the **car grid**; then, for a race, the qualifying question as for the specials (not on a sprint). Best laps goes
+  the first lap starts; then, for a race against opponents, its **difficulty** (6 November 2026: every track's, no longer only the
+  Halloween track's): **Easy** (the opponents slower, at the Easy ghost's pace, easing off ahead of you, never pushing harder behind,
+  items from half the rows), **Medium** (the race as it always was) or **Hard** (the opponents quicker and pushing harder behind you,
+  holding their attacks until they would hit you); the last one chosen comes up first; then the **car grid**; then, for a race, the
+  qualifying question as for the specials (not on a sprint). Story Mode keeps a difficulty of its own (its page's **Difficulty** row,
+  asked at **New story**), for every story race. Best laps goes
   through every track once Track select is open.
 - **The car grid** (Track select's car page): every car of the game, 7 x 7 on a page (223 cars: five pages) -- Twinsen's Halloween
   buggy first, his pumpkin F1 (locked as on the Halloween car page until the Halloween race is won, then for time trials), the digger, Halloween's
