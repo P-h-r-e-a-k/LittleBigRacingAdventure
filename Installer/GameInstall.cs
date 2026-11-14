@@ -452,7 +452,11 @@ internal static class GameInstall
             if (!Directory.GetFiles(storyDir, "racecar_track*.txt").Any(f => File.ReadLines(f).Contains($"{u.Key}={u.Id}")))
                 log($"Story Mode: WARNING: no track of the set wins {u.Id} ({u.Island})");
         var statue = StatueCars();
-        var islandOf = RaceTrackCharacterCars.Catalogue(target).ToDictionary(e => e.Number, e => e.Island);
+        // (a number listed twice is logged, its first entry kept: a doubled number failed two updates, 2026-11-13 and 2026-11-14)
+        var catalogue = RaceTrackCharacterCars.Catalogue(target).ToList();
+        foreach (var twice in catalogue.GroupBy(e => e.Number).Where(g => g.Count() > 1))
+            log($"the car catalogue: WARNING: car {twice.Key} listed {twice.Count()} times ({string.Join(", ", twice.Select(e => e.Name))}), the first kept");
+        var islandOf = catalogue.GroupBy(e => e.Number).ToDictionary(g => g.Key, g => g.First().Island);
         var cars = 0;
         foreach (var (number, name, accel, top, handling) in Cars)
         {
