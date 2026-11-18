@@ -1,13 +1,17 @@
 # Builds the Little Big Halloween Racing Adventure installer: out\LBRA-Setup.exe, one self-contained file (no .NET needed to run it).
 #   1. LBA Assembler's engine (lba2cc.exe, statically linked), from the LBA Assembler repo beside this one -- the installer carries it in;
 #   2. the game's pictures, if they aren't drawn yet (tools\make_art.ps1);
-#   3. the installer, published as a single file, its version the build's date and time (yyyy.M.d.HHmm): an installed game's updater
+#   3. the new lines' voices, packed into out\voices.zip (tools\pack_voices.py) when -VoiceLines is given, else the one there as it is;
+#   4. the installer, published as a single file, its version the build's date and time (yyyy.M.d.HHmm): an installed game's updater
 #      takes a setup from the site only if it is no older than itself (Installer\Updater.cs).
 # Windows PowerShell 5.1 or later; MSYS2's UCRT64 toolchain for the engine (C:\msys64), the .NET 10 SDK.
 #   -Lba <folder>   another LBA Assembler checkout than the one beside this repo (a worktree, for a test build)
 #   -Out <folder>   where the setup goes (out\)
 #   -Version <v>    the setup's version (the build's date and time)
-param([switch]$SkipEngine, [string]$Lba, [string]$Out, [string]$Version)
+#   -VoiceLines <folder>  a `ScriptRoundTrip newlines --built <game> --out <folder>` export of a game built from the same LBA Assembler
+#                   source as this setup: the clips are named by its text ids, which move when a line is put in before others
+#                   (tools\voices_sync.py). Packed with Chatterbox's Python (D:\Chatterbox\venv: soundfile, numpy).
+param([switch]$SkipEngine, [string]$Lba, [string]$Out, [string]$Version, [string]$VoiceLines)
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
 $lba = if ($Lba) { (Resolve-Path $Lba).Path } else { Join-Path (Split-Path -Parent $root) 'LBAAssembler' }
@@ -25,6 +29,14 @@ if (-not $SkipEngine) {
 if (-not (Test-Path (Join-Path $root 'Game\menu.png')) -or -not (Test-Path (Join-Path $root 'Installer\pumpkin.ico'))) {
     powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'tools\make_art.ps1')
 }
+
+$voicesZip = Join-Path $root 'out\voices.zip'
+if ($VoiceLines) {
+    & 'D:\Chatterbox\venv\Scripts\python.exe' (Join-Path $root 'tools\pack_voices.py') $VoiceLines
+    if ($LASTEXITCODE -ne 0) { throw 'The voices did not pack.' }
+} elseif (Test-Path $voicesZip) {
+    "Voices: {0} as it is, packed {1} (-VoiceLines <export> packs them again)" -f $voicesZip, (Get-Item $voicesZip).LastWriteTime
+} else { 'No voices (out\voices.zip): the new lines are shown, not spoken' }
 
 $out = if ($Out) { $Out } else { Join-Path $root 'out' }
 if (-not $Version) { $Version = (Get-Date).ToString('yyyy.M.d.HHmm') }

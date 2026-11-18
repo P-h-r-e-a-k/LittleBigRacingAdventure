@@ -116,6 +116,9 @@
     <EmbeddedResource Include="pumpkin.ico" LogicalName="game/pumpkin.ico" />
     <!-- the game's ghosts to beat, Easy, Medium and Hard for each track (the race engine reads the game folder's ghosts\) -->
     <EmbeddedResource Include="..\Game\ghosts\*.ghost" LogicalName="game/ghosts/%(Filename)%(Extension)" />
+    <!-- the new lines' voices (Chatterbox, from each character's retail voice), packed by build.ps1 (tools\pack_voices.py): the setup puts
+         them in the game's VOICES\ (GameInstall), where the engine plays a text's clip (MESSAGE.CPP SpeakClip) -->
+    <EmbeddedResource Include="..\out\voices.zip" LogicalName="voices.zip" Condition="Exists('..\out\voices.zip')" />
     <Resource Include="pumpkin.ico" />
   </ItemGroup>
 

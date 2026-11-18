@@ -304,6 +304,25 @@ powershell -ExecutionPolicy Bypass -File tools\make_art.ps1 # redraw Game\menu.p
 
 It needs MSYS2's UCRT64 toolchain (`C:\msys64`) for the engine and the .NET 10 SDK.
 
+### The new lines' voices
+
+The story's new lines are voiced with Chatterbox (`D:\Chatterbox`) from each character's retail voice: `NewLines\<Language>\<Character>\`
+holds each line's words (`<bank>_<id>.txt`) and its recording (`.wav`), made by `D:\Chatterbox\run_batches.py` (one GPU worker at a time).
+A new text's id moves whenever a line is put in before it, and the setup's build numbers the texts otherwise than a test build, so a
+recording is found by its line's language, speaker and words, never by its file's name:
+
+```
+ScriptRoundTrip newlines --built <a built game> --out <export>    # the game's new lines now (never --out NewLines: it wipes its --out)
+python tools\voices_sync.py <export> --add                       # the lines nothing says yet into NewLines, for run_batches.py
+powershell -ExecutionPolicy Bypass -File build.ps1 -VoiceLines <export>   # tools\pack_voices.py -> out\voices.zip, into the setup
+```
+
+`out\voices.zip` holds each clip (Ogg Vorbis, 22050 Hz mono, as loud as the character's retail voice) under the hash of its words. The
+setup, once it has built the game, gives each of the game's own new texts the clip of its words: `VOICES\<EN|FR|DE|SP|IT|PO>_<file>_<id>.ogg`
+(LBA Assembler's `Terrain\VoiceClips.cs`), which the engine plays before the text's VOX entry (`MESSAGE.CPP` SpeakClip) -- in the voice
+language, or the text language where LBA2 never had voices (Spanish, Italian, Portuguese). `ScriptRoundTrip voices --game <folder>` does
+the same for a test build or the editor's story folder.
+
 ## Where things are
 
 - `Installer\` - the installer (WPF): `GameInstall.cs` is the install, `MainWindow.xaml` its window, `Updater.cs` the update check and

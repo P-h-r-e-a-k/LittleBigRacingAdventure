@@ -297,6 +297,8 @@ internal static class GameInstall
         // (none of the editor's private special cars in the game: LBA Assembler's RaceTrackService.PrivateCars)
         RaceTrackService.PrivateCars = false;
         var doing = "";
+        // (the game's texts as the CD has them, before the build adds the mod's: which texts are the mod's, for their voices, step 4)
+        var retailText = File.ReadAllBytes(Path.Combine(target, "TEXT.HQR"));
         var result = RaceTrackService.Build(target, builds, new Direct<RaceTrackService.BuildProgress>(p => { doing = p.Doing; progress(0.5 + 0.4 * p.Done, p.Doing); }));
         // (a shared track the build can't make doesn't stop the game: the one it was building when it stopped -- its progress says which --
         // left out and the rest built again, or all of them where it wasn't one of theirs; the Shared tracks page says so)
@@ -531,11 +533,12 @@ internal static class GameInstall
             using var f = File.Create(to);
             s.CopyTo(f);
         }
+        var voices = InstallVoices(target, retailText, log);
         File.WriteAllText(Path.Combine(target, "portable.txt"), "Little Big Halloween Racing Adventure keeps its saves and settings in this folder.\n");
         // (the race track build's own keepsakes -- the files as they were before it, its .bak copies -- of no use to the game: a reinstall
         // copies LBA2's files in afresh)
         foreach (var kept in Directory.GetFiles(target, "*" + Kept).Concat(Directory.GetFiles(target, "*.bak"))) File.Delete(kept);
-        log($"the game: {GameExe}, {MenuFile}, {Specials.Length} special track(s) ({cars} cars), Track select's {trackCount} tracks ({grid.Count} cars in the car grid), {sharedCount} shared track(s)");
+        log($"the game: {GameExe}, {MenuFile}, {Specials.Length} special track(s) ({cars} cars), Track select's {trackCount} tracks ({grid.Count} cars in the car grid), {sharedCount} shared track(s), {voices} voiced lines");
 
         // ---- 5. the updater
         progress(0.99, "Setting up the updates");
@@ -989,4 +992,20 @@ internal static class GameInstall
     }
 
     private static bool Same(string a, string b) => string.Equals(Path.GetFullPath(a).TrimEnd('\\', '/'), Path.GetFullPath(b).TrimEnd('\\', '/'), StringComparison.OrdinalIgnoreCase);
+
+    // The new lines' voices: voices.zip (build.ps1, tools\pack_voices.py) holds each clip under the hash of its words; the built game's
+    // own texts pick theirs and it goes in as <game>\VOICES\<EN|FR|DE|SP|IT|PO>_<file>_<text id>.ogg, the clip the engine plays for a text
+    // (MESSAGE.CPP SpeakClip) -- LBA Assembler's VoiceClips, which says why by the words: this build's ids (its tracks, the player's
+    // shared ones) are its own.
+    private static int InstallVoices(string target, byte[] retailText, Action<string> log)
+    {
+        using var zipStream = typeof(GameInstall).Assembly.GetManifestResourceStream("voices.zip");
+        if (zipStream is null) { log("voices: none in this setup, the new lines are shown, not spoken"); return 0; }
+        try { return VoiceClips.Install(target, retailText, zipStream, log); }
+        catch (Exception e) when (e is IOException or InvalidDataException or UnauthorizedAccessException)
+        {
+            log($"voices: WARNING: left out: {e.Message}");
+            return 0;
+        }
+    }
 }
