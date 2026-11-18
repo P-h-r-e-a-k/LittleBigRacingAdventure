@@ -501,19 +501,23 @@ internal static class GameInstall
         using (var bytes = new MemoryStream())
         {
             ico.CopyTo(bytes);
-            try { log($"{GameExe}: the game's icon ({GameIcon.Replace(Path.Combine(target, GameExe), bytes.ToArray())} pictures) in place of the engine's"); }
+            try { log($"{GameExe}: the game's icon ({HeldRetry(() => GameIcon.Replace(Path.Combine(target, GameExe), bytes.ToArray()))} pictures) in place of the engine's"); }
             catch (Exception e) when (e is IOException or InvalidDataException) { log($"{GameExe} keeps the engine's icon: {e.Message}"); }
         }
         // (and its name, which Task Manager shows -- GameIcon.Name)
         try
         {
-            GameIcon.Name(Path.Combine(target, GameExe), "Little Big Racing Adventure", GameExe, typeof(GameInstall).Assembly.GetName().Version ?? new Version(1, 0, 0, 0));
+            HeldRetry(() => { GameIcon.Name(Path.Combine(target, GameExe), "Little Big Racing Adventure", GameExe, typeof(GameInstall).Assembly.GetName().Version ?? new Version(1, 0, 0, 0)); return 0; });
             log($"{GameExe}: the game's name in place of the engine's");
         }
         catch (IOException e) { log($"{GameExe} keeps the engine's name: {e.Message}"); }
         // (LBA Assembler's engine is a console program -- its headless runs log to the console -- so Windows would open a console window
         // beside the game: the game's copy is marked a windowed program instead; output redirected by a caller still works)
-        if (WindowedProgram(Path.Combine(target, GameExe))) log($"{GameExe}: a windowed program (no console window)");
+        // (held a moment by another program -- a virus scanner reading the exe just written -- it is tried again; still held, the game keeps
+        // a console window beside it rather than the whole update failing: 2026-11-18, "The process cannot access the file ... LBRA.exe
+        // because it is being used by another process", LBRA issue 24)
+        try { if (HeldRetry(() => WindowedProgram(Path.Combine(target, GameExe)))) log($"{GameExe}: a windowed program (no console window)"); }
+        catch (Exception e) when (e is IOException or InvalidDataException) { log($"{GameExe} stays a console program: {e.Message}"); }
         var old = Path.Combine(target, OldGameExe);
         if (File.Exists(old))
         {
@@ -835,6 +839,17 @@ internal static class GameInstall
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidDataException or ArgumentException) { return false; }
         finally { Environment.SetEnvironmentVariable(LBAAssembler.Terrain.Temple.TempleMusic.EnvDirectory, env); }
+    }
+
+    // A file step tried again while another program holds the file (an IOException: a virus scanner reading an exe just written, Explorer
+    // reading its icon) -- every quarter second for up to 10 seconds, then the last error as it was
+    private static T HeldRetry<T>(Func<T> step)
+    {
+        for (var attempt = 0; ; attempt++)
+        {
+            try { return step(); }
+            catch (IOException) when (attempt < 40) { System.Threading.Thread.Sleep(250); }
+        }
     }
 
     // A program's PE header marked a windowed (GUI) program rather than a console one: the optional header's Subsystem field (offset 68 in
