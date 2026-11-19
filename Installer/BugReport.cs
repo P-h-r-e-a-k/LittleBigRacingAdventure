@@ -113,10 +113,30 @@ internal static class BugReport
     }
 
     // The line that says what went wrong
-    private static string Signature(string log, string fallback)
+    internal static string Signature(string log, string fallback)
     {
         var lines = log.Split('\n').Select(l => l.Trim()).Where(l => l.Length > 0).ToList();
-        var last = lines.LastOrDefault(l => l.Contains("*** ERROR", StringComparison.Ordinal) || l.Contains("[CRASH]", StringComparison.OrdinalIgnoreCase) || l.Contains("Exception", StringComparison.Ordinal));
+        // The engine's own crash block ("CRASH exception ..." on Windows, "CRASH signal ..." elsewhere): what it was and where, the same
+        // for every player who meets the same fault in the same build -- and, with the OpenGL renderer running, so marked, with the GL
+        // operation it came in (the engine's GL diagnostics: state gl_active / gl_in_op, the "gl" trail's last line). Its "Exception"
+        // in EXCEPTION_ACCESS_VIOLATION is not the line below's: that one never said more than the code and the thread.
+        var fault = lines.LastOrDefault(l => l.StartsWith("CRASH exception ", StringComparison.Ordinal) || l.StartsWith("CRASH signal ", StringComparison.Ordinal));
+        if (fault is not null)
+        {
+            var at = lines.Skip(lines.LastIndexOf(fault)).ToList();
+            var kind = Regex.Match(fault, @"^CRASH (?:exception 0x[0-9a-fA-F]+ (\S+)|signal \d+ (\S+))");
+            var what = kind.Groups[1].Success ? kind.Groups[1].Value : kind.Groups[2].Success ? kind.Groups[2].Value : "a crash";
+            var access = Regex.Match(fault, @"access=(\w+)").Groups[1].Value;
+            var frame = at.Select(l => Regex.Match(l, @"^CRASH frame 00 (\S+)")).FirstOrDefault(m => m.Success)?.Groups[1].Value;
+            var state = at.FirstOrDefault(l => l.StartsWith("CRASH state", StringComparison.Ordinal)) ?? "";
+            var gl = state.Contains(" gl_active=1", StringComparison.Ordinal);
+            var op = "";
+            if (state.Contains(" gl_in_op=1", StringComparison.Ordinal) && at.LastOrDefault(l => l.StartsWith("CRASH trail gl ", StringComparison.Ordinal)) is { } lastOp)
+                op = Regex.Match(lastOp, @"^CRASH trail gl \d+ f\d+ t\d+ (\S+)").Groups[1].Value;
+            var title = (gl ? "[OpenGL] " : "") + what + (access.Length > 0 ? $" ({access})" : "") + (frame is not null ? $" at {frame}" : "") + (op.Length > 0 ? $" in GL {op}" : "");
+            return title.Length > 110 ? title[..110] : title;
+        }
+        var last =lines.LastOrDefault(l => l.Contains("*** ERROR", StringComparison.Ordinal) || l.Contains("[CRASH]", StringComparison.OrdinalIgnoreCase) || l.Contains("Exception", StringComparison.Ordinal));
         var said = last ?? fallback;
         said = Regex.Replace(said, @"^\*+\s*ERROR->\s*", "").Replace("(SEE README.TXT)", "").Trim();
         return said.Length > 110 ? said[..110] : said;
