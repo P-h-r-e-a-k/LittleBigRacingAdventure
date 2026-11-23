@@ -11,8 +11,11 @@ the key the first 16 hex digits of the SHA-1 of the line's words (UTF-8, every s
 until the game is built -- LBRA's setup numbers the texts otherwise than a story test build -- so the setup (and ScriptRoundTrip voices,
 for a test build) matches each of the built game's own texts to the clip of its words and writes it as VOICES\\<EN_000>_<text id>.ogg,
 the name the engine looks for (LBA Assembler's Terrain\\VoiceClips.cs, MESSAGE.CPP SpeakClip). Ogg Vorbis, 22050 Hz mono, its silence
-trimmed at both ends, as loud as the character's retail voice (their sample.wav). Encoded once, kept in out\\voice_cache\\ (again when
-the .wav is newer). A line with no recording yet is counted, not packed: the game shows it, silent, as before.
+trimmed at both ends, as loud as the character's retail voice (their sample.wav). Encoded once, kept in out\\voice_cache\\ under the
+SHA-1 of the .wav's bytes -- never under its name: voices_sync.py --tidy renames recordings to their lines' new ids, and a clip cached
+under a name said the line that had the name before (Zoe's "Twinsen, I am sick of all this rain!" said "Twinsen! Twinsen, wake up!").
+Clips no recording makes any more are cleared out of the cache. A line with no recording yet is counted, not packed: the game shows it,
+silent, as before.
 """
 
 import argparse
@@ -35,7 +38,7 @@ QUALITY = 1.0          # libsndfile's Vorbis compression level: 1.0 = quality 0,
 EDGE_DB = -45.0        # quieter than this at the ends is trimmed ...
 MARGIN = 0.08          # ... to this many seconds before the first sound and after the last
 GAIN_DB = 6.0          # a clip brought to its character's retail loudness, by this much at most (they came out 0-3 dB louder)
-SETTINGS = f"vorbis {QUALITY}, trim {EDGE_DB} dB {MARGIN} s, level to sample.wav +-{GAIN_DB} dB"   # the cache made with these
+SETTINGS = f"vorbis {QUALITY}, trim {EDGE_DB} dB {MARGIN} s, level to sample.wav +-{GAIN_DB} dB, cached by the .wav's SHA-1"   # the cache made with these
 
 
 def words(path):
@@ -45,6 +48,12 @@ def words(path):
 def key(said):
     """VoiceClips.Key: the words' SHA-1 (UTF-8, spaces, line breaks and '@' left out), its first 16 hex digits"""
     return hashlib.sha1(re.sub(r"[ \t\n\r\f\v @]+", "", said).encode("utf-8")).hexdigest()[:16]
+
+
+def digest(wav):
+    """the recording's own name in the cache: the SHA-1 of its bytes (so a renamed recording keeps its clip, and a name never brings back
+    another recording's)"""
+    return hashlib.sha1(wav.read_bytes()).hexdigest()[:20]
 
 
 def vox_code(text_file):
@@ -126,7 +135,7 @@ def main():
     CACHE.mkdir(parents=True, exist_ok=True)
     stamp.write_text(SETTINGS, encoding="utf-8")
 
-    packed, silent, encoded = {}, [], 0
+    packed, silent, encoded, cached = {}, [], 0, {}
     for lang, prefix in LANGS.items():
         for txt in sorted((fresh / lang).glob("*/*.txt")):
             if txt.name.lower() == "readme.txt":
@@ -139,8 +148,10 @@ def main():
             if wav is None:
                 silent.append(f"{lang}/{txt.parent.name}/{txt.stem}")
                 continue
-            ogg = CACHE / wav.relative_to(NEWLINES).with_suffix(".ogg")
-            if not ogg.exists() or ogg.stat().st_mtime < wav.stat().st_mtime:
+            if wav not in cached:
+                cached[wav] = CACHE / wav.parent.relative_to(NEWLINES) / f"{digest(wav)}.ogg"
+            ogg = cached[wav]
+            if not ogg.exists():
                 encode(wav, ogg)
                 encoded += 1
             packed.setdefault(f"{prefix}{vox_code(bank_file[bank])}/{key(words(txt))}.ogg", ogg)
@@ -151,8 +162,13 @@ def main():
         for name in sorted(packed):
             z.write(packed[name], name)
     tmp.replace(ZIP)
+    keep = set(cached.values())
+    stale = [o for o in CACHE.glob("*/*/*.ogg") if o not in keep]
+    for o in stale:
+        o.unlink()
     size = ZIP.stat().st_size / 1e6
-    print(f"{ZIP}: {len(packed)} clips ({encoded} encoded now), {size:.0f} MB; {len(silent)} lines with no recording yet")
+    print(f"{ZIP}: {len(packed)} clips ({encoded} encoded now, {len(stale)} cached clips no recording makes cleared), {size:.0f} MB; "
+          f"{len(silent)} lines with no recording yet")
     by_lang = {}
     for s in silent:
         by_lang[s.split("/")[0]] = by_lang.get(s.split("/")[0], 0) + 1
