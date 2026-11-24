@@ -59,7 +59,6 @@ internal static class GameInstall
     // of Bú stays a special.
     public const string TracksFolder = "tracks";
     public const string TracksCode = "1234";
-    public const string LongTableCode = "0000", LongTableUnlock = "thanksgiving";
     public static readonly (string IleFile, RaceTrackIsland Island, string Name, string File)[] Tracks =
     {
         ("POLAR.ILE", RaceTrackIsland.Polar, "Polar Island", "polar"),
@@ -189,8 +188,8 @@ internal static class GameInstall
     // A car's story unlock (its unlock= and hint= options), by its island in RACECARS.JSON; "" for one the story doesn't hold back
     private static string StoryOptions(int number, string? island, HashSet<int> statue)
     {
-        // (the Long Table's own cars open with it: RACEGAME.CPP SpecialCodeTyped)
-        if (island == RaceTrackCharacterCars.LongTable) return $"|unlock={LongTableUnlock}cars|hint=Under development";
+        // (the Long Table's own cars open, as the track is since 2026-11-24)
+        if (island == RaceTrackCharacterCars.LongTable) return "";
         // (the Little Big Postcards' reward, an easter egg: the gold black car, given by the souvenir seller in the final once all thirteen
         // are found -- the race-track mode's unlock_at=, LBA Assembler's RaceTrackStory.Eggs.Postcards.cs)
         if (island == RaceTrackCharacterCars.Postcards) return $"|unlock={RaceTrackStory.PostcardUnlock} story|hint=Find all 13 postcards in Story Mode";
@@ -348,8 +347,8 @@ internal static class GameInstall
             TrialSetup().WriteEngineFile(trial, track, prefix: file + "_trial_");
             foreach (var written in new[] { race, trial }) Relative(written, target);
             menu.Append($"special={name}|{SpecialsFolder}/{Path.GetFileName(race)}|{SpecialsFolder}/{Path.GetFileName(trial)}|{track.StartScene}\n");
-            // (the Long Table greyed on the Specials page until 0000 is typed there, the user, 2026-11-02, under a banner while it is built)
-            if (island == RaceTrackIsland.Harvest) menu.Append($"special_lock={LongTableCode}|{LongTableUnlock}|Under development\n");
+            // (the Long Table open to everyone -- the user, 2026-11-24, "we should have it unlocked without needing a code now"; from
+            // 2026-11-02 it was greyed on the Specials page under an "Under development" banner until 0000 was typed there)
             log($"{name}: starts in scene {track.StartScene}; against {string.Join(", ", (track.Drivers ?? new()).Where(d => !d.Ghost).Select(d => d.Name))}" +
                 (island.Levels is not null ? "; easy, medium and hard (the menu's difficulty page)" : ""));
         }
