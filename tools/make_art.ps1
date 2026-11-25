@@ -1,4 +1,4 @@
-# The game's own pictures, drawn here (nothing of the retail games in them):
+﻿# The game's own pictures, drawn here (nothing of the retail games in them):
 #   Game\menu.png       the main menu's backdrop, 640x480 -- the installer puts it in its copy of SCREEN.HQR (entry 4, the menu picture)
 #                       in LBA2's own palette
 #   Installer\lbra.ico  the installer's and the game's icon: a chequered flag on a badge
@@ -154,12 +154,13 @@ $g.FillEllipse((New-Object System.Drawing.SolidBrush (C 240 240 244)), $kx - 13,
 $g.FillRectangle((New-Object System.Drawing.SolidBrush (C 30 40 80)), $kx - 10, $ky - 30, 20, 7)
 $g.FillEllipse($tyre, $kx - 66, $ky - 22, 22, 16); $g.FillEllipse($tyre, $kx + 44, $ky - 22, 22, 16)
 # the title, over the top of the screen (the menu's rows start below 95), a chequered flag either side
-Flag $g 18 18 74 52 6 4 5 0.0
-Flag $g 548 18 74 52 6 4 5 3.1
-$gold = New-Object System.Drawing.Drawing2D.LinearGradientBrush (New-Object System.Drawing.Rectangle 0, 8, 640, 58), (C 255 236 120), (C 240 128 20), ([System.Drawing.Drawing2D.LinearGradientMode]::Vertical)
-Text $g 'Little Big Racing' 'Impact' 58 ([System.Drawing.FontStyle]::Regular) 320 38 $gold (C 200 30 30 110) 0.18
+Flag $g 20 10 70 46 6 4 4 0.0
+Flag $g 550 10 70 46 6 4 4 3.1
+$gold = New-Object System.Drawing.Drawing2D.LinearGradientBrush (New-Object System.Drawing.Rectangle 0, 4, 640, 50), (C 255 236 120), (C 240 128 20), ([System.Drawing.Drawing2D.LinearGradientMode]::Vertical)
+# (all of it over the first row of a seven-row menu, which starts at about 70)
+Text $g 'Little Big Racing' 'Impact' 50 ([System.Drawing.FontStyle]::Regular) 320 28 $gold (C 200 30 30 110) 0.18
 $white = New-Object System.Drawing.SolidBrush (C 244 246 252)
-Text $g 'ADVENTURE' 'Impact' 30 ([System.Drawing.FontStyle]::Regular) 320 80 $white (C 20 40 120 140) 0.18
+Text $g 'ADVENTURE' 'Impact' 20 ([System.Drawing.FontStyle]::Regular) 320 58 $white (C 20 40 120 140) 0.18
 $g.Dispose()
 $menu = Join-Path $root 'Game\menu.png'
 $bmp.Save($menu, [System.Drawing.Imaging.ImageFormat]::Png)
