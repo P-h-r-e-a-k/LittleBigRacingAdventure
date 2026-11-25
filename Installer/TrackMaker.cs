@@ -100,7 +100,7 @@ internal sealed class TrackMakerWindow : Window
 
         // the bottom: the name and Save
         var bottom = new DockPanel { Margin = new Thickness(0, 10, 0, 0) };
-        var save = new Button { Content = "Save to my shared tracks", MinWidth = 200, IsDefault = true, Background = UpdateLook.Brush("Ember") };
+        var save = new Button { Content = "Save to my shared tracks", MinWidth = 200, IsDefault = true, Background = UpdateLook.Brush("AccentDark") };
         save.Click += (_, _) => Save();
         var close = new Button { Content = "Close", MinWidth = 90, Margin = new Thickness(10, 0, 0, 0), IsCancel = true };
         DockPanel.SetDock(close, Dock.Right); DockPanel.SetDock(save, Dock.Right);
@@ -338,7 +338,7 @@ internal sealed class TrackMakerWindow : Window
             var (sign, colour) = item.Kind switch
             {
                 TrackPieceSet.CheckKind.Ok => ("✓", Color.FromRgb(0x7C, 0xD9, 0x8A)),
-                TrackPieceSet.CheckKind.Note => ("•", Color.FromRgb(0xBF, 0xAF, 0xCB)),
+                TrackPieceSet.CheckKind.Note => ("•", Color.FromRgb(0xB4, 0xBE, 0xD2)),
                 _ => ("✗", Color.FromRgb(0xFF, 0x70, 0x70)),
             };
             var row = new DockPanel { Margin = new Thickness(0, 1, 0, 1) };

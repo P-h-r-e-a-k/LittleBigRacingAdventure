@@ -1,184 +1,172 @@
 # The game's own pictures, drawn here (nothing of the retail games in them):
 #   Game\menu.png       the main menu's backdrop, 640x480 -- the installer puts it in its copy of SCREEN.HQR (entry 4, the menu picture)
 #                       in LBA2's own palette
-#   Installer\pumpkin.ico  the installer's and the game's icon, a jack-o'-lantern
+#   Installer\lbra.ico  the installer's and the game's icon: a chequered flag on a badge
+# A year-round racing look since 2026-11-25 (the user: "we need to update the menus it's still halloween themed, it all needs updating
+# including the app icon" -- a racing theme with no season, the name Little Big Racing Adventure): an island race road at sunset, a
+# start gantry across it, chequered flags either side of the title. (Until then: a Halloween night, pumpkins, bats, a witch.)
 # Windows PowerShell 5.1: powershell -ExecutionPolicy Bypass -File tools\make_art.ps1
 Add-Type -AssemblyName System.Drawing
 $root = Split-Path -Parent $PSScriptRoot
 New-Item -ItemType Directory -Force (Join-Path $root 'Game') | Out-Null
 
 function C([int]$r, [int]$g, [int]$b, [int]$a = 255) { [System.Drawing.Color]::FromArgb($a, $r, $g, $b) }
+function P([float]$x, [float]$y) { New-Object System.Drawing.PointF $x, $y }
 
-# A jack-o'-lantern, `s` pixels across, its middle at (cx, cy): ribbed orange body, a stalk, glowing eyes, nose and grin.
-function Pumpkin($g, [float]$cx, [float]$cy, [float]$s, [bool]$glow = $true) {
-    $w = $s; $h = $s * 0.82
-    $x0 = $cx - $w / 2; $y0 = $cy - $h / 2
-    if ($glow) {
-        $path = New-Object System.Drawing.Drawing2D.GraphicsPath
-        $path.AddEllipse($cx - $w * 0.9, $cy - $h * 0.9, $w * 1.8, $h * 1.8)
-        $pg = New-Object System.Drawing.Drawing2D.PathGradientBrush $path
-        $pg.CenterColor = C 255 140 20 110
-        $pg.SurroundColors = @(C 255 90 0 0)
-        $g.FillPath($pg, $path)
+# A chequered flag waving: `cols` x `rows` squares over (x, y) .. (x + w, y + h), its edges rising and falling along a wave of `amp`
+# pixels (`phase` where along it starts), each square a quad on the wave, black and white, a darker band where the cloth folds away.
+function Flag($g, [float]$x, [float]$y, [float]$w, [float]$h, [int]$cols, [int]$rows, [float]$amp, [float]$phase) {
+    for ($i = 0; $i -lt $cols; $i++) {
+        $u0 = $i / $cols; $u1 = ($i + 1) / $cols
+        $d0 = $amp * [Math]::Sin($phase + $u0 * 2 * [Math]::PI); $d1 = $amp * [Math]::Sin($phase + $u1 * 2 * [Math]::PI)
+        # (the fold's shade: the cloth turned away where the wave goes down)
+        $slope = [Math]::Cos($phase + ($u0 + $u1) / 2 * 2 * [Math]::PI)
+        for ($j = 0; $j -lt $rows; $j++) {
+            $v0 = $j / $rows; $v1 = ($j + 1) / $rows
+            $dark = (($i + $j) % 2) -eq 0
+            $lite = [int](225 + 30 * $slope); if ($lite -gt 255) { $lite = 255 }
+            $shadeDark = [int](22 + 14 * $slope)
+            $colour = if ($dark) { C $shadeDark $shadeDark ($shadeDark + 6) } else { C $lite $lite $lite }
+            $pts = @((P ($x + $u0 * $w) ($y + $v0 * $h + $d0)), (P ($x + $u1 * $w) ($y + $v0 * $h + $d1)), (P ($x + $u1 * $w) ($y + $v1 * $h + $d1)), (P ($x + $u0 * $w) ($y + $v1 * $h + $d0)))
+            $g.FillPolygon((New-Object System.Drawing.SolidBrush $colour), [System.Drawing.PointF[]]$pts)
+        }
     }
-    # the ribs: overlapping ellipses, darker to the sides
-    $ribs = @(@(0.0, 0.62, 0), @(-0.26, 0.56, 1), @(0.26, 0.56, 1), @(-0.12, 0.66, 2), @(0.12, 0.66, 2))
-    foreach ($r in $ribs) {
-        $rw = $w * $r[1]; $rx = $cx + $w * $r[0] - $rw / 2
-        $shade = @(@(214, 96, 14), @(196, 82, 10), @(240, 122, 24))[$r[2]]
-        $br = New-Object System.Drawing.Drawing2D.LinearGradientBrush (New-Object System.Drawing.RectangleF $rx, $y0, $rw, $h), (C $shade[0] $shade[1] $shade[2]), (C ([int]($shade[0] * 0.55)) ([int]($shade[1] * 0.45)) 6), ([System.Drawing.Drawing2D.LinearGradientMode]::Vertical)
-        $g.FillEllipse($br, $rx, $y0, $rw, $h)
+    $edge = New-Object System.Drawing.Pen (C 10 10 16), ([Math]::Max(1, $h / 40))
+    $top = @(); $bottom = @()
+    for ($k = 0; $k -le $cols * 2; $k++) {
+        $u = $k / ($cols * 2); $d = $amp * [Math]::Sin($phase + $u * 2 * [Math]::PI)
+        $top += , (P ($x + $u * $w) ($y + $d)); $bottom += , (P ($x + $u * $w) ($y + $h + $d))
     }
-    $pen = New-Object System.Drawing.Pen (C 120 44 4), ([Math]::Max(1, $s / 60))
-    foreach ($r in $ribs) { $rw = $w * $r[1]; $g.DrawEllipse($pen, $cx + $w * $r[0] - $rw / 2, $y0, $rw, $h) }
-    # the stalk
-    $st = New-Object System.Drawing.SolidBrush (C 70 92 30)
-    $g.FillRectangle($st, $cx - $s * 0.05, $y0 - $s * 0.12, $s * 0.1, $s * 0.17)
-    # the face: glowing yellow
-    $face = New-Object System.Drawing.SolidBrush (C 255 226 90)
-    $eyeY = $cy - $h * 0.14
-    foreach ($side in @(-1, 1)) {
-        $ex = $cx + $side * $w * 0.2
-        $pts = @((New-Object System.Drawing.PointF ($ex - $w * 0.1), ($eyeY + $h * 0.08)), (New-Object System.Drawing.PointF ($ex + $w * 0.1), ($eyeY + $h * 0.08)), (New-Object System.Drawing.PointF ($ex + $side * $w * 0.03), ($eyeY - $h * 0.1)))
-        $g.FillPolygon($face, $pts)
-    }
-    $pts = @((New-Object System.Drawing.PointF ($cx - $w * 0.05), ($cy + $h * 0.06)), (New-Object System.Drawing.PointF ($cx + $w * 0.05), ($cy + $h * 0.06)), (New-Object System.Drawing.PointF $cx, ($cy - $h * 0.03)))
-    $g.FillPolygon($face, $pts)
-    $mouth = New-Object System.Drawing.Drawing2D.GraphicsPath
-    $my = $cy + $h * 0.16
-    $mouth.AddLines(@(
-        (New-Object System.Drawing.PointF ($cx - $w * 0.3), ($my - $h * 0.04)),
-        (New-Object System.Drawing.PointF ($cx - $w * 0.18), ($my + $h * 0.02)),
-        (New-Object System.Drawing.PointF ($cx - $w * 0.12), ($my - $h * 0.03)),
-        (New-Object System.Drawing.PointF ($cx - $w * 0.04), ($my + $h * 0.04)),
-        (New-Object System.Drawing.PointF ($cx + $w * 0.04), ($my - $h * 0.03)),
-        (New-Object System.Drawing.PointF ($cx + $w * 0.12), ($my + $h * 0.04)),
-        (New-Object System.Drawing.PointF ($cx + $w * 0.18), ($my - $h * 0.02)),
-        (New-Object System.Drawing.PointF ($cx + $w * 0.3), ($my - $h * 0.04)),
-        (New-Object System.Drawing.PointF ($cx + $w * 0.22), ($my + $h * 0.14)),
-        (New-Object System.Drawing.PointF ($cx - $w * 0.22), ($my + $h * 0.14))))
-    $mouth.CloseFigure()
-    $g.FillPath($face, $mouth)
+    $g.DrawLines($edge, [System.Drawing.PointF[]]$top); $g.DrawLines($edge, [System.Drawing.PointF[]]$bottom)
 }
 
-function Bat($g, [float]$x, [float]$y, [float]$s) {
-    $b = New-Object System.Drawing.SolidBrush (C 8 4 12)
-    $p = New-Object System.Drawing.Drawing2D.GraphicsPath
-    $p.AddLines(@(
-        (New-Object System.Drawing.PointF $x, ($y - $s * 0.1)),
-        (New-Object System.Drawing.PointF ($x + $s * 0.25), ($y - $s * 0.35)),
-        (New-Object System.Drawing.PointF ($x + $s * 0.55), ($y - $s * 0.3)),
-        (New-Object System.Drawing.PointF ($x + $s), ($y - $s * 0.45)),
-        (New-Object System.Drawing.PointF ($x + $s * 0.8), ($y - $s * 0.05)),
-        (New-Object System.Drawing.PointF ($x + $s * 0.62), ($y + $s * 0.02)),
-        (New-Object System.Drawing.PointF ($x + $s * 0.45), ($y + $s * 0.15)),
-        (New-Object System.Drawing.PointF ($x + $s * 0.3), ($y + $s * 0.02)),
-        (New-Object System.Drawing.PointF $x, ($y + $s * 0.12)),
-        (New-Object System.Drawing.PointF ($x - $s * 0.3), ($y + $s * 0.02)),
-        (New-Object System.Drawing.PointF ($x - $s * 0.45), ($y + $s * 0.15)),
-        (New-Object System.Drawing.PointF ($x - $s * 0.62), ($y + $s * 0.02)),
-        (New-Object System.Drawing.PointF ($x - $s * 0.8), ($y - $s * 0.05)),
-        (New-Object System.Drawing.PointF ($x - $s), ($y - $s * 0.45)),
-        (New-Object System.Drawing.PointF ($x - $s * 0.55), ($y - $s * 0.3)),
-        (New-Object System.Drawing.PointF ($x - $s * 0.25), ($y - $s * 0.35))))
-    $p.CloseFigure()
-    $g.FillPath($b, $p)
-}
-
-function Text($g, [string]$text, [string]$font, [float]$size, [System.Drawing.FontStyle]$style, [float]$cy, $fill, $glow) {
+function Text($g, [string]$text, [string]$font, [float]$size, [System.Drawing.FontStyle]$style, [float]$cx, [float]$cy, $fill, $glow, [float]$slant = 0) {
     $ff = New-Object System.Drawing.FontFamily $font
     $path = New-Object System.Drawing.Drawing2D.GraphicsPath
     $sf = New-Object System.Drawing.StringFormat
     $sf.Alignment = [System.Drawing.StringAlignment]::Center
     $sf.LineAlignment = [System.Drawing.StringAlignment]::Center
-    $path.AddString($text, $ff, [int]$style, $size, (New-Object System.Drawing.PointF 320, $cy), $sf)
-    foreach ($k in 7, 5, 3) { $pen = New-Object System.Drawing.Pen $glow, $k; $pen.LineJoin = 'Round'; $g.DrawPath($pen, $path) }
-    $edge = New-Object System.Drawing.Pen (C 20 6 2), 2.5
+    $path.AddString($text, $ff, [int]$style, $size, (P $cx $cy), $sf)
+    if ($slant -ne 0) {
+        # (leaning forward, as racing lettering does: x moved along by how high the point is over the line's middle)
+        $m = New-Object System.Drawing.Drawing2D.Matrix 1, 0, (-$slant), 1, ($slant * $cy), 0
+        $path.Transform($m)
+    }
+    foreach ($k in 9, 6, 3) { $pen = New-Object System.Drawing.Pen $glow, $k; $pen.LineJoin = 'Round'; $g.DrawPath($pen, $path) }
+    $edge = New-Object System.Drawing.Pen (C 12 10 20), 2.5
+    $edge.LineJoin = 'Round'
     $g.DrawPath($edge, $path)
     $g.FillPath($fill, $path)
 }
+
+function Poly($g, $brush, [object[]]$pts) { $g.FillPolygon($brush, [System.Drawing.PointF[]]$pts) }
 
 # ---- the menu's backdrop ----------------------------------------------------------------------------------------------------------
 $bmp = New-Object System.Drawing.Bitmap 640, 480
 $g = [System.Drawing.Graphics]::FromImage($bmp)
 $g.SmoothingMode = 'AntiAlias'
 $g.TextRenderingHint = 'AntiAlias'
-# the night: deep purple overhead to a dusky orange-brown over the hills
-$sky = New-Object System.Drawing.Drawing2D.LinearGradientBrush (New-Object System.Drawing.Rectangle 0, 0, 640, 480), (C 22 8 40), (C 90 36 26), ([System.Drawing.Drawing2D.LinearGradientMode]::Vertical)
-$blend = New-Object System.Drawing.Drawing2D.ColorBlend 4
-$blend.Colors = @((C 18 6 34), (C 44 14 66), (C 86 30 74), (C 120 52 30))
-$blend.Positions = @(0.0, 0.45, 0.75, 1.0)
+$horizon = 300
+# the sky at sunset: deep blue overhead, through violet, to gold at the sea
+$sky = New-Object System.Drawing.Drawing2D.LinearGradientBrush (New-Object System.Drawing.Rectangle 0, 0, 640, ($horizon + 1)), (C 12 20 48), (C 250 190 96), ([System.Drawing.Drawing2D.LinearGradientMode]::Vertical)
+$blend = New-Object System.Drawing.Drawing2D.ColorBlend 5
+$blend.Colors = @((C 10 18 46), (C 30 36 86), (C 96 52 110), (C 222 112 70), (C 252 196 104))
+$blend.Positions = @(0.0, 0.38, 0.62, 0.86, 1.0)
 $sky.InterpolationColors = $blend
-$g.FillRectangle($sky, 0, 0, 640, 480)
-# stars
-$rnd = New-Object System.Random 31
-$star = New-Object System.Drawing.SolidBrush (C 230 220 255)
-for ($i = 0; $i -lt 70; $i++) { $sx = $rnd.Next(0, 640); $sy = $rnd.Next(0, 300); $ss = 1 + $rnd.Next(0, 2); $g.FillRectangle($star, $sx, $sy, $ss, $ss) }
-# the moon, with its glow, and a witch on her broom across it
-$mp = New-Object System.Drawing.Drawing2D.GraphicsPath
-$mp.AddEllipse(420, 40, 220, 220)
-$mg = New-Object System.Drawing.Drawing2D.PathGradientBrush $mp
-$mg.CenterColor = C 250 236 190 150
-$mg.SurroundColors = @(C 200 160 220 0)
-$g.FillPath($mg, $mp)
-$g.FillEllipse((New-Object System.Drawing.SolidBrush (C 246 234 196)), 470, 90, 120, 120)
-$g.FillEllipse((New-Object System.Drawing.SolidBrush (C 226 210 168)), 500, 120, 22, 18)
-$g.FillEllipse((New-Object System.Drawing.SolidBrush (C 226 210 168)), 548, 160, 16, 14)
-$g.FillEllipse((New-Object System.Drawing.SolidBrush (C 230 214 172)), 540, 108, 12, 10)
-$black = New-Object System.Drawing.SolidBrush (C 8 4 12)
-# (the witch: a broom, a cloak, a pointed hat)
-$g.FillPolygon($black, @((New-Object System.Drawing.PointF 486, 168), (New-Object System.Drawing.PointF 580, 148), (New-Object System.Drawing.PointF 581, 151), (New-Object System.Drawing.PointF 487, 171)))
-$g.FillPolygon($black, @((New-Object System.Drawing.PointF 572, 142), (New-Object System.Drawing.PointF 600, 132), (New-Object System.Drawing.PointF 604, 150), (New-Object System.Drawing.PointF 580, 156)))
-$g.FillPolygon($black, @((New-Object System.Drawing.PointF 520, 160), (New-Object System.Drawing.PointF 548, 128), (New-Object System.Drawing.PointF 556, 156)))
-$g.FillPolygon($black, @((New-Object System.Drawing.PointF 512, 166), (New-Object System.Drawing.PointF 528, 146), (New-Object System.Drawing.PointF 536, 162)))
-$g.FillEllipse($black, 540, 116, 14, 14)
-$g.FillPolygon($black, @((New-Object System.Drawing.PointF 534, 120), (New-Object System.Drawing.PointF 562, 120), (New-Object System.Drawing.PointF 552, 92)))
-# bats
-foreach ($bat in @(@(90, 150, 22), @(140, 120, 14), @(60, 200, 12), @(400, 70, 12), @(610, 260, 16), @(30, 110, 10), @(250, 190, 9))) { Bat $g $bat[0] $bat[1] $bat[2] }
-# the hills, a temple's stepped silhouette, dead trees and graves
-$hill = New-Object System.Drawing.SolidBrush (C 14 8 18)
-$g.FillPolygon($hill, @((New-Object System.Drawing.PointF 0, 360), (New-Object System.Drawing.PointF 120, 330), (New-Object System.Drawing.PointF 260, 352), (New-Object System.Drawing.PointF 400, 322), (New-Object System.Drawing.PointF 520, 345), (New-Object System.Drawing.PointF 640, 318), (New-Object System.Drawing.PointF 640, 480), (New-Object System.Drawing.PointF 0, 480)))
-for ($k = 0; $k -lt 5; $k++) { $w = 150 - $k * 28; $g.FillRectangle($hill, 250 + (150 - $w) / 2, 330 - $k * 22, $w, 24) }
-$g.FillRectangle($hill, 314, 210, 22, 22)
-$tree = New-Object System.Drawing.Pen (C 14 8 18), 5
-$tree.StartCap = 'Round'; $tree.EndCap = 'Round'
-foreach ($t in @(@(40, 350, 1), @(600, 330, -1))) {
-    $tx = $t[0]; $ty = $t[1]; $d = $t[2]
-    $g.DrawLine($tree, $tx, $ty, $tx + 4 * $d, $ty - 90)
-    $tree.Width = 3
-    $g.DrawLine($tree, $tx + 2 * $d, $ty - 50, $tx + 30 * $d, $ty - 80); $g.DrawLine($tree, $tx + 30 * $d, $ty - 80, $tx + 40 * $d, $ty - 76)
-    $g.DrawLine($tree, $tx + 3 * $d, $ty - 70, $tx - 22 * $d, $ty - 100); $g.DrawLine($tree, $tx + 4 * $d, $ty - 88, $tx + 18 * $d, $ty - 112)
-    $tree.Width = 5
+$g.FillRectangle($sky, 0, 0, 640, ($horizon + 1))
+# a few early stars high up
+$rnd = New-Object System.Random 25
+$star = New-Object System.Drawing.SolidBrush (C 220 226 255 200)
+for ($i = 0; $i -lt 40; $i++) { $sx = $rnd.Next(0, 640); $sy = $rnd.Next(0, 120); $g.FillRectangle($star, $sx, $sy, 1, 1) }
+# long clouds lit from below
+$cloud = New-Object System.Drawing.SolidBrush (C 236 140 110 110)
+foreach ($c in @(@(30, 190, 210, 10), @(380, 172, 240, 9), @(120, 226, 180, 7), @(470, 238, 150, 6), @(250, 206, 120, 6))) { $g.FillEllipse($cloud, $c[0], $c[1], $c[2], $c[3]) }
+# the sun on the sea, its glow
+$sp = New-Object System.Drawing.Drawing2D.GraphicsPath
+$sp.AddEllipse(300, 170, 260, 260)
+$sg = New-Object System.Drawing.Drawing2D.PathGradientBrush $sp
+$sg.CenterColor = C 255 226 140 190
+$sg.SurroundColors = @(C 255 150 80 0)
+$g.FillPath($sg, $sp)
+$g.FillEllipse((New-Object System.Drawing.SolidBrush (C 255 232 150)), 390, 262, 80, 80)
+# the sea, the sun's path on it
+$sea = New-Object System.Drawing.Drawing2D.LinearGradientBrush (New-Object System.Drawing.Rectangle 0, $horizon, 640, 60), (C 60 54 96), (C 16 26 58), ([System.Drawing.Drawing2D.LinearGradientMode]::Vertical)
+$g.FillRectangle($sea, 0, $horizon, 640, 180)
+$glint = New-Object System.Drawing.SolidBrush (C 255 214 130 200)
+for ($k = 0; $k -lt 14; $k++) { $gw = 70 - $k * 4; $g.FillRectangle($glint, [float](430 - $gw / 2 + $rnd.Next(-6, 7)), [float]($horizon + 3 + $k * 4), [float]$gw, [float]1.5) }
+# the islands: far hills either side, a lighthouse on the left one
+$far = New-Object System.Drawing.SolidBrush (C 52 36 70)
+Poly $g $far @((P 0 $horizon), (P 0 262), (P 60 250), (P 130 262), (P 190 276), (P 240 $horizon))
+Poly $g $far @((P 520 $horizon), (P 560 280), (P 610 268), (P 640 272), (P 640 $horizon))
+$near = New-Object System.Drawing.SolidBrush (C 22 18 38)
+Poly $g $near @((P 0 480), (P 0 300), (P 50 288), (P 120 300), (P 200 318), (P 250 340), (P 236 480))
+Poly $g $near @((P 640 480), (P 640 296), (P 590 290), (P 520 306), (P 450 330), (P 404 480))
+$g.FillRectangle($near, 72, 232, 12, 60); Poly $g $near @((P 68 236), (P 88 236), (P 78 224))
+$g.FillEllipse((New-Object System.Drawing.SolidBrush (C 255 230 150 220)), 72, 236, 12, 8)
+# palm trees on the right
+$trunk = New-Object System.Drawing.Pen (C 22 18 38), 4
+foreach ($t in @(@(560, 296, 1), @(600, 292, -1))) {
+    $g.DrawBezier($trunk, (P $t[0] $t[1]), (P ($t[0] + 4 * $t[2]) ($t[1] - 30)), (P ($t[0] - 2 * $t[2]) ($t[1] - 50)), (P ($t[0] + 6 * $t[2]) ($t[1] - 72)))
+    $tx = $t[0] + 6 * $t[2]; $ty = $t[1] - 72
+    foreach ($a in @(-160, -120, -60, -20, 20, 200)) {
+        $r = [Math]::PI * $a / 180
+        Poly $g $near @((P $tx $ty), (P ($tx + 30 * [Math]::Cos($r)) ($ty + 14 * [Math]::Sin($r) + 6)), (P ($tx + 22 * [Math]::Cos($r)) ($ty + 10 * [Math]::Sin($r) + 10)))
+    }
 }
-$grave = New-Object System.Drawing.SolidBrush (C 30 24 40)
-foreach ($gx in 96, 150, 470, 540) { $g.FillRectangle($grave, $gx, 372, 20, 30); $g.FillEllipse($grave, $gx, 362, 20, 22) }
-$g.FillRectangle($grave, 205, 360, 6, 40); $g.FillRectangle($grave, 197, 370, 22, 6)
-$g.FillRectangle($grave, 590, 362, 6, 40); $g.FillRectangle($grave, 582, 372, 22, 6)
-# a ghost, low on the left
-$gp = New-Object System.Drawing.Drawing2D.GraphicsPath
-$gp.AddArc(16, 236, 44, 44, 180, 180)
-$gp.AddLines(@((New-Object System.Drawing.PointF 60, 258), (New-Object System.Drawing.PointF 60, 300), (New-Object System.Drawing.PointF 52, 292), (New-Object System.Drawing.PointF 45, 302), (New-Object System.Drawing.PointF 38, 292), (New-Object System.Drawing.PointF 31, 302), (New-Object System.Drawing.PointF 23, 292), (New-Object System.Drawing.PointF 16, 300), (New-Object System.Drawing.PointF 16, 258)))
-$gp.CloseFigure()
-$g.FillPath((New-Object System.Drawing.SolidBrush (C 226 230 240 220)), $gp)
-$g.FillEllipse($black, 28, 254, 7, 10); $g.FillEllipse($black, 42, 254, 7, 10); $g.FillEllipse($black, 34, 270, 9, 10)
-# the pumpkins along the bottom
-Pumpkin $g 70 440 70
-Pumpkin $g 150 452 46
-Pumpkin $g 570 438 76
-Pumpkin $g 494 454 44
-Pumpkin $g 320 460 40
-# the title, over the top of the screen (the menu's rows start below 95)
-$orange = New-Object System.Drawing.Drawing2D.LinearGradientBrush (New-Object System.Drawing.Rectangle 0, 6, 640, 62), (C 255 214 80), (C 236 92 10), ([System.Drawing.Drawing2D.LinearGradientMode]::Vertical)
-Text $g 'Little Big Halloween' 'Chiller' 66 ([System.Drawing.FontStyle]::Bold) 36 $orange (C 120 30 160 90)
-$lilac = New-Object System.Drawing.SolidBrush (C 222 206 255)
-Text $g 'Racing Adventure' 'Chiller' 38 ([System.Drawing.FontStyle]::Regular) 78 $lilac (C 40 10 60 120)
+# the race road: from the sea's edge in the middle down to the bottom, widening, its kerbs red and white, a dashed line down it
+$road = New-Object System.Drawing.SolidBrush (C 46 44 56)
+$rows = 40
+function RoadAt([double]$t) {
+    # (perspective: the far half small; the road bends left as it comes)
+    $y = $horizon + 12 + (480 - $horizon - 12) * $t * $t
+    $c = 330 - 70 * [Math]::Sin($t * 2.2)
+    $w = 8 + 300 * $t * $t
+    return @($y, $c, $w)
+}
+for ($k = 0; $k -lt $rows; $k++) {
+    $a = RoadAt ($k / $rows); $b = RoadAt (($k + 1) / $rows)
+    $y0 = $a[0]; $c0 = $a[1]; $w0 = $a[2]; $y1 = $b[0]; $c1 = $b[1]; $w1 = $b[2]
+    Poly $g $road @((P ($c0 - $w0) $y0), (P ($c0 + $w0) $y0), (P ($c1 + $w1) $y1), (P ($c1 - $w1) $y1))
+    $kerb = if (($k % 2) -eq 0) { C 214 36 36 } else { C 236 236 236 }
+    $kw0 = $w0 * 0.08 + 1; $kw1 = $w1 * 0.08 + 1
+    $kb = New-Object System.Drawing.SolidBrush $kerb
+    Poly $g $kb @((P ($c0 - $w0 - $kw0) $y0), (P ($c0 - $w0) $y0), (P ($c1 - $w1) $y1), (P ($c1 - $w1 - $kw1) $y1))
+    Poly $g $kb @((P ($c0 + $w0) $y0), (P ($c0 + $w0 + $kw0) $y0), (P ($c1 + $w1 + $kw1) $y1), (P ($c1 + $w1) $y1))
+    if (($k % 3) -eq 1) {
+        $lw0 = $w0 * 0.03 + 0.5; $lw1 = $w1 * 0.03 + 0.5
+        Poly $g (New-Object System.Drawing.SolidBrush (C 236 224 170)) @((P ($c0 - $lw0) $y0), (P ($c0 + $lw0) $y0), (P ($c1 + $lw1) $y1), (P ($c1 - $lw1) $y1))
+    }
+}
+# the start gantry across the road, a little way out: two posts and a chequered banner, lit by the sun from behind
+$ga = RoadAt 0.42
+$gy = $ga[0]; $gc = $ga[1]; $gw = $ga[2] + 14
+$post = New-Object System.Drawing.SolidBrush (C 30 26 40)
+$g.FillRectangle($post, [float]($gc - $gw - 4), [float]($gy - 64), [float]6, [float]66); $g.FillRectangle($post, [float]($gc + $gw - 2), [float]($gy - 64), [float]6, [float]66)
+Flag $g ($gc - $gw) ($gy - 66) (2 * $gw) 14 14 2 1.5 0.3
+# a kart coming down the road at the front: its wheels, its red body with a yellow stripe, its driver's helmet
+$kx = 250; $ky = 452
+$kart = New-Object System.Drawing.SolidBrush (C 196 30 34)
+$tyre = New-Object System.Drawing.SolidBrush (C 14 12 18)
+$g.FillEllipse($tyre, $kx - 58, $ky - 6, 26, 22); $g.FillEllipse($tyre, $kx + 32, $ky - 6, 26, 22)
+Poly $g $kart @((P ($kx - 50) ($ky + 6)), (P ($kx - 40) ($ky - 14)), (P ($kx + 40) ($ky - 14)), (P ($kx + 50) ($ky + 6)), (P ($kx + 30) ($ky + 14)), (P ($kx - 30) ($ky + 14)))
+$g.FillRectangle((New-Object System.Drawing.SolidBrush (C 250 210 60)), $kx - 40, $ky - 6, 80, 4)
+$g.FillEllipse((New-Object System.Drawing.SolidBrush (C 240 240 244)), $kx - 13, $ky - 40, 26, 26)
+$g.FillRectangle((New-Object System.Drawing.SolidBrush (C 30 40 80)), $kx - 10, $ky - 30, 20, 7)
+$g.FillEllipse($tyre, $kx - 66, $ky - 22, 22, 16); $g.FillEllipse($tyre, $kx + 44, $ky - 22, 22, 16)
+# the title, over the top of the screen (the menu's rows start below 95), a chequered flag either side
+Flag $g 18 18 74 52 6 4 5 0.0
+Flag $g 548 18 74 52 6 4 5 3.1
+$gold = New-Object System.Drawing.Drawing2D.LinearGradientBrush (New-Object System.Drawing.Rectangle 0, 8, 640, 58), (C 255 236 120), (C 240 128 20), ([System.Drawing.Drawing2D.LinearGradientMode]::Vertical)
+Text $g 'Little Big Racing' 'Impact' 58 ([System.Drawing.FontStyle]::Regular) 320 38 $gold (C 200 30 30 110) 0.18
+$white = New-Object System.Drawing.SolidBrush (C 244 246 252)
+Text $g 'ADVENTURE' 'Impact' 30 ([System.Drawing.FontStyle]::Regular) 320 80 $white (C 20 40 120 140) 0.18
 $g.Dispose()
 $menu = Join-Path $root 'Game\menu.png'
 $bmp.Save($menu, [System.Drawing.Imaging.ImageFormat]::Png)
 $bmp.Dispose()
 "menu: $menu"
 
-# ---- the icon ---------------------------------------------------------------------------------------------------------------------
+# ---- the icon: a chequered flag on a round badge, deep blue with a red rim ------------------------------------------------------------
 $sizes = 256, 64, 48, 32, 16
 $pngs = @()
 foreach ($s in $sizes) {
@@ -186,11 +174,26 @@ foreach ($s in $sizes) {
     $gi = [System.Drawing.Graphics]::FromImage($b)
     $gi.SmoothingMode = 'AntiAlias'
     $gi.Clear([System.Drawing.Color]::Transparent)
-    Pumpkin $gi ($s / 2) ($s * 0.56) ($s * 0.92) $false
+    $rim = [Math]::Max(1.5, $s * 0.07)
+    $gi.FillEllipse((New-Object System.Drawing.SolidBrush (C 206 30 34)), [float]0.5, [float]0.5, [float]($s - 1), [float]($s - 1))
+    $inner = New-Object System.Drawing.Drawing2D.LinearGradientBrush (New-Object System.Drawing.RectangleF 0, 0, $s, $s), (C 40 64 140), (C 12 20 52), ([System.Drawing.Drawing2D.LinearGradientMode]::Vertical)
+    $gi.FillEllipse($inner, [float]$rim, [float]$rim, [float]($s - 2 * $rim), [float]($s - 2 * $rim))
+    # (fewer squares at the small sizes: they stay squares)
+    $cols = if ($s -ge 48) { 5 } else { 4 }; $rows = if ($s -ge 48) { 4 } else { 3 }
+    $fw = $s * 0.58; $fh = $s * 0.4
+    $fx = $s * 0.27; $fy = $s * 0.24
+    # the pole, then the flag off its top
+    $pole = New-Object System.Drawing.SolidBrush (C 236 220 160)
+    $pw = [Math]::Max(1, $s * 0.05)
+    $gi.FillRectangle($pole, [float]($fx - $pw), [float]($fy - $s * 0.02), [float]$pw, [float]($s * 0.62))
+    Flag $gi $fx $fy $fw $fh $cols $rows ([Math]::Max(0.6, $s * 0.035)) 0.4
     $gi.Dispose()
     $ms = New-Object System.IO.MemoryStream
     $b.Save($ms, [System.Drawing.Imaging.ImageFormat]::Png)
     $pngs += , $ms.ToArray()
+    if ($s -eq 256) { $b.Save('E:\dump\TEMP\nov25\theme\icon_256.png', [System.Drawing.Imaging.ImageFormat]::Png) }
+    if ($s -eq 32) { $b.Save('E:\dump\TEMP\nov25\theme\icon_32.png', [System.Drawing.Imaging.ImageFormat]::Png) }
+    if ($s -eq 16) { $b.Save('E:\dump\TEMP\nov25\theme\icon_16.png', [System.Drawing.Imaging.ImageFormat]::Png) }
     $b.Dispose()
 }
 $ico = New-Object System.IO.MemoryStream
@@ -206,6 +209,6 @@ for ($i = 0; $i -lt $sizes.Count; $i++) {
 }
 foreach ($p in $pngs) { $wr.Write($p) }
 $wr.Flush()
-$icon = Join-Path $root 'Installer\pumpkin.ico'
+$icon = Join-Path $root 'Installer\lbra.ico'
 [System.IO.File]::WriteAllBytes($icon, $ico.ToArray())
 "icon: $icon"

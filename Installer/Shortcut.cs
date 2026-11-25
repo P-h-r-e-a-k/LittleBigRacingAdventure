@@ -34,6 +34,33 @@ internal static class Shortcut
         finally { Marshal.FinalReleaseComObject(shell); }
     }
 
+    // The desktop's shortcut `from` renamed `to` (the game's name changed: Little Big Halloween Racing Adventure became Little Big Racing
+    // Adventure, 2026-11-25), its description with it -- only one that starts a game in `installDir` (another install's, a test's, left as
+    // it is: a sandbox install renamed the player's own shortcut, 2026-11-25). True: it was. Not when there's one by the new name already.
+    public static bool Rename(string from, string to, string installDir)
+    {
+        var old = Path.Combine(DesktopFolder(), from + ".lnk");
+        var now = Path.Combine(DesktopFolder(), to + ".lnk");
+        if (!File.Exists(old) || File.Exists(now)) return false;
+        var type = Type.GetTypeFromProgID("WScript.Shell") ?? throw new InvalidOperationException("Windows Script Host isn't there.");
+        dynamic shell = Activator.CreateInstance(type)!;
+        try
+        {
+            dynamic link = shell.CreateShortcut(old);
+            var target = (string)link.TargetPath;
+            Marshal.FinalReleaseComObject(link);
+            var dir = Path.TrimEndingDirectorySeparator(Path.GetFullPath(installDir)) + Path.DirectorySeparatorChar;
+            if (string.IsNullOrEmpty(target) || !Path.GetFullPath(target).StartsWith(dir, StringComparison.OrdinalIgnoreCase)) return false;
+            File.Move(old, now);
+            link = shell.CreateShortcut(now);
+            link.Description = to;
+            link.Save();
+            Marshal.FinalReleaseComObject(link);
+        }
+        finally { Marshal.FinalReleaseComObject(shell); }
+        return true;
+    }
+
     public static void Desktop(string target, string name, string? icon = null)
     {
         var path = Path.Combine(DesktopFolder(), name + ".lnk");

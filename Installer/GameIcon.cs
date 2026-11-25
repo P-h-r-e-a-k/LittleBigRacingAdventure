@@ -4,10 +4,10 @@ using System.Text;
 
 namespace LBRAInstaller;
 
-// The game's exe given the game's own icon, the pumpkin, in place of the engine's (the user, 2026-10-24: "LBRA in windowed mode displays
+// The game's exe given the game's own icon (lbra.ico, a chequered flag; a pumpkin until 2026-11-25) in place of the engine's (the user, 2026-10-24: "LBRA in windowed mode displays
 // the icon of the engine, let's use our current LBRA icon instead"). The engine's window takes its icon from the exe's first icon group
 // (SDL: ExtractIconEx of the program's own file), and so do the taskbar and Explorer: the exe's icons are replaced -- its icon groups
-// and their images taken out, the pumpkin.ico's images put in as group 1 -- with Windows' own resource update.
+// and their images taken out, the .ico's images put in as group 1 -- with Windows' own resource update.
 internal static class GameIcon
 {
     private const int RtIcon = 3, RtGroupIcon = 14;

@@ -1,8 +1,8 @@
 <Window x:Class="LBRAInstaller.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Little Big Halloween Racing Adventure - Setup" Width="760" Height="480" MinWidth="620" MinHeight="470"
-        WindowStartupLocation="CenterScreen" Background="#14101A" Foreground="#F2E6D8" FontFamily="Segoe UI" FontSize="13">
+        Title="Little Big Racing Adventure - Setup" Width="760" Height="480" MinWidth="620" MinHeight="470"
+        WindowStartupLocation="CenterScreen" Background="#0E1424" Foreground="#EEF1F7" FontFamily="Segoe UI" FontSize="13">
     <Grid Margin="22,16,22,18">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -12,16 +12,16 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0">
-            <!-- The title on one line, one height: Halloween alone orange and italic, glowing -->
+            <!-- The title on one line, one height: Racing alone gold and italic, glowing -->
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Little Big " FontSize="28" FontWeight="Black" Foreground="#C9B8E8"/>
-                <TextBlock Text="Halloween" FontSize="28" FontWeight="Black" FontStyle="Italic" Foreground="{StaticResource Pumpkin}">
-                    <TextBlock.Effect><DropShadowEffect Color="#FF4A00" BlurRadius="18" ShadowDepth="0" Opacity="0.7"/></TextBlock.Effect>
+                <TextBlock Text="Little Big " FontSize="28" FontWeight="Black" Foreground="#C8D2E6"/>
+                <TextBlock Text="Racing" FontSize="28" FontWeight="Black" FontStyle="Italic" Foreground="{StaticResource Gold}">
+                    <TextBlock.Effect><DropShadowEffect Color="#FF5A1A" BlurRadius="18" ShadowDepth="0" Opacity="0.7"/></TextBlock.Effect>
                 </TextBlock>
-                <TextBlock Text=" Racing Adventure" FontSize="28" FontWeight="Black" Foreground="#C9B8E8"/>
+                <TextBlock Text=" Adventure" FontSize="28" FontWeight="Black" Foreground="#C8D2E6"/>
             </StackPanel>
-            <TextBlock TextWrapping="Wrap" Margin="0,6,0,0" Foreground="#BFAFCB">
-                A Halloween special: a race through LBA1's Temple of Bú, ported to LBA2's engine. The game is made from your own copies of
+            <TextBlock TextWrapping="Wrap" Margin="0,6,0,0" Foreground="#B4BED2">
+                Kart races and a story across the islands of Little Big Adventure 2, on LBA2's engine. The game is made from your own copies of
                 Little Big Adventure and Little Big Adventure 2: choose their folders and a folder to install into. Their files are copied,
                 never changed.
             </TextBlock>
@@ -48,13 +48,13 @@
             <Button Grid.Row="2" Grid.Column="2" Content="Browse…" Margin="8,4,0,4" Click="Browse_Click" Tag="TargetBox"/>
         </Grid>
         <StackPanel Grid.Row="2" Margin="0,12,0,8">
-            <CheckBox x:Name="ShortcutBox" Content="Put a shortcut on the desktop" IsChecked="True" Foreground="#F2E6D8"/>
-            <ProgressBar x:Name="Progress" Height="10" Margin="0,10,0,0" Minimum="0" Maximum="1" Foreground="{StaticResource Pumpkin}" Background="{StaticResource Panel}" BorderBrush="{StaticResource Edge}"/>
-            <TextBlock x:Name="Status" Margin="0,6,0,0" Foreground="#BFAFCB" TextTrimming="CharacterEllipsis"/>
+            <CheckBox x:Name="ShortcutBox" Content="Put a shortcut on the desktop" IsChecked="True" Foreground="#EEF1F7"/>
+            <ProgressBar x:Name="Progress" Height="10" Margin="0,10,0,0" Minimum="0" Maximum="1" Foreground="{StaticResource Accent}" Background="{StaticResource Panel}" BorderBrush="{StaticResource Edge}"/>
+            <TextBlock x:Name="Status" Margin="0,6,0,0" Foreground="#B4BED2" TextTrimming="CharacterEllipsis"/>
         </StackPanel>
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
             <Button x:Name="PlayButton" Content="Play" Margin="0,0,10,0" Click="Play_Click" IsEnabled="False"/>
-            <Button x:Name="InstallButton" Content="Install" Click="Install_Click" Background="{StaticResource Ember}"/>
+            <Button x:Name="InstallButton" Content="Install" Click="Install_Click" Background="{StaticResource AccentDark}"/>
             <Button Content="Close" Margin="10,0,0,0" Click="Close_Click"/>
         </StackPanel>
     </Grid>

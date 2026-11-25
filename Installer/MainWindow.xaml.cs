@@ -93,7 +93,7 @@ public partial class MainWindow : Window
             try { await Task.Run(() => GameInstall.Run(lba1, lba2, target, Report, Log, source, music, music2)); }
             finally { try { Directory.CreateDirectory(target); File.WriteAllLines(Path.Combine(target, "setup.log"), lines); } catch (Exception error) when (error is IOException or UnauthorizedAccessException) { } }
             if (shortcut) { try { Shortcut.Desktop(Path.Combine(target, GameInstall.GameExe), GameInstall.Title, Path.Combine(target, GameInstall.IconFile)); Log("a shortcut on the desktop"); } catch (Exception error) { Log("no shortcut: " + error.Message); } }
-            Status.Text = "Installed. Happy Halloween!";
+            Status.Text = "Installed. Ready, steady, go!";
             PlayButton.IsEnabled = true;
             // (installed: Install stays greyed -- a second press installed it all again; a failed install can be tried again)
             installed = true;

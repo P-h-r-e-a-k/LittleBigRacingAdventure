@@ -202,11 +202,11 @@ internal sealed class ShareWindow : Window
             Text = $"Your {count} ghost(s) -- your best lap of each track -- go into one zip file to send to a friend. They are shown under your name.",
             TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 14, 0, 0),
         });
-        root.Children.Add(new TextBlock { Text = "Your name", Margin = new Thickness(0, 12, 0, 4), Foreground = new SolidColorBrush(Color.FromRgb(0xBF, 0xAF, 0xCB)) });
+        root.Children.Add(new TextBlock { Text = "Your name", Margin = new Thickness(0, 12, 0, 4), Foreground = new SolidColorBrush(Color.FromRgb(0xB4, 0xBE, 0xD2)) });
         _name = new TextBox { Text = name, MaxLength = 24, Padding = new Thickness(4) };
         root.Children.Add(_name);
         var buttons = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right, Margin = new Thickness(0, 18, 0, 0) };
-        var ok = new Button { Content = "Save the zip...", Background = UpdateLook.Brush("Ember"), IsDefault = true, MinWidth = 120 };
+        var ok = new Button { Content = "Save the zip...", Background = UpdateLook.Brush("AccentDark"), IsDefault = true, MinWidth = 120 };
         ok.Click += (_, _) => { if (PlayerName.Length > 0) DialogResult = true; else _name.Focus(); };
         var cancel = new Button { Content = "Cancel", Margin = new Thickness(10, 0, 0, 0), IsCancel = true, MinWidth = 90 };
         buttons.Children.Add(ok);

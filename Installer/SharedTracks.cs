@@ -200,7 +200,7 @@ internal sealed class SharedTracksWindow : Window
 {
     private readonly string installDir;
     private readonly ListBox list = new() { Height = 190, Margin = new Thickness(0, 10, 0, 0) };
-    private readonly TextBlock said = new() { TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 8, 0, 0), Foreground = new SolidColorBrush(Color.FromRgb(0xBF, 0xAF, 0xCB)) };
+    private readonly TextBlock said = new() { TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 8, 0, 0), Foreground = new SolidColorBrush(Color.FromRgb(0xB4, 0xBE, 0xD2)) };
     private readonly Button build = new() { Content = "Build them into the game", MinWidth = 180, IsDefault = true, IsEnabled = false };
     private readonly Button remove = new() { Content = "Take out", MinWidth = 90, Margin = new Thickness(10, 0, 0, 0), IsEnabled = false };
     private bool changed;
@@ -225,11 +225,11 @@ internal sealed class SharedTracksWindow : Window
         root.Children.Add(list);
         root.Children.Add(said);
         var row = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 12, 0, 0) };
-        var add = new Button { Content = "Add a track file...", MinWidth = 140, Background = UpdateLook.Brush("Ember") };
+        var add = new Button { Content = "Add a track file...", MinWidth = 140, Background = UpdateLook.Brush("AccentDark") };
         add.Click += (_, _) => Add();
         remove.Click += (_, _) => Remove();
         // (a track of your own, made here: the user, 2026-11-04 -- no LBA Assembler needed)
-        var make = new Button { Content = "Make a track...", MinWidth = 120, Margin = new Thickness(0, 0, 10, 0), Background = UpdateLook.Brush("Ember") };
+        var make = new Button { Content = "Make a track...", MinWidth = 120, Margin = new Thickness(0, 0, 10, 0), Background = UpdateLook.Brush("AccentDark") };
         make.Click += (_, _) => Make();
         row.Children.Add(make);
         row.Children.Add(add);

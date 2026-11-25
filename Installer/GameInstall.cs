@@ -23,7 +23,10 @@ internal static class GameInstall
     // made before takes the old exe away and moves the desktop shortcut to the new one)
     public const string GameExe = "LBRA.exe";
     public const string OldGameExe = "Little Big Halloween Racing Adventure.exe";
-    public const string Title = "Little Big Halloween Racing Adventure";
+    // (the name since 2026-11-25 -- the user chose "Little Big Racing Adventure" for a year-round look; the Halloween edition's name before,
+    // kept for its desktop shortcut: Updater renames it)
+    public const string Title = "Little Big Racing Adventure";
+    public const string OldTitle = "Little Big Halloween Racing Adventure";
     public const string WindowTitle = "Little Big Racing Adventure";
     public const string MenuFile = "RACEGAME.TXT";
     public const string Lba1Folder = "lba1";
@@ -490,12 +493,12 @@ internal static class GameInstall
         var grid = GridCars(target, log, statue);
         foreach (var line in grid) menu.Append(line).Append('\n');
         File.WriteAllText(Path.Combine(target, MenuFile), menu.ToString(), new UTF8Encoding(false));
-        // the menu's picture: the Halloween backdrop in LBA2's own palette, in the copy's SCREEN.HQR
+        // the menu's picture: the racing backdrop (an island road at sunset) in LBA2's own palette, in the copy's SCREEN.HQR
         MenuPicture(target);
         log("the menu's picture: SCREEN.HQR entry 4");
         using (var engine = typeof(GameInstall).Assembly.GetManifestResourceStream("engine.exe") ?? throw new InvalidDataException("The installer has no engine in it."))
         using (var exe = File.Create(Path.Combine(target, GameExe))) engine.CopyTo(exe);
-        // (the game's own icon in the exe, the pumpkin, in place of the engine's: its window, the taskbar and Explorer show it -- GameIcon)
+        // (the game's own icon in the exe, the chequered flag, in place of the engine's: its window, the taskbar and Explorer show it -- GameIcon)
         using (var ico = typeof(GameInstall).Assembly.GetManifestResourceStream("game/" + IconFile) ?? throw new InvalidDataException("The installer has no icon in it."))
         using (var bytes = new MemoryStream())
         {
@@ -537,7 +540,7 @@ internal static class GameInstall
             s.CopyTo(f);
         }
         var voices = InstallVoices(target, retailText, log);
-        File.WriteAllText(Path.Combine(target, "portable.txt"), "Little Big Halloween Racing Adventure keeps its saves and settings in this folder.\n");
+        File.WriteAllText(Path.Combine(target, "portable.txt"), $"{Title} keeps its saves and settings in this folder.\n");
         // (the race track build's own keepsakes -- the files as they were before it, its .bak copies -- of no use to the game: a reinstall
         // copies LBA2's files in afresh)
         foreach (var kept in Directory.GetFiles(target, "*" + Kept).Concat(Directory.GetFiles(target, "*.bak"))) File.Delete(kept);
@@ -554,7 +557,7 @@ internal static class GameInstall
     // and the engine races those: RACEGAME.CPP SpecialLaps)
     public const int Laps = 3;
     public const int EndToMenuMs = 8000;
-    public const string IconFile = "pumpkin.ico";
+    public const string IconFile = "lbra.ico";
 
     // The race file's own files (the opponents' lines, the line to drive by, the raised road) named from the game's folder, so the folder
     // can move: the engine finds them beside its data (RACEGAME.CPP)

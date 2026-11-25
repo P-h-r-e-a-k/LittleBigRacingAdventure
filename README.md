@@ -1,8 +1,10 @@
-# Little Big Halloween Racing Adventure
+# Little Big Racing Adventure
 
-A Halloween special: a kart race through the Temple of Bù from *Little Big Adventure*, rebuilt as an island in *Little Big Adventure 2*
-and decked out for Halloween (jack-o'-lanterns, graves, witches throwing fire, ghosts and bats), played on LBA Assembler's LBA2 engine
-with a menu of its own in the retail game's style. It comes before the full *Little Big Racing Adventure*.
+Kart races across the islands of *Little Big Adventure 2* -- a track on every island, a story mode that races its way through the game,
+time trials, ghosts and two-player races -- played on LBA Assembler's LBA2 engine with a menu of its own in the retail game's style. It
+began on 2026-10-17 as *Little Big Halloween Racing Adventure*, a Halloween special (a kart race through the Temple of Bù from *Little Big
+Adventure*, rebuilt as an island in LBA2 and decked out for Halloween); that race is still in it, under Specials. Since 2026-11-25 the
+menu, the installer and the icon have a year-round racing look (an island road at sunset, chequered flags), drawn by `tools\make_art.ps1`.
 
 The game is made on the player's machine from their own copies of LBA1 and LBA2: nothing of either game is in this repo or in the
 installer.
@@ -19,7 +21,7 @@ installer.
 3. LBA Assembler's race track build makes every track in the copy: Track select's fifteen (Polar Island and the palace and Island CX
    made as islands of their own) and the Temple of Bù island with its Halloween race.
 4. The game goes in: LBA Assembler's engine as `LBRA.exe`, the race files (`specials\`, `tracks\`), the menu
-   (`RACEGAME.TXT`), the menu's picture (the Halloween backdrop, written into the copy's `SCREEN.HQR` in LBA2's own palette) and
+   (`RACEGAME.TXT`), the menu's picture (the racing backdrop, written into the copy's `SCREEN.HQR` in LBA2's own palette) and
    `portable.txt`, so saves, settings and best times stay in the install folder (`User\LBA2\`).
 5. The updater: the setup copies itself to `Update\LBRA-Setup.exe` and writes `Update\install.json` (the LBA1 and LBA2 folders it
    installed from, when, and which file of the site it was, if known).
@@ -51,7 +53,7 @@ The game updates from the newest release on GitHub, <https://github.com/P-h-r-e-
   setup's version is its build's date and time, `build.ps1`). Anything else is deleted and never run; a file refused for what it is
   isn't downloaded again. The same build as the installed one is only recorded.
 - **Installing**: only once the game is closed. Automatic: `LBRA-Setup.new.exe --update "<folder>"` runs; Ask first: "A new version of
-  Little Big Halloween Racing Adventure is ready. Install it now?" -- **Install**, or **Later** (the download kept for the next check).
+  Little Big Racing Adventure is ready. Install it now?" -- **Install**, or **Later** (the download kept for the next check).
   `--update` reinstalls into the same folder from the stored LBA1 and LBA2 folders with a small progress window, keeps `User\` (saves,
   settings, best laps), becomes `Update\LBRA-Setup.exe`, records the file it came from and starts `LBRA.exe` again. If the stored folders
   are gone it says so and opens the setup window, filled in.
@@ -300,7 +302,7 @@ The LBA Assembler repo must be beside this one (`..\LBAAssembler`): the installe
 
 ```
 powershell -ExecutionPolicy Bypass -File build.ps1          # engine, pictures if missing, installer -> out\LBRA-Setup.exe (version: now)
-powershell -ExecutionPolicy Bypass -File tools\make_art.ps1 # redraw Game\menu.png and Installer\pumpkin.ico
+powershell -ExecutionPolicy Bypass -File tools\make_art.ps1 # redraw Game\menu.png and Installer\lbra.ico
 ```
 
 It needs MSYS2's UCRT64 toolchain (`C:\msys64`) for the engine and the .NET 10 SDK.

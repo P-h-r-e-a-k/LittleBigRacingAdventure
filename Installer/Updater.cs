@@ -150,6 +150,8 @@ internal static class Updater
         };
         Save(installDir, info);
         log($"updates: {Path.Combine(dir, InfoFile)} written (source: {source?.ToString() ?? "not known"})");
+        try { if (Shortcut.Rename(GameInstall.OldTitle, GameInstall.Title, installDir)) log($"the desktop shortcut renamed {GameInstall.Title}"); }
+        catch (Exception e) { log("the desktop shortcut not renamed: " + e.Message); }
         try { if (Shortcut.Repoint(Path.Combine(installDir, GameInstall.OldGameExe), Path.Combine(installDir, GameInstall.GameExe), GameInstall.Title)) log($"the desktop shortcut now starts {GameInstall.GameExe}"); }
         catch (Exception e) { log("the desktop shortcut not changed: " + e.Message); }
     }

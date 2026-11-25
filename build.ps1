@@ -1,4 +1,4 @@
-# Builds the Little Big Halloween Racing Adventure installer: out\LBRA-Setup.exe, one self-contained file (no .NET needed to run it).
+# Builds the Little Big Racing Adventure installer: out\LBRA-Setup.exe, one self-contained file (no .NET needed to run it).
 #   1. LBA Assembler's engine (lba2cc.exe, statically linked), from the LBA Assembler repo beside this one -- the installer carries it in;
 #   2. the game's pictures, if they aren't drawn yet (tools\make_art.ps1);
 #   3. the new lines' voices, packed into out\voices.zip (tools\pack_voices.py) when -VoiceLines is given, else the one there as it is;
@@ -26,7 +26,7 @@ if (-not $SkipEngine) {
     } finally { Pop-Location }
 }
 
-if (-not (Test-Path (Join-Path $root 'Game\menu.png')) -or -not (Test-Path (Join-Path $root 'Installer\pumpkin.ico'))) {
+if (-not (Test-Path (Join-Path $root 'Game\menu.png')) -or -not (Test-Path (Join-Path $root 'Installer\lbra.ico'))) {
     powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'tools\make_art.ps1')
 }
 

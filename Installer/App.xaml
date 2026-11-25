@@ -4,14 +4,15 @@
              ShutdownMode="OnMainWindowClose">
     <!-- the setup's look: its window's, and the updater's small windows' (UpdateWindows.cs) -->
     <Application.Resources>
-        <SolidColorBrush x:Key="Pumpkin" Color="#F07A12"/>
-        <SolidColorBrush x:Key="Ember" Color="#9C3D0A"/>
-        <SolidColorBrush x:Key="Panel" Color="#211A2B"/>
-        <SolidColorBrush x:Key="Edge" Color="#3D2F52"/>
+        <SolidColorBrush x:Key="Accent" Color="#E8342C"/>
+        <SolidColorBrush x:Key="AccentDark" Color="#A3201B"/>
+        <SolidColorBrush x:Key="Gold" Color="#FFC23A"/>
+        <SolidColorBrush x:Key="Panel" Color="#172036"/>
+        <SolidColorBrush x:Key="Edge" Color="#2E3D5C"/>
         <Style TargetType="Button">
             <Setter Property="Background" Value="{StaticResource Panel}"/>
-            <Setter Property="Foreground" Value="#F2E6D8"/>
-            <Setter Property="BorderBrush" Value="{StaticResource Pumpkin}"/>
+            <Setter Property="Foreground" Value="#EEF1F7"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Accent}"/>
             <Setter Property="Padding" Value="14,5"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
@@ -21,7 +22,7 @@
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="b" Property="Background" Value="#3A2412"/></Trigger>
+                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="b" Property="Background" Value="#2A3550"/></Trigger>
                             <Trigger Property="IsEnabled" Value="False"><Setter TargetName="b" Property="Opacity" Value="0.4"/></Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -30,9 +31,9 @@
         </Style>
         <Style TargetType="TextBox">
             <Setter Property="Background" Value="{StaticResource Panel}"/>
-            <Setter Property="Foreground" Value="#F2E6D8"/>
+            <Setter Property="Foreground" Value="#EEF1F7"/>
             <Setter Property="BorderBrush" Value="{StaticResource Edge}"/>
-            <Setter Property="CaretBrush" Value="{StaticResource Pumpkin}"/>
+            <Setter Property="CaretBrush" Value="{StaticResource Accent}"/>
             <Setter Property="Padding" Value="4,3"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
