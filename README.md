@@ -43,7 +43,7 @@ The game updates from the newest release on GitHub, <https://github.com/P-h-r-e-
 
 - **When**: the game, at its start (never in LBA Assembler's Play, any run with the engine's command harness, or player 2's game), starts
   `Update\LBRA-Setup.exe --check-update "<folder>" --wait-pid <the game>` hidden, and plays on: it doesn't wait for the check. Options >
-  **Camera, window, updates** > **Updates**: **Check for updates: On launch / Weekly / Manually** (`update_check=launch|weekly|manual`, on
+  **Window and updates** > **Updates**: **Check for updates: On launch / Weekly / Manually** (`update_check=launch|weekly|manual`, on
   launch by default; a game with the old `updates=off` becomes Manually), **New versions: Automatic / Ask first** (`updates=auto|ask`), and
   **Check for updates now**; under them what the last check said (`Update\status.txt`).
 - **The check** (no window): a HEAD request over HTTPS; a new version is an ETag other than the one installed from -- or, for an install
@@ -64,13 +64,13 @@ The game updates from the newest release on GitHub, <https://github.com/P-h-r-e-
 
 ## The game
 
-The main menu: **Story Mode** (greyed until the full game), **Racing**, the game's own **Options** (with **Race controls, power-ups** and
-**Camera, window, updates** at the end), **Feedback**, **Quit**. **Racing** holds **Track select**, **Specials**, **Multiplayer**, **Best laps** and **Shared tracks**.
+The main menu: **Story Mode** (greyed until the full game), **Racing**, the game's own **Options** (with **Camera**, **Race controls,
+power-ups**, **Window and updates** and **Feedback** at the end), **Quit**. **Racing** holds **Track select**, **Specials**, **Multiplayer**, **Best laps** and **Shared tracks**.
 **Esc** in a race or time trial opens the pause menu instead: **Resume Game**, **Restart**, **Change car**, **Change track** and **Main menu** (Esc goes back, and Esc there resumes). Online and in the story, Esc opens the main menu with **Resume Game** at the top.
-**Feedback** holds **Report bug**, which takes a short description (up to 120 characters) and puts it on this project's public GitHub page with the game's logs, with names, folders and addresses removed first, and **Request feature**, which does the same with your idea and sends no logs.
+**Feedback** (in Options) holds **Report bug**, which takes a short description (up to 120 characters) and puts it on this project's public GitHub page with the game's logs, with names, folders and addresses removed first, and **Request feature**, which does the same with your idea and sends no logs.
 **Quit** asks first, "Quit the game?": **No** (the row it opens on, or **Esc**) goes back, **Yes** leaves. The window's X closes the game straight away.
 
-- **Bug reports:** if the game stops unexpectedly or an update fails, it asks once whether to send reports, then does as you said. A report is an issue on this project's public GitHub page with the game's log in it, with names, folders and addresses removed first. Options, Camera, window, updates, Bug reports turns them on or off, and sends one yourself.
+- **Bug reports:** if the game stops unexpectedly or an update fails, it asks once whether to send reports, then does as you said. A report is an issue on this project's public GitHub page with the game's log in it, with names, folders and addresses removed first. Options, Window and updates, Bug reports turns them on or off, and sends one yourself.
 - **Multiplayer:** race other people, one of you hosting. Host a race and Join a race look for a new version first, and offer to update and start again, so everyone is on the same one. **Host a race** takes a password if you want one (Enter for none) and a port (UDP 21997 unless you change it), asks your router to open that port and
   shows the address to give your friends. If the router says no, forward the port by hand, or type one it already sends to this PC; the lobby still shows your address. A PC with its own IPv6 address on the internet shows that too. **Join a race** takes either address, typed or pasted with
   Ctrl+V, and asks for the password if there is one. Everyone meets in the host's lobby, where the host sets the laps and whether there's a qualifying lap. When the host presses
@@ -79,7 +79,9 @@ The main menu: **Story Mode** (greyed until the full game), **Racing**, the game
   Online times don't go in Best laps. Games with the same tracks and cars can race whatever their builds; if yours differs from the host's, it says which versions.
   **Two players on this PC** splits the screen side by side or one above the other, or gives each player a screen of their own, picked from a list. Each player has their side of the keyboard in a race: player 1, on the left, **W A S D**,
   **Q** for items, **E** the handbrake and **R** the view; player 2, on the right, the **arrow keys**, **right Ctrl** for items (and to pick in the menus), **right Shift** the handbrake and **/** the view. A controller if there is one for them; with two controllers each player has one.
-- **Options, Camera, window, updates:** the camera's view, full screen or a window, the mini-map, **Sky in races** (off by default: the sky goes for the race and comes back when it ends), and **Updates**: when to check (on launch by default, weekly or manually) and whether a new version installs itself or asks first.
+- **Options, Camera:** every camera setting on one page -- **Outdoors** (Auto, Classic, or Auto in a car), **Indoors** (Follow or
+  Classic), **Movie camera** (the cut scenes' own angles) and **Race view** (inside the car, just behind, further back).
+- **Options, Window and updates:** full screen or a window, the mini-map, **Sky in races** (off by default: the sky goes for the race and comes back when it ends), and **Updates**: when to check (on launch by default, weekly or manually) and whether a new version installs itself or asks first.
 - **Track select** (for now behind a code): choosing it asks for the code -- type the digits (the keyboard's row or its keypad; each
   shows as a star, Backspace takes one back), **Enter** to open, **Esc** back. A wrong code says "Wrong code" and empties; the right
   one (**1234**) opens Track select for the rest of the run (it isn't kept: the next start asks again). The code is the installer's
@@ -263,12 +265,12 @@ The main menu: **Story Mode** (greyed until the full game), **Racing**, the game
     Ghosts are text files in `User\LBA2\GHOSTS\`: yours are named after the track (`Otringal.ghost`), other people's
     `<track> - <name>.ghost`. "Your best lap" is always your own.
 - **Mini-map**: a small map of the whole track in the bottom-right corner while you race, with a dot for every car -- yours the big
-  yellow one, each monster its own colour. Options > **Camera, window, updates** > **Mini-map: On / Off** turns it off or back on
+  yellow one, each monster its own colour. Options > **Window and updates** > **Mini-map: On / Off** turns it off or back on
   (`minimap=` in `RACEGAME_SETTINGS.TXT`; on at first). It is hidden behind the menu and the pause, and once you finish.
 - **Camera**: three views -- **inside the car** (the driver's view: the car itself isn't drawn, and the view climbs and dips with
   it on the temple's ramps and stairs), **just behind** (the camera as it was up to 2026-10-20) and **further back** (farther behind
   and higher: the car smaller and lower in the picture, more of the road ahead in view; the first time). **V** (a pad's **Back**
-  button) goes round them during a race, the view's name shown a moment; Options > **Camera, window, updates** > **Camera** too
+  button) goes round them during a race, the view's name shown a moment; Options > **Camera** > **Race view** too
   (Enter goes round them). The last one chosen is kept (`camera=0|1|2` in `RACEGAME_SETTINGS.TXT`).
 
 The first time: before the first race or time trial a **Controls** page, and before the first race a **Power-ups** page (every power-up
@@ -280,7 +282,7 @@ handbrake (a pad's **B** button): hold it into a tight corner and steer -- the b
 some speed -- then let go and the tyres grip again, the car pointing down the road. The gears change by themselves. **Shift** (a pad's **Y**) opens
 the inventory in the car when you're driving about, though not during a race. **V** changes the camera's view, P to pause, Esc
 for the menu. **F11** or **Alt+Enter** switches between full screen and a window at any time (also
-Options > **Camera, window, updates**;
+Options > **Window and updates**;
 kept in `lba2.cfg`). In a window the game fills the window whatever its shape: resize or maximise it and the menus, the race and
 its display are laid out to fit, with no black bars. The window's size, and whether it was maximised, is remembered for the next start
 (`WindowWidth`, `WindowHeight`, `WindowMaximized` in `User\LBA2\lba2.cfg`). Full screen is unchanged.
