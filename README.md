@@ -66,8 +66,8 @@ The game updates from the newest release on GitHub, <https://github.com/P-h-r-e-
 
 ## The game
 
-The main menu: **Story Mode** (greyed until the full game), **Racing**, the game's own **Options** (with **Camera**, **Race controls,
-power-ups**, **Window and updates** and **Feedback** at the end), **Quit**. **Racing** holds **Track select**, **Specials**, **Multiplayer**, **Best laps** and **Shared tracks**.
+The main menu: **Story Mode** (greyed until the full game), **Racing**, the game's own **Options** (with **Camera**, **Window and
+updates** and **Feedback** at the end; every key is on **Controls**), **Quit**. **Racing** holds **Track select**, **Specials**, **Multiplayer**, **Best laps** and **Shared tracks**.
 **Esc** in a race or time trial opens the pause menu instead: **Resume Game**, **Restart**, **Change car**, **Change track** and **Main menu** (Esc goes back, and Esc there resumes). Online and in the story, Esc opens the main menu with **Resume Game** at the top.
 **Feedback** (in Options) holds **Report bug**, which takes a short description (up to 120 characters) and puts it on this project's public GitHub page with the game's logs, with names, folders and addresses removed first, and **Request feature**, which does the same with your idea and sends no logs.
 **Quit** asks first, "Quit the game?": **No** (the row it opens on, or **Esc**) goes back, **Yes** leaves. The window's X closes the game straight away.
@@ -284,8 +284,8 @@ power-ups**, **Window and updates** and **Feedback** at the end), **Quit**. **Ra
   (Enter goes round them). The last one chosen is kept (`camera=0|1|2` in `RACEGAME_SETTINGS.TXT`).
 
 The first time: before the first race or time trial a **Controls** page, and before the first race a **Power-ups** page (every power-up
-of the track in its item box, with what it does). Enter turns the pages, Esc skips them; they don't come back by themselves, but
-Options shows them again.
+of the track in its item box, with what it does) -- in Story Mode as the first race with power-ups lines up on its grid. Enter turns
+the pages, Esc skips them; they show once. Every key, on foot and in the car, is on Options > **Controls**.
 
 Driving (the keys as they come; Options > Controls changes any of them, and the Controls page shows them as set): the arrow keys,
 **Ctrl** uses the power-up in the item box (the behaviour menu has no use in the car), **Z** is the
