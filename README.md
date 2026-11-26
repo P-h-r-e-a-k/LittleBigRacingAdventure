@@ -80,7 +80,15 @@ power-ups**, **Window and updates** and **Feedback** at the end), **Quit**. **Ra
   random if the host turned it off, then the race and back to the lobby, where more people can join. Type in the lobby to chat: Enter sends, Esc clears. You can also join a race that has already started. Cars touch, and power-ups work between players: mushrooms, balls, penguins, oil and lightning all reach the others.
   Online times don't go in Best laps. Games with the same tracks and cars can race whatever their builds; if yours differs from the host's, it says which versions.
   **Two players on this PC** splits the screen side by side or one above the other, or gives each player a screen of their own, picked from a list. Each player has their side of the keyboard in a race: player 1, on the left, **W A S D**,
-  **Q** for items, **E** the handbrake and **R** the view; player 2, on the right, the **arrow keys**, **right Ctrl** for items (and to pick in the menus), **right Shift** the handbrake and **/** the view. A controller if there is one for them; with two controllers each player has one.
+  **Q** for items, **E** the handbrake and **R** the view; player 2, on the right, the **arrow keys**, **right Ctrl** for items (and to pick in the menus), **right Shift** the handbrake and **/** the view (each player's keys can be changed: Options > **Controls** > **Two players, one keyboard**). A controller if there is one for them; with two controllers each player has one.
+- **Options, Controls:** every control can be changed, on the keyboard and on a controller, and **on foot** and **in the car** separately,
+  so one key can do one thing while Twinsen walks and another while he drives: **Keyboard: on foot**, **Keyboard: in the car**,
+  **Controller: on foot**, **Controller: in the car**, and **Two players, one keyboard**. Each page lists its actions with two keys
+  each: pick one and press the new key (Esc, or a pad's B, keeps the old one). A key already used on the same page is refused; on foot
+  and in the car are separate pages, so sharing a key between them is fine. **Default Configuration** puts that page back as it came,
+  **Accept Configuration** keeps the changes (saved at once, in `lba2.cfg`). In the car every action not on the car's page works as on
+  foot, unless its key was given to a car action. The menus always take the arrows, Enter and Esc, whatever is changed.
+- **Menus with a controller:** **A** picks, **B** goes back, **Start** closes the menu.
 - **Options, Camera:** every camera setting on one page -- **Outdoors** (Auto, Classic, or Auto in a car), **Indoors** (Follow or
   Classic), **Movie camera** (the cut scenes' own angles) and **Race view** (inside the car, just behind, further back).
 - **Options, Window and updates:** full screen or a window, the mini-map, **Sky in races** (off by default: the sky goes for the race and comes back when it ends), and **Updates**: when to check (on launch by default, weekly or manually) and whether a new version installs itself or asks first.
@@ -279,7 +287,8 @@ The first time: before the first race or time trial a **Controls** page, and bef
 of the track in its item box, with what it does). Enter turns the pages, Esc skips them; they don't come back by themselves, but
 Options shows them again.
 
-Driving: the arrow keys, **Ctrl** uses the power-up in the item box (the behaviour menu has no use in the car), **Z** is the
+Driving (the keys as they come; Options > Controls changes any of them, and the Controls page shows them as set): the arrow keys,
+**Ctrl** uses the power-up in the item box (the behaviour menu has no use in the car), **Z** is the
 handbrake (a pad's **B** button): hold it into a tight corner and steer -- the back of the car steps out and it slides round, losing
 some speed -- then let go and the tyres grip again, the car pointing down the road. The gears change by themselves. **Shift** (a pad's **Y**) opens
 the inventory in the car when you're driving about, though not during a race. **V** changes the camera's view, P to pause, Esc
