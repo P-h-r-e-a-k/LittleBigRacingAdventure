@@ -1,7 +1,9 @@
 ﻿# The game's own pictures, drawn here (nothing of the retail games in them):
 #   Game\menu.png       the main menu's backdrop, 640x480 -- the installer puts it in its copy of SCREEN.HQR (entry 4, the menu picture)
 #                       in LBA2's own palette
-#   Installer\lbra.ico  the installer's and the game's icon: a chequered flag on a badge
+#   Installer\lbra.ico  the installer's and the game's icon: Twinsen's head and shoulders in his racing overalls, no helmet, on a badge
+#                       with a chequered flag behind him (tools\art: his portraits, drawn from the game's own body by LBAAssembler's
+#                       BodyPipeline -- portrait <game> 1 twinsen_portrait.png 512 -28 0.40, and twinsen_face.png 256 -20 0.26 for 16/32)
 # A year-round racing look since 2026-11-25 (the user: "we need to update the menus it's still halloween themed, it all needs updating
 # including the app icon" -- a racing theme with no season, the name Little Big Racing Adventure): an island race road at sunset, a
 # start gantry across it, chequered flags either side of the title. (Until then: a Halloween night, pumpkins, bats, a witch.)
@@ -167,7 +169,10 @@ $bmp.Save($menu, [System.Drawing.Imaging.ImageFormat]::Png)
 $bmp.Dispose()
 "menu: $menu"
 
-# ---- the icon: a chequered flag on a round badge, deep blue with a red rim ------------------------------------------------------------
+# ---- the icon: Twinsen in his racing overalls on a round badge, deep blue with a red rim, a chequered flag behind him ----------------
+# (the user, 2026-11-25: "generate new app icon. Twinsen's head in his racing overalls, but no helmet"; until then the flag alone)
+$portrait = [System.Drawing.Image]::FromFile((Join-Path $PSScriptRoot 'art\twinsen_portrait.png'))
+$face = [System.Drawing.Image]::FromFile((Join-Path $PSScriptRoot 'art\twinsen_face.png'))
 $sizes = 256, 64, 48, 32, 16
 $pngs = @()
 foreach ($s in $sizes) {
@@ -179,15 +184,24 @@ foreach ($s in $sizes) {
     $gi.FillEllipse((New-Object System.Drawing.SolidBrush (C 206 30 34)), [float]0.5, [float]0.5, [float]($s - 1), [float]($s - 1))
     $inner = New-Object System.Drawing.Drawing2D.LinearGradientBrush (New-Object System.Drawing.RectangleF 0, 0, $s, $s), (C 40 64 140), (C 12 20 52), ([System.Drawing.Drawing2D.LinearGradientMode]::Vertical)
     $gi.FillEllipse($inner, [float]$rim, [float]$rim, [float]($s - 2 * $rim), [float]($s - 2 * $rim))
-    # (fewer squares at the small sizes: they stay squares)
-    $cols = if ($s -ge 48) { 5 } else { 4 }; $rows = if ($s -ge 48) { 4 } else { 3 }
-    $fw = $s * 0.58; $fh = $s * 0.4
-    $fx = $s * 0.27; $fy = $s * 0.24
-    # the pole, then the flag off its top
-    $pole = New-Object System.Drawing.SolidBrush (C 236 220 160)
-    $pw = [Math]::Max(1, $s * 0.05)
-    $gi.FillRectangle($pole, [float]($fx - $pw), [float]($fy - $s * 0.02), [float]$pw, [float]($s * 0.62))
-    Flag $gi $fx $fy $fw $fh $cols $rows ([Math]::Max(0.6, $s * 0.035)) 0.4
+    # (inside the rim only from here: the flag and Twinsen cut off round it)
+    $clip = New-Object System.Drawing.Drawing2D.GraphicsPath
+    $clip.AddEllipse([float]$rim, [float]$rim, [float]($s - 2 * $rim), [float]($s - 2 * $rim))
+    $gi.SetClip($clip)
+    $gi.InterpolationMode = 'HighQualityBicubic'
+    if ($s -ge 48) {
+        # the flag behind him, over his shoulder (fewer squares at the small sizes: they stay squares)
+        $cols = if ($s -ge 64) { 5 } else { 4 }; $rows = if ($s -ge 64) { 4 } else { 3 }
+        Flag $gi ($s * 0.50) ($s * 0.13) ($s * 0.52) ($s * 0.36) $cols $rows ([Math]::Max(0.6, $s * 0.03)) 0.4
+        # head and shoulders, the overalls running off the badge's bottom
+        $pw = $s * 0.90
+        $gi.DrawImage($portrait, [float](($s - $pw) / 2 - $s * 0.04), [float]($s * 0.12), [float]$pw, [float]$pw)
+    } else {
+        # (16 and 32: his face alone, as big as the badge takes, else it is a smudge)
+        $pw = $s * 0.98
+        $gi.DrawImage($face, [float](($s - $pw) / 2), [float]($s * 0.06), [float]$pw, [float]$pw)
+    }
+    $gi.ResetClip()
     $gi.Dispose()
     $ms = New-Object System.IO.MemoryStream
     $b.Save($ms, [System.Drawing.Imaging.ImageFormat]::Png)
@@ -212,4 +226,5 @@ foreach ($p in $pngs) { $wr.Write($p) }
 $wr.Flush()
 $icon = Join-Path $root 'Installer\lbra.ico'
 [System.IO.File]::WriteAllBytes($icon, $ico.ToArray())
+$portrait.Dispose(); $face.Dispose()
 "icon: $icon"

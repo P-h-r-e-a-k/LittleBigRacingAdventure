@@ -4,7 +4,9 @@ Kart races across the islands of *Little Big Adventure 2* -- a track on every is
 time trials, ghosts and two-player races -- played on LBA Assembler's LBA2 engine with a menu of its own in the retail game's style. It
 began on 2026-10-17 as *Little Big Halloween Racing Adventure*, a Halloween special (a kart race through the Temple of Bù from *Little Big
 Adventure*, rebuilt as an island in LBA2 and decked out for Halloween); that race is still in it, under Specials. Since 2026-11-25 the
-menu, the installer and the icon have a year-round racing look (an island road at sunset, chequered flags), drawn by `tools\make_art.ps1`.
+menu, the installer and the icon have a year-round racing look (an island road at sunset, chequered flags), drawn by `tools\make_art.ps1`;
+the icon is Twinsen's head and shoulders in his racing overalls, no helmet, in front of a chequered flag (his portraits in `tools\art`,
+drawn from the game's own body).
 
 The game is made on the player's machine from their own copies of LBA1 and LBA2: nothing of either game is in this repo or in the
 installer.
